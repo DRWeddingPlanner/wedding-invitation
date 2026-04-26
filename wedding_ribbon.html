@@ -1,0 +1,2202 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title data-key="site_title">Tom & Rainy ｜ 2024.11.02</title>
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,200;0,300;0,400;1,200;1,300&family=Noto+Serif+TC:wght@200;300;400&display=swap" rel="stylesheet">
+<link id="extraFont" rel="stylesheet" href="">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
+<style>
+*{margin:0;padding:0;box-sizing:border-box}
+:root{
+  --bg:#0C0906;--bg2:#120E0A;--bg3:#1A1410;--bg4:#201810;
+  --cream:#EDE4D4;--cream2:#D4C9B5;--muted:#8C7B68;
+  --gold:#C4A44A;--gold2:#A88A35;--gold-dim:rgba(196,164,74,0.12);
+  --border:rgba(196,164,74,0.25);--border2:rgba(196,164,74,0.1);
+  --green:#5a9e6a;--red:#9e5a5a;
+}
+html{scroll-behavior:smooth}
+body{background:var(--bg);color:var(--cream);font-family:'Noto Serif TC',serif;overflow-x:hidden;}
+body::before{content:'';position:fixed;inset:0;z-index:0;background:radial-gradient(ellipse at 20% 10%,rgba(196,164,74,0.04) 0%,transparent 50%),radial-gradient(ellipse at 80% 90%,rgba(196,164,74,0.03) 0%,transparent 50%);pointer-events:none;}
+
+/* NAV */
+#topNav{position:fixed;top:0;left:0;right:0;z-index:900;height:56px;display:flex;align-items:center;justify-content:space-between;padding:0 28px;transition:background 0.4s;}
+#topNav.scrolled{background:rgba(12,9,6,0.92);backdrop-filter:blur(14px);border-bottom:1px solid var(--border2);}
+.nav-logo{font-family:'Cormorant Garamond',serif;font-size:1rem;color:var(--gold);letter-spacing:3px;font-style:italic;}
+.nav-links{display:flex;gap:2px;}
+.nav-a{background:none;border:none;font-family:'Noto Serif TC',serif;font-size:0.7rem;color:var(--muted);padding:6px 12px;cursor:pointer;letter-spacing:2px;transition:color 0.2s;}
+.nav-a:hover,.nav-a.active{color:var(--gold);}
+@media(max-width:600px){.nav-links{display:none;}}
+
+/* SECTIONS */
+section{padding:100px 24px 80px;position:relative;z-index:1;}
+.sec-center{max-width:560px;margin:0 auto;}
+.sec-wide{max-width:900px;margin:0 auto;}
+.sec-tag{display:block;font-size:0.6rem;letter-spacing:8px;color:var(--gold);text-transform:uppercase;margin-bottom:16px;text-align:center;}
+.sec-title{font-family:'Cormorant Garamond',serif;font-size:clamp(2rem,5vw,3.2rem);font-weight:200;letter-spacing:3px;color:var(--cream);text-align:center;margin-bottom:12px;}
+.sec-desc{text-align:center;font-size:0.78rem;color:var(--muted);letter-spacing:1px;line-height:2;margin-bottom:40px;}
+.gold-line{display:block;width:50px;height:1px;background:var(--gold);margin:24px auto;opacity:0.5;}
+.reveal{opacity:0;transform:translateY(28px);transition:opacity 0.8s ease,transform 0.8s ease;}
+.reveal.visible{opacity:1;transform:translateY(0);}
+
+/* HEADER */
+#s-header{min-height:100vh;display:flex;align-items:center;justify-content:center;text-align:center;padding:80px 24px;}
+.header-tag{font-size:0.6rem;letter-spacing:8px;color:var(--gold);text-transform:uppercase;margin-bottom:20px;font-family:'Cormorant Garamond',serif;}
+.header-names{font-family:'Cormorant Garamond',serif;font-size:clamp(3.5rem,12vw,8rem);font-weight:200;color:var(--cream);letter-spacing:4px;line-height:1;margin-bottom:12px;}
+.header-amp{color:var(--gold);font-style:italic;}
+.h-divider{display:flex;align-items:center;gap:16px;margin:20px auto;justify-content:center;}
+.h-line{height:1px;width:60px;background:linear-gradient(to right,transparent,var(--gold));}
+.h-line.r{background:linear-gradient(to left,transparent,var(--gold));}
+.h-star{color:var(--gold);font-size:0.75rem;}
+.header-date{font-size:0.78rem;letter-spacing:5px;color:var(--cream2);margin-bottom:20px;}
+.parents-row{display:flex;align-items:center;justify-content:center;gap:20px;flex-wrap:wrap;}
+.parents-block{text-align:center;}
+.parents-label{font-size:0.55rem;letter-spacing:4px;color:var(--gold);text-transform:uppercase;margin-bottom:5px;}
+.parents-names{font-family:'Cormorant Garamond',serif;font-size:0.9rem;font-weight:300;color:var(--muted);letter-spacing:2px;}
+.parents-sep{color:rgba(196,164,74,0.3);font-size:0.7rem;}
+.scroll-hint{position:absolute;bottom:32px;left:50%;transform:translateX(-50%);font-size:0.6rem;letter-spacing:4px;color:var(--muted);text-align:center;}
+.scroll-line{width:1px;height:36px;background:linear-gradient(to bottom,transparent,var(--gold));margin:8px auto 0;animation:pulse 2s infinite;}
+@keyframes pulse{0%,100%{opacity:0.3}50%{opacity:1}}
+
+/* INFO CARD */
+#s-info{background:var(--bg2);}
+.info-card{border:1px solid var(--border);background:rgba(26,20,16,0.5);padding:28px 32px;}
+.info-item{display:flex;align-items:baseline;padding:13px 0;border-bottom:1px solid var(--border2);}
+.info-item:last-child{border-bottom:none;}
+.i-label{font-size:0.58rem;letter-spacing:4px;color:var(--gold);text-transform:uppercase;width:76px;flex-shrink:0;padding-top:3px;}
+.i-val{font-family:'Cormorant Garamond',serif;font-size:1.1rem;font-weight:300;color:var(--cream);letter-spacing:2px;flex:1;line-height:1.4;}
+.i-sub{font-size:0.66rem;color:var(--muted);letter-spacing:1px;margin-top:3px;}
+
+/* COUNTDOWN */
+#s-countdown{background:var(--bg);text-align:center;}
+.count-grid{display:flex;justify-content:center;gap:0;margin:40px auto;}
+.count-item{text-align:center;min-width:100px;}
+.count-num{font-family:'Cormorant Garamond',serif;font-size:clamp(3.5rem,10vw,6.5rem);font-weight:200;color:var(--cream);line-height:1;display:block;}
+.count-label{font-size:0.58rem;letter-spacing:4px;color:var(--gold);text-transform:uppercase;margin-top:6px;}
+.count-sep{font-family:'Cormorant Garamond',serif;font-size:4rem;font-weight:200;color:rgba(196,164,74,0.3);line-height:1;padding-top:8px;user-select:none;}
+.countdown-over{font-family:'Cormorant Garamond',serif;font-size:2.5rem;font-weight:200;color:var(--gold);letter-spacing:4px;font-style:italic;}
+@media(max-width:480px){.count-item{min-width:64px;}.count-sep{display:none;}.count-grid{gap:8px;}.count-num{font-size:3.2rem;}}
+
+/* RSVP */
+#s-rsvp{background:var(--bg2);}
+.card{border:1px solid var(--border);background:rgba(26,20,16,0.5);padding:36px 32px;}
+.card-title{font-family:'Cormorant Garamond',serif;font-size:1.4rem;font-weight:300;color:var(--cream);letter-spacing:3px;margin-bottom:6px;}
+.card-sub{font-size:0.72rem;color:var(--muted);letter-spacing:1px;line-height:1.8;margin-bottom:28px;}
+.attend-toggle{display:flex;margin-bottom:24px;}
+.a-btn{flex:1;padding:12px;font-size:0.73rem;letter-spacing:3px;cursor:pointer;font-family:'Noto Serif TC',serif;border:1px solid var(--border);background:transparent;color:var(--muted);transition:all 0.3s;}
+.a-btn.active{background:var(--gold);border-color:var(--gold);color:var(--bg);}
+.fg{margin-bottom:20px;}
+.fl{display:block;font-size:0.58rem;letter-spacing:4px;color:var(--gold);text-transform:uppercase;margin-bottom:9px;}
+.fi{width:100%;background:transparent;border:none;border-bottom:1px solid var(--border);padding:9px 0;font-size:0.88rem;font-family:'Noto Serif TC',serif;color:var(--cream);outline:none;transition:border-color 0.3s;}
+.fi:focus{border-color:var(--gold);}
+.fi::placeholder{color:var(--muted);font-size:0.78rem;}
+.frow{display:grid;grid-template-columns:1fr 1fr;gap:18px;}
+.fsel{width:100%;background:var(--bg3);border:1px solid var(--border);padding:10px 14px;font-size:0.83rem;font-family:'Noto Serif TC',serif;color:var(--cream);outline:none;cursor:pointer;-webkit-appearance:none;background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='6'%3E%3Cpath d='M0 0l5 6 5-6z' fill='%238C7B68'/%3E%3C/svg%3E");background-repeat:no-repeat;background-position:right 12px center;}
+.fsel option{background:var(--bg3);}
+.fta{width:100%;background:transparent;border:1px solid var(--border);padding:11px 14px;font-size:0.83rem;font-family:'Noto Serif TC',serif;color:var(--cream);outline:none;resize:none;height:80px;transition:border-color 0.3s;}
+.fta:focus{border-color:var(--gold);}
+.fta::placeholder{color:var(--muted);font-size:0.76rem;}
+.hg{display:none;}.hg.show{display:block;}
+.hgrow{display:none;}.hgrow.show{display:grid;grid-template-columns:1fr 1fr;gap:18px;}
+.check-group{display:flex;flex-direction:column;gap:7px;}
+.ci{display:flex;align-items:center;gap:10px;padding:8px 12px;border:1px solid var(--border2);cursor:pointer;transition:border-color 0.2s;}
+.ci:hover{border-color:var(--border);}
+.ci input[type=checkbox]{appearance:none;-webkit-appearance:none;width:15px;height:15px;border:1px solid var(--border);background:transparent;cursor:pointer;flex-shrink:0;position:relative;transition:all 0.2s;}
+.ci input[type=checkbox]:checked{background:var(--gold);border-color:var(--gold);}
+.ci input[type=checkbox]:checked::after{content:'✓';position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);font-size:9px;color:var(--bg);}
+.ci label{font-size:0.8rem;color:var(--cream2);cursor:pointer;flex:1;letter-spacing:1px;}
+.radio-grp{display:flex;gap:0;}
+.rb{flex:1;padding:10px;font-size:0.75rem;letter-spacing:2px;cursor:pointer;font-family:'Noto Serif TC',serif;border:1px solid var(--border);background:transparent;color:var(--muted);transition:all 0.3s;}
+.rb.active{background:var(--gold-dim);border-color:var(--gold);color:var(--gold);}
+.btn-gold{width:100%;background:transparent;border:1px solid var(--gold);color:var(--gold);padding:15px;font-size:0.76rem;font-family:'Noto Serif TC',serif;letter-spacing:4px;cursor:pointer;transition:all 0.3s;margin-top:4px;}
+.btn-gold:hover{background:var(--gold);color:var(--bg);}
+.btn-ghost{width:100%;background:transparent;border:1px solid var(--border);color:var(--cream2);padding:12px;font-size:0.73rem;font-family:'Noto Serif TC',serif;letter-spacing:3px;cursor:pointer;transition:all 0.3s;text-decoration:none;display:block;text-align:center;}
+.btn-ghost:hover{border-color:var(--gold);color:var(--gold);}
+.or-div{display:flex;align-items:center;gap:12px;font-size:0.68rem;color:var(--muted);letter-spacing:2px;margin:16px 0;}
+.or-div::before,.or-div::after{content:'';flex:1;height:1px;background:var(--border2);}
+.rsvp-ok{display:none;text-align:center;padding:20px 0;animation:fadeUp 0.5s ease;}
+.rsvp-ok.show{display:block;}
+@keyframes fadeUp{from{opacity:0;transform:translateY(12px)}to{opacity:1;transform:translateY(0)}}
+.ok-icon{font-size:2.8rem;margin-bottom:14px;}
+.ok-title{font-family:'Cormorant Garamond',serif;font-size:1.8rem;font-weight:300;font-style:italic;color:var(--gold);letter-spacing:3px;margin-bottom:10px;}
+.ok-msg{font-size:0.76rem;color:var(--muted);letter-spacing:1px;line-height:2;}
+.sync-note{font-size:0.62rem;color:var(--muted);text-align:center;margin-top:12px;letter-spacing:1px;}
+.sync-note.ok{color:var(--green);}
+.sync-note.err{color:var(--red);}
+
+/* CHECKIN */
+#s-checkin{background:var(--bg);}
+.step-indicator{display:flex;align-items:center;justify-content:center;gap:0;margin-bottom:40px;}
+.st-circle{width:30px;height:30px;border-radius:50%;border:1px solid var(--border);display:flex;align-items:center;justify-content:center;font-family:'Cormorant Garamond',serif;font-size:0.82rem;color:var(--muted);transition:all 0.4s;}
+.st-circle.active{border-color:var(--gold);color:var(--gold);box-shadow:0 0 16px rgba(196,164,74,0.2);}
+.st-circle.done{background:var(--gold);border-color:var(--gold);color:var(--bg);}
+.st-label{font-size:0.58rem;letter-spacing:3px;color:var(--muted);margin-top:6px;text-align:center;white-space:nowrap;transition:color 0.4s;}
+.st-label.active{color:var(--gold);}
+.st-wrap{display:flex;flex-direction:column;align-items:center;}
+.st-conn{width:48px;height:1px;background:var(--border);margin-bottom:22px;position:relative;overflow:hidden;}
+.st-conn-fill{position:absolute;left:0;top:0;bottom:0;background:var(--gold);width:0%;transition:width 0.5s ease;}
+/* Step panels */
+.step-panel{display:none;animation:fadeUp 0.4s ease;}
+.step-panel.active{display:block;}
+/* Search */
+.name-input-big{width:100%;background:transparent;border:none;border-bottom:1px solid var(--border);padding:14px 0;font-size:1.1rem;font-family:'Cormorant Garamond',serif;color:var(--cream);outline:none;letter-spacing:2px;text-align:center;transition:border-color 0.3s;}
+.name-input-big:focus{border-color:var(--gold);}
+.name-input-big::placeholder{color:var(--muted);font-size:0.9rem;letter-spacing:3px;}
+.input-hint{font-size:0.65rem;color:var(--muted);letter-spacing:2px;text-align:center;margin:8px 0 28px;}
+/* Seat card */
+.seat-card{border:1px solid var(--border);background:rgba(26,20,16,0.6);padding:36px;text-align:center;position:relative;}
+.seat-card::before{content:'';position:absolute;inset:0;background:radial-gradient(ellipse at 50% 0%,rgba(196,164,74,0.05),transparent 60%);pointer-events:none;}
+.seat-welcome{font-size:0.58rem;letter-spacing:7px;color:var(--gold);text-transform:uppercase;margin-bottom:12px;}
+.seat-guest{font-family:'Cormorant Garamond',serif;font-size:2rem;font-weight:300;color:var(--cream);letter-spacing:3px;margin-bottom:28px;}
+.seat-table-frame{display:inline-flex;flex-direction:column;align-items:center;border:1px solid var(--border);padding:24px 48px;margin-bottom:20px;position:relative;}
+.seat-table-frame::before,.seat-table-frame::after{content:'';position:absolute;width:7px;height:7px;border-color:var(--gold);border-style:solid;}
+.seat-table-frame::before{top:-1px;left:-1px;border-width:1px 0 0 1px;}
+.seat-table-frame::after{bottom:-1px;right:-1px;border-width:0 1px 1px 0;}
+.seat-num{font-family:'Cormorant Garamond',serif;font-size:5.5rem;font-weight:200;color:var(--gold);line-height:1;}
+.seat-num-label{font-size:0.58rem;letter-spacing:5px;color:var(--muted);text-transform:uppercase;margin-top:4px;}
+.seat-name-badge{display:inline-block;border:1px solid var(--border);padding:6px 20px;font-size:0.88rem;color:var(--cream2);letter-spacing:2px;margin-top:12px;}
+.seat-meta{font-size:0.7rem;color:var(--muted);letter-spacing:2px;margin-top:8px;}
+/* Not found */
+.not-found{text-align:center;padding:32px 0;}
+.not-found .nf-icon{font-size:2.4rem;margin-bottom:14px;}
+.not-found h3{font-family:'Cormorant Garamond',serif;font-size:1.4rem;color:var(--cream);letter-spacing:2px;margin-bottom:8px;}
+.not-found p{font-size:0.76rem;color:var(--muted);line-height:2;margin-bottom:20px;}
+/* Success */
+.success-card{border:1px solid var(--border);background:rgba(26,20,16,0.6);padding:40px;text-align:center;}
+.sc-icon{font-size:3rem;margin-bottom:18px;animation:bounce 0.6s ease;}
+@keyframes bounce{0%{transform:scale(0)}60%{transform:scale(1.2)}100%{transform:scale(1)}}
+.sc-welcome{font-size:0.6rem;letter-spacing:6px;color:var(--muted);text-transform:uppercase;margin-bottom:8px;}
+.sc-name{font-family:'Cormorant Garamond',serif;font-size:1.8rem;font-weight:300;color:var(--cream);letter-spacing:3px;margin-bottom:18px;}
+.sc-title{font-family:'Cormorant Garamond',serif;font-size:2.5rem;font-weight:200;color:var(--gold);font-style:italic;letter-spacing:4px;margin-bottom:10px;}
+.sc-msg{font-size:0.76rem;color:var(--muted);letter-spacing:1px;line-height:2.2;margin-bottom:24px;}
+.sc-recap{display:flex;border:1px solid var(--border);margin-bottom:20px;}
+.sc-recap-item{flex:1;padding:14px;text-align:center;border-right:1px solid var(--border);}
+.sc-recap-item:last-child{border-right:none;}
+.sc-recap-label{font-size:0.55rem;letter-spacing:4px;color:var(--gold);text-transform:uppercase;margin-bottom:6px;}
+.sc-recap-val{font-family:'Cormorant Garamond',serif;font-size:1.2rem;color:var(--cream);font-weight:300;}
+.sc-time{font-size:0.65rem;color:var(--gold2);letter-spacing:3px;margin-bottom:20px;}
+.btn-outline-sm{background:none;border:1px solid var(--border);color:var(--muted);padding:10px 28px;font-size:0.68rem;letter-spacing:3px;cursor:pointer;font-family:'Noto Serif TC',serif;transition:all 0.2s;}
+.btn-outline-sm:hover{border-color:var(--gold);color:var(--gold);}
+
+/* ADMIN */
+#s-admin{background:var(--bg2);display:none;}
+#s-admin.show{display:block;}
+.admin-login-card{max-width:380px;margin:0 auto;border:1px solid var(--border);background:rgba(26,20,16,0.5);padding:40px 32px;text-align:center;}
+.admin-dash{display:none;}.admin-dash.show{display:block;}
+.dash-header{display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:12px;margin-bottom:0;}
+.dash-title{font-family:'Cormorant Garamond',serif;font-size:1.6rem;font-weight:300;color:var(--cream);letter-spacing:2px;}
+/* Admin tabs */
+.admin-tabs{display:flex;gap:0;border-bottom:1px solid var(--border2);margin-bottom:28px;margin-top:16px;}
+.admin-tab{background:none;border:none;border-bottom:2px solid transparent;color:var(--muted);padding:10px 20px;font-size:0.75rem;letter-spacing:2px;cursor:pointer;font-family:'Noto Serif TC',serif;transition:all 0.2s;margin-bottom:-1px;}
+.admin-tab:hover{color:var(--cream);}
+.admin-tab.active{color:var(--gold);border-bottom-color:var(--gold);}
+.admin-tab-panel{display:none;}
+.admin-tab-panel.active{display:block;}
+/* Info editor fields */
+.info-edit-group{margin-bottom:20px;border:1px solid var(--border2);background:var(--bg3);}
+.info-edit-head{padding:10px 16px;background:var(--bg4);border-bottom:1px solid var(--border2);font-size:0.6rem;letter-spacing:4px;color:var(--gold);text-transform:uppercase;}
+.info-edit-row{display:grid;gap:0;border-bottom:1px solid var(--border2);}
+.info-edit-row:last-child{border-bottom:none;}
+.info-edit-row.cols2{grid-template-columns:1fr 1fr;}
+.info-edit-row.cols3{grid-template-columns:1fr 1fr 1fr;}
+.info-edit-cell{padding:12px 16px;border-right:1px solid var(--border2);}
+.info-edit-cell:last-child{border-right:none;}
+.info-edit-label{font-size:0.58rem;letter-spacing:3px;color:var(--gold);text-transform:uppercase;margin-bottom:7px;}
+.info-edit-input{width:100%;background:transparent;border:none;border-bottom:1px solid transparent;padding:3px 0;font-size:0.85rem;color:var(--cream);font-family:'Noto Serif TC',serif;outline:none;transition:border-color 0.2s;}
+.info-edit-input:focus{border-bottom-color:var(--gold);}
+.info-edit-input::placeholder{color:var(--muted);font-size:0.76rem;}
+.btn-tiny{background:none;border:1px solid var(--border);color:var(--muted);padding:7px 16px;font-size:0.65rem;letter-spacing:2px;cursor:pointer;font-family:'Noto Serif TC',serif;transition:all 0.2s;}
+.btn-tiny:hover{border-color:var(--gold);color:var(--gold);}
+.stats-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(130px,1fr));gap:10px;margin-bottom:28px;}
+.stat{border:1px solid var(--border);background:rgba(26,20,16,0.5);padding:18px;text-align:center;}
+.stat.hl{background:var(--gold-dim);border-color:rgba(196,164,74,0.4);}
+.stat-num{font-family:'Cormorant Garamond',serif;font-size:2.6rem;font-weight:200;color:var(--gold);line-height:1;}
+.stat-label{font-size:0.58rem;letter-spacing:3px;color:var(--muted);margin-top:7px;}
+.prog-wrap{background:rgba(196,164,74,0.1);height:3px;margin-top:7px;border-radius:2px;overflow:hidden;}
+.prog-fill{height:100%;background:var(--gold);border-radius:2px;transition:width 0.8s ease;}
+.dash-sec{font-size:0.58rem;letter-spacing:5px;color:var(--gold);text-transform:uppercase;margin-bottom:14px;margin-top:28px;}
+.tables-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(170px,1fr));gap:8px;margin-bottom:24px;}
+.t-item{border:1px solid var(--border);background:rgba(26,20,16,0.5);padding:13px 16px;display:flex;justify-content:space-between;align-items:center;}
+.t-item-left{}.t-name{font-size:0.82rem;color:var(--cream2);}.t-sub{font-size:0.65rem;color:var(--muted);margin-top:2px;}
+.t-num{font-family:'Cormorant Garamond',serif;font-size:1.7rem;color:var(--gold);font-weight:200;}
+.filter-row{display:flex;gap:6px;flex-wrap:wrap;margin-bottom:14px;}
+.fbtn{background:none;border:1px solid var(--border);color:var(--muted);padding:6px 14px;font-size:0.65rem;letter-spacing:2px;cursor:pointer;font-family:'Noto Serif TC',serif;transition:all 0.2s;}
+.fbtn.active,.fbtn:hover{border-color:var(--gold);color:var(--gold);}
+.gtbl{width:100%;border-collapse:collapse;font-size:0.78rem;}
+.gtbl th{border-bottom:1px solid var(--border);font-size:0.58rem;letter-spacing:3px;color:var(--gold);padding:10px 12px;text-align:left;text-transform:uppercase;background:var(--bg4);}
+.gtbl td{padding:9px 12px;color:var(--cream2);border-bottom:1px solid var(--border2);}
+.chip{display:inline-block;padding:2px 9px;font-size:0.65rem;letter-spacing:1px;border:1px solid;}
+.chip-y{border-color:#5a9e6a;color:#7dc98d;}.chip-n{border-color:#7a5a3a;color:#b58a5a;}
+
+/* FOOTER */
+footer{text-align:center;padding:60px 24px;border-top:1px solid var(--border2);position:relative;z-index:1;}
+.footer-logo{font-family:'Cormorant Garamond',serif;font-size:2.2rem;font-weight:200;color:var(--cream);letter-spacing:6px;font-style:italic;margin-bottom:12px;}
+.footer-sub{font-size:0.6rem;color:var(--muted);letter-spacing:4px;margin-bottom:32px;}
+.footer-links{display:flex;justify-content:center;gap:20px;flex-wrap:wrap;margin-bottom:32px;}
+.footer-link{font-size:0.65rem;letter-spacing:3px;color:var(--muted);cursor:pointer;text-decoration:none;background:none;border:none;transition:color 0.2s;}
+.footer-link:hover{color:var(--gold);}
+.footer-copy{font-size:0.58rem;color:rgba(139,123,104,0.5);letter-spacing:2px;}
+.admin-trigger{background:none;border:1px solid rgba(139,123,104,0.25);font-size:0.65rem;color:rgba(139,123,104,0.5);letter-spacing:2px;cursor:pointer;margin-top:20px;display:block;margin-left:auto;margin-right:auto;padding:8px 20px;transition:all 0.3s;}
+.admin-trigger:hover{color:var(--gold);border-color:var(--gold);}
+
+.invite-text{font-size:0.82rem;color:var(--muted);line-height:2.4;letter-spacing:1px;text-align:center;}
+/* SEAT ASSIGNMENT */
+.t-card{
+  flex-shrink:0;width:300px;
+  border:1px solid var(--border);
+  background:var(--bg3);
+  border-radius:2px;overflow:hidden;
+}
+.t-card-head{
+  background:var(--bg4);
+  padding:14px 16px;
+  display:flex;align-items:center;justify-content:space-between;
+  border-bottom:1px solid var(--border);
+}
+.t-card-num{
+  font-family:'Cormorant Garamond',serif;
+  font-size:1.1rem;font-weight:300;
+  color:var(--cream);letter-spacing:2px;
+}
+.t-card-count{
+  font-size:0.7rem;color:var(--gold);letter-spacing:2px;
+}
+.t-card-body{padding:14px 16px;}
+.t-name-input{
+  width:100%;background:transparent;
+  border:none;border-bottom:1px solid var(--border);
+  padding:7px 0;font-size:0.88rem;
+  font-family:'Noto Serif TC',serif;
+  color:var(--cream);outline:none;
+  margin-bottom:14px;letter-spacing:1px;
+}
+.t-name-input::placeholder{color:var(--muted);font-size:0.78rem;}
+.t-name-input:focus{border-color:var(--gold);}
+.t-capacity-row{
+  display:flex;align-items:center;gap:10px;
+  margin-bottom:14px;
+}
+.t-cap-label{font-size:0.6rem;letter-spacing:3px;color:var(--gold);text-transform:uppercase;}
+.t-counter{
+  display:flex;align-items:center;gap:0;
+  border:1px solid var(--border);
+  background:var(--bg2);
+  border-radius:2px;margin-left:auto;
+}
+.t-counter-btn{
+  background:none;border:none;color:var(--muted);
+  width:32px;height:32px;font-size:1.1rem;
+  cursor:pointer;transition:color 0.2s;
+  display:flex;align-items:center;justify-content:center;
+}
+.t-counter-btn:hover{color:var(--gold);}
+.t-counter-val{
+  font-family:'Cormorant Garamond',serif;
+  font-size:1.1rem;color:var(--cream);
+  min-width:32px;text-align:center;
+}
+.t-guest-list{display:flex;flex-direction:column;gap:6px;margin-bottom:14px;}
+.t-guest-row{
+  display:flex;align-items:center;gap:6px;
+}
+.t-guest-num{
+  font-size:0.68rem;color:var(--muted);
+  width:18px;flex-shrink:0;text-align:right;
+}
+.t-guest-name{
+  flex:1;background:transparent;border:none;
+  border-bottom:1px solid var(--border2);
+  padding:5px 0;font-size:0.82rem;
+  font-family:'Noto Serif TC',serif;
+  color:var(--cream);outline:none;
+  transition:border-color 0.2s;
+}
+.t-guest-name:focus{border-color:var(--gold);}
+.t-guest-name::placeholder{color:rgba(139,123,104,0.4);}
+.t-icon-btn{
+  background:none;border:1px solid var(--border2);
+  width:28px;height:28px;border-radius:2px;
+  cursor:pointer;font-size:0.85rem;
+  display:flex;align-items:center;justify-content:center;
+  transition:all 0.2s;flex-shrink:0;opacity:0.4;
+}
+.t-icon-btn.on{opacity:1;border-color:var(--gold);background:var(--gold-dim);}
+.t-footer-row{
+  display:grid;grid-template-columns:1fr 1fr;
+  gap:8px;margin-bottom:12px;
+  padding-top:12px;
+  border-top:1px solid var(--border2);
+}
+.t-footer-item{display:flex;flex-direction:column;align-items:center;gap:6px;}
+.t-footer-label{font-size:0.58rem;letter-spacing:3px;color:var(--gold);text-transform:uppercase;}
+.t-del-btn{
+  width:100%;background:none;
+  border:1px solid rgba(158,90,90,0.3);
+  color:rgba(158,90,90,0.6);
+  padding:8px;font-size:0.7rem;letter-spacing:2px;
+  cursor:pointer;font-family:'Noto Serif TC',serif;
+  transition:all 0.2s;
+}
+.t-del-btn:hover{border-color:var(--red);color:var(--red);}
+.t-card-mini{
+  flex-shrink:0;
+  border:1px solid var(--border);
+  background:var(--bg3);
+  padding:12px 16px;
+  display:flex;flex-direction:column;
+  align-items:center;justify-content:center;
+  min-width:80px;text-align:center;
+  gap:4px;
+}
+.t-card-mini-num{
+  font-family:'Cormorant Garamond',serif;
+  font-size:1.5rem;font-weight:200;
+  color:var(--gold);line-height:1;
+}
+.t-card-mini-label{
+  font-size:0.55rem;letter-spacing:2px;
+  color:var(--muted);
+}
+.t-card-mini-count{
+  font-size:0.72rem;color:var(--cream2);
+  letter-spacing:1px;margin-top:2px;
+}
+/* TRANSPORT */
+.transport-card{border:1px solid var(--border);background:rgba(26,20,16,0.5);overflow:hidden;}
+.transport-card-head{
+  display:flex;align-items:center;gap:14px;
+  padding:16px 20px;cursor:pointer;
+  transition:background 0.2s;
+}
+.transport-card-head:hover{background:var(--gold-dim);}
+.transport-icon{font-size:1.1rem;width:24px;text-align:center;flex-shrink:0;}
+.transport-label{font-size:0.88rem;color:var(--cream);letter-spacing:2px;flex:1;}
+.transport-arrow{
+  font-size:1.2rem;color:var(--gold);
+  transition:transform 0.3s;
+  display:inline-block;
+}
+.transport-arrow.open{transform:rotate(90deg);}
+.transport-card-body{
+  padding:0 20px 16px 58px;
+  border-top:1px solid var(--border2);
+  animation:fadeUp 0.3s ease;
+}
+.transport-card-body p{
+  font-size:0.82rem;color:var(--muted);
+  line-height:2.2;letter-spacing:1px;
+  white-space:pre-wrap;margin-top:14px;
+}
+.transport-map-btn{
+  display:flex;align-items:center;gap:12px;
+  padding:16px 20px;
+  border:1px solid var(--border);
+  background:rgba(26,20,16,0.5);
+  color:var(--cream2);text-decoration:none;
+  font-size:0.85rem;letter-spacing:2px;
+  transition:all 0.3s;
+}
+.transport-map-btn:hover{border-color:var(--gold);color:var(--gold);}
+/* SEAT MAP */
+.seat-map{margin:20px 0;padding:20px;border:1px solid var(--border2);background:var(--bg4);}
+.seat-map-title{font-size:0.6rem;letter-spacing:4px;color:var(--gold);text-transform:uppercase;margin-bottom:14px;text-align:center;}
+.seat-map-grid{display:flex;flex-wrap:wrap;gap:8px;justify-content:center;}
+.seat-map-table{width:72px;height:72px;border:1px solid var(--border);display:flex;flex-direction:column;align-items:center;justify-content:center;cursor:default;transition:all 0.2s;position:relative;}
+.seat-map-table.highlight{border-color:var(--gold);background:rgba(196,164,74,0.15);box-shadow:0 0 16px rgba(196,164,74,0.3);}
+.seat-map-table .smt-num{font-family:'Cormorant Garamond',serif;font-size:1.6rem;font-weight:200;color:var(--cream);line-height:1;}
+.seat-map-table.highlight .smt-num{color:var(--gold);}
+.seat-map-table .smt-name{font-size:0.52rem;color:var(--muted);letter-spacing:1px;margin-top:2px;text-align:center;padding:0 3px;}
+.seat-map-table.highlight .smt-name{color:var(--cream2);}
+.seat-map-table .smt-you{position:absolute;top:-8px;right:-6px;background:var(--gold);color:var(--bg);font-size:0.5rem;letter-spacing:1px;padding:2px 5px;}
+/* QR */
+.qr-section{border:1px solid var(--border);padding:24px;text-align:center;background:rgba(26,20,16,0.5);}
+.qr-wrap{display:inline-block;background:#fff;padding:12px;margin:16px auto;border-radius:4px;}
+/* Manual checkin btn */
+.btn-checkin-manual{background:none;border:1px solid var(--green);color:var(--green);padding:4px 12px;font-size:0.65rem;letter-spacing:1px;cursor:pointer;font-family:'Noto Serif TC',serif;transition:all 0.2s;white-space:nowrap;}
+.btn-checkin-manual:hover{background:var(--green);color:#fff;}
+.btn-checkin-manual.done{border-color:rgba(90,158,106,0.5);color:rgba(90,158,106,0.8);background:rgba(90,158,106,0.08);cursor:pointer;}
+.btn-checkin-manual.done:hover{border-color:var(--red);color:var(--red);background:rgba(158,90,90,0.08);}
+/* SPIN */
+.spin{display:inline-block;width:14px;height:14px;border:1px solid rgba(196,164,74,0.3);border-top-color:var(--gold);border-radius:50%;animation:_spin 0.8s linear infinite;vertical-align:middle;margin-right:7px;}
+@keyframes _spin{to{transform:rotate(360deg)}}
+
+@media(max-width:480px){
+  section{padding:80px 16px 60px;}
+  .card,.seat-card,.success-card,.admin-login-card{padding:24px 18px;}
+  .frow,.hgrow{grid-template-columns:1fr;}
+  .sc-recap{flex-direction:column;}
+  .sc-recap-item{border-right:none;border-bottom:1px solid var(--border);}
+  .sc-recap-item:last-child{border-bottom:none;}
+}
+</style>
+</head>
+<body>
+
+<!-- NAV -->
+<nav id="topNav">
+  <div class="nav-logo" data-key="nav_logo">DR Wedding</div>
+  <div class="nav-links">
+    <button class="nav-a" onclick="smoothTo('#s-info')">婚禮資訊</button>
+    <button class="nav-a" onclick="smoothTo('#s-rsvp')">出席回覆</button>
+    <button class="nav-a" onclick="smoothTo('#s-checkin')">座位查詢</button>
+  </div>
+</nav>
+
+<!-- HERO IMAGE -->
+<div id="heroImage" style="width:100%;height:60vh;min-height:280px;max-height:600px;overflow:hidden;position:relative;background:var(--bg3);display:flex;align-items:center;justify-content:center;cursor:pointer;" onclick="document.getElementById('heroImgInput').click()">
+  <img id="heroImg" src="" alt="" style="width:100%;height:100%;object-fit:cover;display:none;">
+  <div id="heroImgPlaceholder" style="text-align:center;color:var(--muted);">
+    <div style="font-size:2.5rem;margin-bottom:12px;opacity:0.4;">🖼</div>
+    <div style="font-size:0.65rem;letter-spacing:4px;color:var(--gold);text-transform:uppercase;">點擊上傳圖片</div>
+    <div style="font-size:0.6rem;color:var(--muted);margin-top:6px;letter-spacing:1px;">建議比例 16:9 或 3:1 橫幅</div>
+  </div>
+  <input type="file" id="heroImgInput" accept="image/*" style="display:none" onchange="loadHeroImg(event)">
+</div>
+
+<!-- HEADER -->
+<section id="s-header">
+  <div class="reveal">
+    <div class="header-tag" data-key="header_tag">Wedding Invitation</div>
+    <div class="header-names">
+      <span data-key="hero_name1">Tom</span>
+      <span class="header-amp"> &amp; </span>
+      <span data-key="hero_name2">Rainy</span>
+    </div>
+    <div class="parents-row">
+      <div class="parents-block">
+        <div class="parents-label" data-key="parents_groom_label">新郎父母</div>
+        <div class="parents-names" data-key="parents_groom">父親姓名 ・ 母親姓名</div>
+      </div>
+      <div class="parents-sep">✦</div>
+      <div class="parents-block">
+        <div class="parents-label" data-key="parents_bride_label">新娘父母</div>
+        <div class="parents-names" data-key="parents_bride">父親姓名 ・ 母親姓名</div>
+      </div>
+    </div>
+    <div class="scroll-hint" style="position:relative;bottom:auto;left:auto;transform:none;margin:28px auto 0;">scroll<div class="scroll-line"></div></div>
+    <div class="invite-letter reveal" style="max-width:520px;margin:24px auto 0;text-align:center;">
+      <div class="h-divider" style="margin:24px auto;"><div class="h-line"></div><div class="h-star">&#10022;</div><div class="h-line r"></div></div>
+      <p class="invite-text" data-key="invite_text">親愛的朋友們：<br>婚禮的日子一天天接近了<br>在這個對我們來說格外重要的時刻<br>誠摯地邀請您——我們珍惜的朋友<br>一同來見證與分享這份喜悅：)<br><br>在人生的每一段旅程中<br>因為有你們的陪伴與出現<br>才更加完整而溫暖<br><br>也因此，我們特別珍惜<br>能在這一天與你相聚的時光<br><br>為了讓您在婚禮當天能擁有愉快的體驗<br>想邀請您協助填寫以下資訊<br>讓我們能用心為您做好安排<br><br>無論當天是否方便出席<br>都很希望能收到您的回覆<br>或是一句簡單的祝福<br>對我們而言都意義非凡<br><br>期待與您相見的那一天<br>好久不見，我們婚禮見 🤍</p>
+    </div>
+  </div>
+  </div>
+</section>
+
+<!-- INFO -->
+<section id="s-info">
+  <div class="sec-center">
+    <span class="sec-tag reveal" data-key="info_tag">Wedding Details</span>
+    <div class="info-card reveal">
+      <div class="info-item">
+        <div class="i-label" data-key="info_date_label">日期</div>
+        <div><div class="i-val" data-key="info_date">2024 年 11 月 2 日（週六）</div></div>
+      </div>
+      <div class="info-item" id="ceremonyRow">
+        <div class="i-label" data-key="info_ceremony_label">儀式</div>
+        <div style="flex:1;display:flex;gap:24px;flex-wrap:wrap;">
+          <div>
+            <div class="i-val" data-key="save_ceremony_time">10：00</div>
+            <div class="i-sub" data-key="save_ceremony_sub">歡迎提早入座</div>
+          </div>
+          <div id="ceremonyVenueWrap">
+            <div class="i-val" data-key="ceremony_venue_name" style="font-size:0.95rem;"></div>
+            <div class="i-sub" data-key="ceremony_venue_addr"></div>
+          </div>
+        </div>
+      </div>
+      <div class="info-item">
+        <div class="i-label" data-key="info_banquet_label">宴席</div>
+        <div style="flex:1;display:flex;gap:24px;flex-wrap:wrap;">
+          <div>
+            <div class="i-val" data-key="save_banquet_time">12：00</div>
+            <div class="i-sub" data-key="save_banquet_sub">準時開席</div>
+          </div>
+          <div>
+            <div class="i-val" data-key="banquet_venue_name" style="font-size:0.95rem;"></div>
+            <div class="i-sub" data-key="banquet_venue_addr"></div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    </div>
+  </div>
+</section>
+
+<!-- TRANSPORT -->
+<section id="s-transport" style="background:var(--bg);padding:80px 24px;">
+  <div class="sec-center">
+    <span class="sec-tag reveal">How To Get Here</span>
+    <h2 class="sec-title reveal delay-1" data-key="transport_title">交通資訊</h2>
+    <span class="gold-line reveal delay-2"></span>
+
+    <div id="transportCards" class="reveal delay-2" style="display:flex;flex-direction:column;gap:12px;margin-top:8px;">
+
+      <!-- By Car -->
+      <div class="transport-card" id="tc-car">
+        <div class="transport-card-head" onclick="toggleTransport('car')">
+          <span class="transport-icon">🚗</span>
+          <span class="transport-label" data-key="transport_car_label">開車</span>
+          <span class="transport-arrow" id="ta-car">›</span>
+        </div>
+        <div class="transport-card-body" id="tb-car" style="display:none;">
+          <p data-key="transport_car_content">請填入開車交通說明</p>
+        </div>
+      </div>
+
+      <!-- Bus -->
+      <div class="transport-card" id="tc-bus">
+        <div class="transport-card-head" onclick="toggleTransport('bus')">
+          <span class="transport-icon">🚌</span>
+          <span class="transport-label" data-key="transport_bus_label">附近公車站牌</span>
+          <span class="transport-arrow" id="ta-bus">›</span>
+        </div>
+        <div class="transport-card-body" id="tb-bus" style="display:none;">
+          <p data-key="transport_bus_content">請填入公車站牌資訊</p>
+        </div>
+      </div>
+
+      <!-- Public Transit -->
+      <div class="transport-card" id="tc-transit">
+        <div class="transport-card-head" onclick="toggleTransport('transit')">
+          <span class="transport-icon">🚇</span>
+          <span class="transport-label" data-key="transport_transit_label">公共運輸</span>
+          <span class="transport-arrow" id="ta-transit">›</span>
+        </div>
+        <div class="transport-card-body" id="tb-transit" style="display:none;">
+          <p data-key="transport_transit_content">請填入捷運／公共運輸說明</p>
+        </div>
+      </div>
+
+      <!-- Google Map embed -->
+      <div id="transportMapBlock" style="display:none;">
+        <div style="position:relative;width:100%;padding-top:56%;border:1px solid var(--border);overflow:hidden;margin-top:4px;">
+          <iframe id="transportMapIframe"
+            style="position:absolute;top:0;left:0;width:100%;height:100%;border:none;filter:grayscale(20%) contrast(1.05);"
+            allowfullscreen loading="lazy" referrerpolicy="no-referrer-when-downgrade">
+          </iframe>
+        </div>
+        <div style="display:flex;justify-content:flex-end;margin-top:8px;">
+          <a id="transportMapExtLink" href="#" target="_blank"
+            style="font-size:0.65rem;color:var(--muted);letter-spacing:2px;text-decoration:none;transition:color 0.2s;"
+            onmouseover="this.style.color='var(--gold)'" onmouseout="this.style.color='var(--muted)'">
+            📍 在 Google Maps 中開啟 ↗
+          </a>
+        </div>
+      </div>
+
+    </div>
+  </div>
+</section>
+
+<!-- RSVP -->
+<section id="s-rsvp">
+  <div class="sec-center">
+    <span class="sec-tag reveal" data-key="rsvp_tag">RSVP</span>
+    <h2 class="sec-title reveal" data-key="rsvp_title">出席回覆</h2>
+    <span class="gold-line reveal"></span>
+    <div class="card reveal">
+      <div id="rsvpFormWrap">
+        <div class="attend-toggle">
+          <button class="a-btn active" onclick="setAttend('yes',this)" data-key="rsvp_yes_btn">一定出席！</button>
+          <button class="a-btn" onclick="setAttend('no',this)" data-key="rsvp_no_btn">無法出席</button>
+        </div>
+        <div class="fg"><label class="fl" data-key="rsvp_l_name">姓名</label><input type="text" class="fi" id="rsvpName" placeholder="請輸入您的中文全名"></div>
+        <div class="fg"><label class="fl">LINE ID / 手機號碼</label><input type="text" class="fi" id="rsvpContact" placeholder="請輸入LINE ID及手機號碼"></div>
+        <div id="attendFields">
+          <div class="fg" id="ceremonyAttendRow">
+            <label class="fl">是否參加儀式</label>
+            <div class="radio-grp">
+              <button class="rb active" onclick="setRadio('ceremony','yes',this)">參加儀式＋宴席</button>
+              <button class="rb" onclick="setRadio('ceremony','no',this)">僅參加宴席</button>
+            </div>
+          </div>
+          <div class="frow">
+            <div class="fg"><label class="fl" data-key="rsvp_l_adult">出席人數（含自己）</label><select class="fsel" id="rsvpAdult"><option>1</option><option>2</option><option>3</option><option>4</option><option>5</option><option>6</option><option>7</option><option>8</option></select></div>
+            <div class="fg"><label class="fl">兒童椅數量</label><select class="fsel" id="rsvpChildChair"><option>0</option><option>1</option><option>2</option><option>3</option><option>4</option></select></div>
+          </div>
+          <div class="fg"><label class="fl">素食人數</label><select class="fsel" id="rsvpVeg"><option>0</option><option>1</option><option>2</option><option>3</option><option>4</option><option>5</option><option>6</option><option>7</option><option>8</option><option>9</option><option>10</option></select></div>
+          <div class="fg">
+            <label class="fl">特殊飲食需求</label>
+            <div class="check-group">
+              <div class="ci"><input type="checkbox" id="diet0" value="無特殊需求" onchange="handleDietNone(this)"><label for="diet0">無特殊需求</label></div>
+              <div class="ci"><input type="checkbox" id="diet1" value="不吃牛"><label for="diet1">不吃牛</label></div>
+              <div class="ci"><input type="checkbox" id="diet2" value="不吃豬"><label for="diet2">不吃豬</label></div>
+              <div class="ci"><input type="checkbox" id="diet3" value="甲殼類過敏"><label for="diet3">甲殼類過敏</label></div>
+              <div class="ci"><input type="checkbox" id="diet4" value="其他" onchange="toggleDietOther(this)"><label for="diet4">其他</label></div>
+            </div>
+            <input type="text" class="fi" id="dietOther" placeholder="請說明其他飲食需求" style="margin-top:10px;display:none;">
+          </div>
+          <div class="fg"><label class="fl" data-key="rsvp_l_card">喜帖方式</label><select class="fsel" id="rsvpCard" onchange="handleCardChange(this)"><option value="no">不需要喜帖</option><option value="paper">需要紙本喜帖</option><option value="digital">需要電子喜帖</option></select></div>
+          <div class="fg hg" id="addrGroup"><label class="fl">郵遞區號 + 收件地址</label><input type="text" class="fi" id="rsvpAddr" placeholder="例：100 台北市中正區..."></div>
+          <div class="fg hg" id="emailGroup"><label class="fl">Email 信箱</label><input type="email" class="fi" id="rsvpEmail" placeholder="請輸入您的 Email 信箱"></div>
+        </div>
+        <div class="fg"><label class="fl" data-key="rsvp_l_msg">留言給新人</label><textarea class="fta" id="rsvpMsg" placeholder="有什麼想對我們說的？"></textarea></div>
+        <button class="btn-gold" onclick="submitRSVP()" data-key="rsvp_submit_btn">確認送出</button>
+        <p class="sync-note" id="syncNote"></p>
+      </div>
+      <div class="rsvp-ok" id="rsvpOK">
+        <div class="ok-icon">🎊</div>
+        <div class="ok-title" data-key="rsvp_success_title">期待與您見面！</div>
+        <p class="ok-msg" data-key="rsvp_success_msg">謝謝您的回覆<br>非常期待在婚禮上見到您 ✦</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- SEAT & CHECKIN -->
+<section id="s-checkin">
+  <div class="sec-center">
+    <span class="sec-tag reveal">Seating & Check-in</span>
+    <h2 class="sec-title reveal">座位查詢 & 婚禮報到</h2>
+    <span class="gold-line reveal"></span>
+
+    <!-- Step indicator -->
+    <div class="step-indicator reveal">
+      <div class="st-wrap"><div class="st-circle active" id="sc1">1</div><div class="st-label active" id="sl1">搜尋座位</div></div>
+      <div style="display:flex;flex-direction:column;align-items:center;">
+        <div class="st-conn"><div class="st-conn-fill" id="conn1"></div></div>
+      </div>
+      <div class="st-wrap"><div class="st-circle" id="sc2">2</div><div class="st-label" id="sl2">確認資訊</div></div>
+      <div style="display:flex;flex-direction:column;align-items:center;">
+        <div class="st-conn"><div class="st-conn-fill" id="conn2"></div></div>
+      </div>
+      <div class="st-wrap"><div class="st-circle" id="sc3">3</div><div class="st-label" id="sl3">完成報到</div></div>
+    </div>
+
+    <!-- Step 1 -->
+    <div class="step-panel active" id="sp1">
+      <div class="card">
+        <p class="card-sub" style="text-align:center;margin-bottom:24px;">請輸入您的姓名查詢座位，確認後完成報到</p>
+        <input type="text" class="name-input-big" id="seatNameInput" placeholder="請輸入您的姓名" onkeydown="if(event.key==='Enter')doSearch()">
+        <p class="input-hint">✦ 請輸入與出席回覆相同的姓名</p>
+        <button class="btn-gold" id="searchBtn" onclick="doSearch()">查 詢 座 位</button>
+      </div>
+    </div>
+
+    <!-- Step 2 -->
+    <div class="step-panel" id="sp2">
+      <div class="seat-card" id="seatDisplay"></div>
+      <div style="text-align:center;margin-top:12px;">
+        <button class="btn-outline-sm" onclick="goStep(1)">← 重新搜尋</button>
+      </div>
+    </div>
+
+    <!-- Step 3 -->
+    <div class="step-panel" id="sp3">
+      <div class="success-card" id="successDisplay"></div>
+      <div style="text-align:center;margin-top:12px;">
+        <button class="btn-outline-sm" onclick="restart()">為下一位賓客報到</button>
+      </div>
+    </div>
+
+    <div style="margin-top:16px;border:1px solid var(--border2);padding:14px 18px;background:rgba(196,164,74,0.02);">
+      <p style="font-size:0.65rem;color:var(--muted);letter-spacing:1px;line-height:2;">⚙ 新人設定：在後台「系統設定」填入 Google Sheets CSV 連結即可啟用即時座位查詢。</p>
+    </div>
+  </div>
+</section>
+
+<!-- ADMIN -->
+<section id="s-admin">
+  <div class="sec-wide">
+    <span class="sec-tag">Admin Dashboard</span>
+    <h2 class="sec-title" style="margin-bottom:40px;">管理後台</h2>
+
+    <!-- Login -->
+    <div id="adminLoginCard" class="admin-login-card">
+      <div style="font-family:'Cormorant Garamond',serif;font-size:1.4rem;color:var(--cream);letter-spacing:3px;margin-bottom:8px;">後台登入</div>
+      <p style="font-size:0.72rem;color:var(--muted);letter-spacing:1px;line-height:2;margin-bottom:24px;">僅供新人及婚顧使用</p>
+      <div class="fg"><label class="fl">管理員密碼</label><input type="password" class="fi" id="adminPwd" placeholder="請輸入密碼" onkeydown="if(event.key==='Enter')adminLogin()"></div>
+      <br>
+      <button class="btn-gold" onclick="adminLogin()">進入後台</button>
+      <p style="font-size:0.62rem;color:var(--muted);margin-top:14px;letter-spacing:1px;">預設密碼：wedding2024</p>
+    </div>
+
+    <!-- Dashboard -->
+    <div class="admin-dash" id="adminDash">
+      <div class="dash-header">
+        <div class="dash-title">管理後台</div>
+        <button class="btn-tiny" onclick="loadAdminData()">⟳ 重新整理</button>
+      </div>
+
+      <!-- Tabs -->
+      <div class="admin-tabs">
+        <button class="admin-tab active" onclick="switchAdminTab('stats',this)">📊 統計儀表板</button>
+        <button class="admin-tab" onclick="switchAdminTab('winfo',this)">✏️ 婚禮資訊設定</button>
+      </div>
+
+      <!-- Tab: Stats -->
+      <div class="admin-tab-panel active" id="atab-stats">
+      <div class="stats-grid">
+        <div class="stat hl"><div class="stat-num" id="dTotal">—</div><div class="stat-label">已填寫回覆</div></div>
+        <div class="stat"><div class="stat-num" id="dAttend">—</div><div class="stat-label">確認出席人數</div></div>
+        <div class="stat">
+          <div class="stat-num" id="dChecked">—</div>
+          <div class="stat-label">已報到</div>
+          <div class="prog-wrap"><div class="prog-fill" id="dBar" style="width:0%"></div></div>
+        </div>
+        <div class="stat"><div class="stat-num" id="dVeg">—</div><div class="stat-label">素食人數</div></div>
+        <div class="stat"><div class="stat-num" id="dChild">—</div><div class="stat-label">兒童椅</div></div>
+        <div class="stat"><div class="stat-num" id="dTables">—</div><div class="stat-label">桌次數</div></div>
+      </div>
+      <div class="dash-sec" style="display:flex;align-items:center;justify-content:space-between;">
+        <span>📋 出席回覆記錄</span>
+        <div style="display:flex;gap:8px;">
+          <button class="btn-tiny" onclick="loadRSVPRecords()">⟳ 重新整理</button>
+          <button class="btn-tiny" onclick="downloadRSVPExcel()" style="border-color:var(--gold);color:var(--gold);">📥 下載 Excel</button>
+          <button class="btn-tiny" onclick="clearRSVPConfirm()" style="border-color:var(--red);color:var(--red);">🗑 清除記錄</button>
+        </div>
+      </div>
+      <div style="overflow-x:auto;margin-bottom:32px;">
+        <table class="gtbl" id="rsvpRecordTbl">
+          <thead>
+            <tr>
+              <th>#</th><th>時間</th><th>姓名</th><th>聯絡方式</th><th>出席</th>
+              <th>儀式</th><th>人數</th><th>兒童椅</th><th>素食</th>
+              <th>飲食需求</th><th>喜帖</th><th>地址/Email</th><th>留言</th>
+            </tr>
+          </thead>
+          <tbody id="rsvpRecordBody">
+            <tr><td colspan="13" style="text-align:center;padding:28px;color:var(--muted);">尚無回覆記錄</td></tr>
+          </tbody>
+        </table>
+      </div>
+
+      <div class="dash-sec" style="display:flex;align-items:center;justify-content:space-between;">
+      </div>
+      <div style="margin-bottom:8px;"></div>
+
+
+      <div class="dash-sec" style="display:flex;align-items:center;justify-content:space-between;margin-top:28px;">
+        <span>🪑 座位分配表</span>
+        <div style="display:flex;gap:8px;">
+          <button class="btn-tiny" id="seatingCollapseBtn" onclick="toggleSeatingCollapse()" title="縮小/展開">⊟ 縮小</button>
+          <button class="btn-tiny" onclick="addTable()" style="border-color:var(--gold);color:var(--gold);">＋ 新增桌次</button>
+          <button class="btn-tiny" onclick="saveAllTables()" style="border-color:var(--green);color:var(--green);">💾 儲存紀錄</button>
+          <button class="btn-tiny" onclick="exportSeatingExcel()">📥 匯出 Excel</button>
+        </div>
+      </div>
+
+      <!-- Summary bar -->
+      <div id="seatingMeta" style="font-size:0.7rem;color:var(--muted);letter-spacing:2px;margin-bottom:16px;">共 0 桌 · 已安排 0 人</div>
+
+      <!-- Table cards horizontal scroll -->
+      <div id="seatingBoard" style="display:flex;gap:16px;overflow-x:auto;padding-bottom:16px;align-items:flex-start;"></div>
+
+      <div class="dash-sec" style="display:flex;align-items:center;justify-content:space-between;">
+        <span>賓客名單</span>
+        <button class="btn-tiny" onclick="addGuestRow()" style="border-color:var(--gold);color:var(--gold);">＋ 新增列</button>
+      </div>
+      <div class="filter-row">
+        <button class="fbtn active" onclick="filterG('all',this)">全部</button>
+        <button class="fbtn" onclick="filterG('attend',this)">確認出席</button>
+        <button class="fbtn" onclick="filterG('checked',this)">已報到</button>
+        <button class="fbtn" onclick="filterG('veg',this)">素食</button>
+      </div>
+      <div style="overflow-x:auto;">
+        <table class="gtbl">
+          <thead><tr><th>姓名</th><th>桌號</th><th>桌名</th><th>人數</th><th>素食</th><th>兒童椅</th><th>飲食需求</th><th>報到</th><th>手動報到</th><th></th></tr></thead>
+          <tbody id="guestTbody"></tbody>
+        </table>
+      </div>
+
+      <div class="dash-sec" style="margin-top:28px;">🔲 QR Code 產生器</div>
+      <div class="qr-section" style="margin-bottom:8px;">
+        <p style="font-size:0.72rem;color:var(--muted);letter-spacing:1px;margin-bottom:16px;">產生網站 QR Code，賓客掃描即可進入出席回覆表單</p>
+        <div style="display:flex;gap:12px;justify-content:center;flex-wrap:wrap;margin-bottom:16px;">
+          <button class="btn-tiny" onclick="genQR('rsvp')" style="border-color:var(--gold);color:var(--gold);">📋 出席回覆 QR</button>
+          <button class="btn-tiny" onclick="genQR('checkin')" style="border-color:var(--gold);color:var(--gold);">✅ 座位報到 QR</button>
+          <button class="btn-tiny" onclick="genQR('home')">🏠 首頁 QR</button>
+        </div>
+        <div id="qrLabel" style="font-size:0.7rem;color:var(--muted);letter-spacing:2px;margin-bottom:8px;"></div>
+        <div class="qr-wrap" id="qrBox" style="display:none;"></div>
+        <div style="margin-top:10px;display:none;" id="qrDownloadRow">
+          <button class="btn-tiny" onclick="downloadQR()">📥 下載 QR Code</button>
+        </div>
+        <p style="font-size:0.62rem;color:var(--muted);letter-spacing:1px;margin-top:10px;">⚙ 請先部署網站並確認正式網址，QR Code 將指向當前頁面網址</p>
+      </div>
+
+      </div><!-- /atab-stats -->
+
+      <!-- Tab: Wedding Info Editor -->
+      <div class="admin-tab-panel" id="atab-winfo">
+        <div style="display:flex;justify-content:flex-end;gap:8px;margin-bottom:20px;">
+          <button class="btn-tiny" onclick="resetWInfoFields()">↺ 重設</button>
+          <button class="btn-tiny" onclick="saveWInfo()" style="border-color:var(--green);color:var(--green);">💾 儲存並套用</button>
+        </div>
+
+        <div class="info-edit-group">
+          <div class="info-edit-head">新人名稱</div>
+          <div class="info-edit-row cols2">
+            <div class="info-edit-cell"><div class="info-edit-label">新郎姓名</div><input class="info-edit-input" id="wi-hero_name1" placeholder="Tom"></div>
+            <div class="info-edit-cell"><div class="info-edit-label">新娘姓名</div><input class="info-edit-input" id="wi-hero_name2" placeholder="Rainy"></div>
+          </div>
+        </div>
+
+        <div class="info-edit-group">
+          <div class="info-edit-head">雙方父母</div>
+          <div class="info-edit-row cols2">
+            <div class="info-edit-cell"><div class="info-edit-label">新郎方標籤</div><input class="info-edit-input" id="wi-parents_groom_label" placeholder="新郎父母"></div>
+            <div class="info-edit-cell"><div class="info-edit-label">新郎方姓名</div><input class="info-edit-input" id="wi-parents_groom" placeholder="父親 ・ 母親"></div>
+          </div>
+          <div class="info-edit-row cols2">
+            <div class="info-edit-cell"><div class="info-edit-label">新娘方標籤</div><input class="info-edit-input" id="wi-parents_bride_label" placeholder="新娘父母"></div>
+            <div class="info-edit-cell"><div class="info-edit-label">新娘方姓名</div><input class="info-edit-input" id="wi-parents_bride" placeholder="父親 ・ 母親"></div>
+          </div>
+        </div>
+
+        <div class="info-edit-group">
+          <div class="info-edit-head">日期</div>
+          <div class="info-edit-row">
+            <div class="info-edit-cell">
+              <div class="info-edit-label">選擇婚禮日期</div>
+              <input type="date" id="wi-wedding_date_picker"
+                style="background:transparent;border:none;border-bottom:1px solid var(--border);
+                       color:var(--cream);font-size:0.88rem;font-family:'Noto Serif TC',serif;
+                       outline:none;padding:6px 0;cursor:pointer;width:auto;
+                       color-scheme:dark;"
+                oninput="onDatePickerChange(this.value)">
+              <div style="display:flex;gap:16px;margin-top:10px;flex-wrap:wrap;">
+                <div>
+                  <div class="info-edit-label" style="margin-bottom:4px;">精簡格式（標題用）</div>
+                  <div id="wi-hero_date-preview" style="font-size:0.8rem;color:var(--cream2);letter-spacing:1px;"></div>
+                  <input type="hidden" id="wi-hero_date">
+                </div>
+                <div>
+                  <div class="info-edit-label" style="margin-bottom:4px;">完整格式（資訊欄）</div>
+                  <div id="wi-info_date-preview" style="font-size:0.8rem;color:var(--cream2);letter-spacing:1px;"></div>
+                  <input type="hidden" id="wi-info_date">
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="info-edit-group">
+          <div class="info-edit-head">婚宴場地</div>
+          <div class="info-edit-row cols2">
+            <div class="info-edit-cell"><div class="info-edit-label">場地名稱</div><input class="info-edit-input" id="wi-venue_name" placeholder="婚宴場地名稱"></div>
+            <div class="info-edit-cell"><div class="info-edit-label">地址</div><input class="info-edit-input" id="wi-venue_addr" placeholder="完整地址"></div>
+          </div>
+          <div class="info-edit-row">
+            <div class="info-edit-cell">
+              <div class="info-edit-label">Google Map 地址（輸入後自動載入地圖）</div>
+              <input class="info-edit-input" id="wi-map_address" placeholder="例：台北市信義區市府路1號" oninput="previewMap(this.value)">
+              <div id="mapPreviewWrap" style="display:none;margin-top:10px;border:1px solid var(--border2);overflow:hidden;">
+                <iframe id="mapPreviewIframe" style="width:100%;height:160px;border:none;filter:grayscale(20%);" loading="lazy"></iframe>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="info-edit-group">
+          <div class="info-edit-head">婚禮儀式</div>
+          <div class="info-edit-row cols3">
+            <div class="info-edit-cell"><div class="info-edit-label">儀式時間</div><input class="info-edit-input" id="wi-save_ceremony_time" placeholder="10：00"></div>
+            <div class="info-edit-cell"><div class="info-edit-label">儀式補充說明</div><input class="info-edit-input" id="wi-save_ceremony_sub" placeholder="歡迎提早入座"></div>
+            <div class="info-edit-cell">
+              <div class="info-edit-label">顯示儀式</div>
+              <label style="display:flex;align-items:center;gap:8px;cursor:pointer;margin-top:4px;">
+                <input type="checkbox" id="wi-show_ceremony" checked style="accent-color:var(--gold);">
+                <span style="font-size:0.78rem;color:var(--cream2);">開啟</span>
+              </label>
+            </div>
+          </div>
+          <div class="info-edit-row cols2">
+            <div class="info-edit-cell"><div class="info-edit-label">儀式地點名稱</div><input class="info-edit-input" id="wi-ceremony_venue_name" placeholder="儀式場地名稱"></div>
+            <div class="info-edit-cell"><div class="info-edit-label">儀式地點地址</div><input class="info-edit-input" id="wi-ceremony_venue_addr" placeholder="地址或樓層說明"></div>
+          </div>
+        </div>
+
+        <div class="info-edit-group">
+          <div class="info-edit-head">宴席</div>
+          <div class="info-edit-row cols3">
+            <div class="info-edit-cell"><div class="info-edit-label">宴席時間</div><input class="info-edit-input" id="wi-save_banquet_time" placeholder="12：00"></div>
+            <div class="info-edit-cell"><div class="info-edit-label">宴席補充說明</div><input class="info-edit-input" id="wi-save_banquet_sub" placeholder="準時開席"></div>
+          </div>
+          <div class="info-edit-row cols2">
+            <div class="info-edit-cell"><div class="info-edit-label">宴席地點名稱</div><input class="info-edit-input" id="wi-banquet_venue_name" placeholder="宴席場地名稱"></div>
+            <div class="info-edit-cell"><div class="info-edit-label">宴席地點地址</div><input class="info-edit-input" id="wi-banquet_venue_addr" placeholder="地址或樓層說明"></div>
+          </div>
+        </div>
+
+        <div class="info-edit-group">
+          <div class="info-edit-head">邀請信內文</div>
+          <div class="info-edit-row">
+            <div class="info-edit-cell">
+              <div class="info-edit-label">邀請文字</div>
+              <textarea id="wi-invite_text" style="width:100%;background:transparent;border:none;border-bottom:1px solid transparent;padding:3px 0;font-size:0.82rem;color:var(--cream);font-family:'Noto Serif TC',serif;outline:none;resize:none;min-height:80px;line-height:1.8;transition:border-color 0.2s;" placeholder="親愛的朋友們..."></textarea>
+            </div>
+          </div>
+        </div>
+
+        <div class="info-edit-group">
+          <div class="info-edit-head">交通資訊</div>
+          <div class="info-edit-row cols2">
+            <div class="info-edit-cell">
+              <div class="info-edit-label">區塊標題</div>
+              <input class="info-edit-input" id="wi-transport_title" placeholder="交通資訊">
+            </div>
+          </div>
+          <div class="info-edit-row cols2">
+            <div class="info-edit-cell">
+              <div class="info-edit-label">🚗 開車（標題）</div>
+              <input class="info-edit-input" id="wi-transport_car_label" placeholder="開車">
+            </div>
+            <div class="info-edit-cell">
+              <div class="info-edit-label">🚌 公車站牌（標題）</div>
+              <input class="info-edit-input" id="wi-transport_bus_label" placeholder="附近公車站牌">
+            </div>
+          </div>
+          <div class="info-edit-row">
+            <div class="info-edit-cell">
+              <div class="info-edit-label">🚗 開車說明</div>
+              <textarea id="wi-transport_car_content" style="width:100%;background:transparent;border:none;border-bottom:1px solid transparent;padding:3px 0;font-size:0.82rem;color:var(--cream);font-family:'Noto Serif TC',serif;outline:none;resize:none;min-height:56px;line-height:1.8;" placeholder="例：由 XX 交流道下，往 OO 方向行駛 500 公尺即達..."></textarea>
+            </div>
+          </div>
+          <div class="info-edit-row">
+            <div class="info-edit-cell">
+              <div class="info-edit-label">🚌 公車站牌說明</div>
+              <textarea id="wi-transport_bus_content" style="width:100%;background:transparent;border:none;border-bottom:1px solid transparent;padding:3px 0;font-size:0.82rem;color:var(--cream);font-family:'Noto Serif TC',serif;outline:none;resize:none;min-height:56px;line-height:1.8;" placeholder="例：搭乘 XX 路公車至「OO站」下車，步行約 3 分鐘..."></textarea>
+            </div>
+          </div>
+          <div class="info-edit-row cols2">
+            <div class="info-edit-cell">
+              <div class="info-edit-label">🚇 公共運輸（標題）</div>
+              <input class="info-edit-input" id="wi-transport_transit_label" placeholder="公共運輸">
+            </div>
+          </div>
+          <div class="info-edit-row">
+            <div class="info-edit-cell">
+              <div class="info-edit-label">🚇 公共運輸說明</div>
+              <textarea id="wi-transport_transit_content" style="width:100%;background:transparent;border:none;border-bottom:1px solid transparent;padding:3px 0;font-size:0.82rem;color:var(--cream);font-family:'Noto Serif TC',serif;outline:none;resize:none;min-height:56px;line-height:1.8;" placeholder="例：搭乘捷運 XX 線至「OO站」1號出口，步行約 5 分鐘..."></textarea>
+            </div>
+          </div>
+        </div>
+
+        <div style="display:flex;justify-content:flex-end;margin-top:8px;">
+          <button class="btn-tiny" onclick="saveWInfo()" style="border-color:var(--green);color:var(--green);padding:10px 28px;">💾 儲存並套用</button>
+        </div>
+      </div><!-- /atab-winfo -->
+
+    </div><!-- /adminDash -->
+  </div>
+</section>
+
+<!-- FOOTER -->
+<footer>
+  <div class="footer-links">
+    <button class="footer-link" onclick="smoothTo('#s-info')">婚禮資訊</button>
+    <button class="footer-link" onclick="smoothTo('#s-rsvp')">出席回覆</button>
+    <button class="footer-link" onclick="smoothTo('#s-checkin')">座位查詢</button>
+  </div>
+  <div class="footer-copy" data-key="footer_copy">DR Wedding 婚禮顧問</div>
+  <div style="margin-top:16px;display:flex;justify-content:center;gap:12px;">
+    <button class="footer-link" onclick="window.open('admin_editor.html','_blank')" style="font-size:0.58rem;">後台編輯</button>
+  </div>
+  <button class="admin-trigger" onclick="toggleAdmin()">▲ 管理後台</button>
+</footer>
+
+<script>
+/* ═══ CONFIG (saved content from localStorage) ═══ */
+const STORAGE_KEY='dr_wedding_content';
+function getSiteData(){try{return JSON.parse(localStorage.getItem(STORAGE_KEY)||'{}')}catch(e){return{}}}
+
+let CFG={
+  WEDDING_DATE: new Date('2024-11-02T12:00:00+08:00'),
+  SHEET_CSV_URL: '',
+  APPS_SCRIPT_URL: '',
+  ADMIN_PASSWORD: 'wedding2024',
+};
+
+function applyContent(){
+  const d=getSiteData();
+  document.querySelectorAll('[data-key]').forEach(el=>{
+    const k=el.getAttribute('data-key');
+    if(d[k]===undefined)return;
+    if(el.tagName==='INPUT'||el.tagName==='TEXTAREA')el.value=d[k];
+    else el.innerHTML=d[k];
+  });
+  if(d.gform_url)document.getElementById('gformLink').href=d.gform_url;
+  if(d.site_title)document.title=d.site_title;
+  if(d.names_font){applyNamesFont(d.names_font);}
+  // Use map_address if set, otherwise fall back to banquet venue address
+  const mapAddr = d.map_address || (d.banquet_venue_name && d.banquet_venue_addr ? d.banquet_venue_name+' '+d.banquet_venue_addr : d.banquet_venue_addr || d.venue_addr || '');
+  if(mapAddr){applyMapToPage(mapAddr);}
+  if(d.show_ceremony==='false'){
+    document.getElementById('ceremonyRow').style.display='none';
+    document.getElementById('ceremonyAttendRow').style.display='none';
+  }
+  if(d.wedding_date_iso)CFG.WEDDING_DATE=new Date(d.wedding_date_iso);
+  if(d.sheet_csv_url)CFG.SHEET_CSV_URL=d.sheet_csv_url;
+  if(d.apps_script_url)CFG.APPS_SCRIPT_URL=d.apps_script_url;
+}
+applyContent();
+
+/* ═══ NAV ═══ */
+window.addEventListener('scroll',()=>{
+  document.getElementById('topNav').classList.toggle('scrolled',window.scrollY>80);
+});
+function smoothTo(sel){document.querySelector(sel)?.scrollIntoView({behavior:'smooth',block:'start'});}
+
+/* ═══ REVEAL ═══ */
+const revObs=new IntersectionObserver(entries=>{
+  entries.forEach(e=>{if(e.isIntersecting)e.target.classList.add('visible');});
+},{threshold:0.1});
+document.querySelectorAll('.reveal').forEach(el=>revObs.observe(el));
+
+/* ═══ TRANSPORT ═══ */
+function toggleTransport(id){
+  const body=document.getElementById('tb-'+id);
+  const arrow=document.getElementById('ta-'+id);
+  const open=body.style.display==='none';
+  body.style.display=open?'block':'none';
+  arrow.classList.toggle('open',open);
+}
+
+/* ═══ COUNTDOWN ═══ */
+function tick(){
+  const diff = CFG.WEDDING_DATE - new Date();
+  const grid = document.getElementById('countGrid');
+  if(!grid) return;
+  if(diff<=0){
+    grid.innerHTML='<div class="countdown-over">✦ 幸福相聚 ✦</div>';
+    return;
+  }
+  const d=Math.floor(diff/86400000),h=Math.floor((diff%86400000)/3600000),
+        m=Math.floor((diff%3600000)/60000),s=Math.floor((diff%60000)/1000);
+  const el=id=>document.getElementById(id);
+  if(el('cDays'))  el('cDays').textContent  =String(d).padStart(2,'0');
+  if(el('cHours')) el('cHours').textContent =String(h).padStart(2,'0');
+  if(el('cMins'))  el('cMins').textContent  =String(m).padStart(2,'0');
+  if(el('cSecs'))  el('cSecs').textContent  =String(s).padStart(2,'0');
+}
+tick();
+setInterval(tick,1000);
+
+/* ═══ FONT ═══ */
+const FONTS={
+  'Cormorant Garamond':'https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,200;0,300;1,200;1,300&display=swap',
+  'Playfair Display':'https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,700;1,400&display=swap',
+  'Great Vibes':'https://fonts.googleapis.com/css2?family=Great+Vibes&display=swap',
+  'Dancing Script':'https://fonts.googleapis.com/css2?family=Dancing+Script:wght@400;700&display=swap',
+  'Libre Baskerville':'https://fonts.googleapis.com/css2?family=Libre+Baskerville:ital,wght@0,400;0,700;1,400&display=swap',
+  'Italiana':'https://fonts.googleapis.com/css2?family=Italiana&display=swap',
+  'Noto Serif TC':'https://fonts.googleapis.com/css2?family=Noto+Serif+TC:wght@200;300;400&display=swap',
+};
+function applyNamesFont(font){
+  if(!font||!FONTS[font])return;
+  document.getElementById('extraFont').href=FONTS[font];
+  document.querySelector('.header-names').style.fontFamily="'"+font+"', serif";
+}
+
+/* ═══ HERO IMAGE + RSVP DB (IndexedDB) ═══ */
+const IMGDB={db:null,
+  init(){return new Promise((res,rej)=>{
+    const r=indexedDB.open('dr_wedding',6);
+    r.onupgradeneeded=e=>{
+      const db=e.target.result;
+      if(!db.objectStoreNames.contains('assets'))db.createObjectStore('assets');
+      if(!db.objectStoreNames.contains('rsvp'))db.createObjectStore('rsvp',{keyPath:'id',autoIncrement:true});
+      if(!db.objectStoreNames.contains('checkins'))db.createObjectStore('checkins',{keyPath:'name'});
+      if(!db.objectStoreNames.contains('tables'))db.createObjectStore('tables',{keyPath:'num'});
+      if(!db.objectStoreNames.contains('guestOverrides'))db.createObjectStore('guestOverrides',{keyPath:'name'});
+      if(!db.objectStoreNames.contains('manualGuests'))db.createObjectStore('manualGuests',{keyPath:'id',autoIncrement:true});
+    };
+    r.onsuccess=e=>{this.db=e.target.result;res();};
+    r.onerror=rej;
+  });},
+  put(key,val){return new Promise((res,rej)=>{const tx=this.db.transaction('assets','readwrite');tx.objectStore('assets').put(val,key);tx.oncomplete=res;tx.onerror=rej;});},
+  get(key){return new Promise((res,rej)=>{const tx=this.db.transaction('assets','readonly');const req=tx.objectStore('assets').get(key);req.onsuccess=()=>res(req.result);req.onerror=rej;});},
+  addRSVP(record){return new Promise((res,rej)=>{const tx=this.db.transaction('rsvp','readwrite');tx.objectStore('rsvp').add(record);tx.oncomplete=res;tx.onerror=rej;});},
+  getAllRSVP(){return new Promise((res,rej)=>{const tx=this.db.transaction('rsvp','readonly');const req=tx.objectStore('rsvp').getAll();req.onsuccess=()=>res(req.result);req.onerror=rej;});},
+  clearRSVP(){return new Promise((res,rej)=>{const tx=this.db.transaction('rsvp','readwrite');tx.objectStore('rsvp').clear();tx.oncomplete=res;tx.onerror=rej;});},
+  addCheckin(name){return new Promise((res,rej)=>{const tx=this.db.transaction('checkins','readwrite');tx.objectStore('checkins').put({name,time:new Date().toLocaleString('zh-TW')});tx.oncomplete=res;tx.onerror=rej;});},
+  getAllCheckins(){return new Promise((res,rej)=>{const tx=this.db.transaction('checkins','readonly');const req=tx.objectStore('checkins').getAll();req.onsuccess=()=>res(req.result);req.onerror=rej;})},
+  removeCheckin(name){return new Promise((res,rej)=>{const tx=this.db.transaction('checkins','readwrite');tx.objectStore('checkins').delete(name);tx.oncomplete=res;tx.onerror=rej;});},
+  putOverride(rec){return new Promise((res,rej)=>{const tx=this.db.transaction('guestOverrides','readwrite');tx.objectStore('guestOverrides').put(rec);tx.oncomplete=res;tx.onerror=rej;});},
+  getAllOverrides(){return new Promise((res,rej)=>{const tx=this.db.transaction('guestOverrides','readonly');const req=tx.objectStore('guestOverrides').getAll();req.onsuccess=()=>res(req.result);req.onerror=rej;});},
+  addManualGuest(g){return new Promise((res,rej)=>{const tx=this.db.transaction('manualGuests','readwrite');const req=tx.objectStore('manualGuests').add(g);req.onsuccess=e=>{g.id=e.target.result;res(g);};tx.onerror=rej;});},
+  getAllManualGuests(){return new Promise((res,rej)=>{const tx=this.db.transaction('manualGuests','readonly');const req=tx.objectStore('manualGuests').getAll();req.onsuccess=()=>res(req.result);req.onerror=rej;});},
+  deleteManualGuest(id){return new Promise((res,rej)=>{const tx=this.db.transaction('manualGuests','readwrite');tx.objectStore('manualGuests').delete(id);tx.oncomplete=res;tx.onerror=rej;});},
+  putTable(t){return new Promise((res,rej)=>{const tx=this.db.transaction('tables','readwrite');tx.objectStore('tables').put(t);tx.oncomplete=res;tx.onerror=rej;});},
+  getAllTables(){return new Promise((res,rej)=>{const tx=this.db.transaction('tables','readonly');const req=tx.objectStore('tables').getAll();req.onsuccess=()=>res(req.result);req.onerror=rej;});},
+  deleteTable(num){return new Promise((res,rej)=>{const tx=this.db.transaction('tables','readwrite');tx.objectStore('tables').delete(num);tx.oncomplete=res;tx.onerror=rej;});}
+};
+
+// Init DB and restore hero image — errors are swallowed so page always works
+IMGDB.init().then(()=>IMGDB.get('hero_img')).then(src=>{if(src)setHeroImg(src);}).catch(()=>{});
+
+function compressAndStore(file){
+  const reader=new FileReader();
+  reader.onload=ev=>{
+    const img=new Image();
+    img.onload=()=>{
+      const MAX=1600;
+      let w=img.width,h=img.height;
+      if(w>MAX){h=Math.round(h*MAX/w);w=MAX;}
+      const canvas=document.createElement('canvas');
+      canvas.width=w;canvas.height=h;
+      canvas.getContext('2d').drawImage(img,0,0,w,h);
+      const compressed=canvas.toDataURL('image/jpeg',0.75);
+      setHeroImg(compressed);
+      IMGDB.put('hero_img',compressed).catch(()=>{});
+    };
+    img.src=ev.target.result;
+  };
+  reader.readAsDataURL(file);
+}
+
+function setHeroImg(src){
+  const img=document.getElementById('heroImg');
+  img.src=src;img.style.display='block';
+  document.getElementById('heroImgPlaceholder').style.display='none';
+}
+
+function loadHeroImg(e){
+  const file=e.target.files[0];if(!file)return;
+  compressAndStore(file);
+}
+
+/* ═══ RSVP ═══ */
+let attendVal='yes';
+const radioState={ceremony:'yes'};
+function setAttend(v,btn){
+  attendVal=v;
+  document.querySelectorAll('.a-btn').forEach(b=>b.classList.remove('active'));btn.classList.add('active');
+  document.getElementById('attendFields').style.display=v==='yes'?'':'none';
+}
+function setRadio(g,v,btn){
+  radioState[g]=v;
+  btn.closest('.radio-grp').querySelectorAll('.rb').forEach(b=>b.classList.remove('active'));btn.classList.add('active');
+}
+function handleCardChange(sel){
+  document.getElementById('addrGroup').classList.toggle('show',sel.value==='paper');
+  document.getElementById('emailGroup').classList.toggle('show',sel.value==='digital');
+}
+function handleDietNone(cb){
+  if(cb.checked){
+    document.querySelectorAll('.ci input[type=checkbox]').forEach(c=>{if(c!==cb)c.checked=false;});
+    document.getElementById('dietOther').style.display='none';
+  }
+}
+function toggleDietOther(cb){
+  if(cb.checked)document.getElementById('diet0').checked=false;
+  document.getElementById('dietOther').style.display=cb.checked?'block':'none';
+}
+['diet1','diet2','diet3'].forEach(id=>{
+  document.getElementById(id).addEventListener('change',function(){if(this.checked)document.getElementById('diet0').checked=false;});
+});
+
+async function submitRSVP(){
+  const name=document.getElementById('rsvpName').value.trim();
+  if(!name){alert('請輸入您的姓名');return;}
+  const contact=document.getElementById('rsvpContact').value.trim();
+  if(!contact){alert('請輸入LINE ID及手機號碼');return;}
+  if(attendVal==='yes'){
+    const card=document.getElementById('rsvpCard').value;
+    if(card==='paper'&&!document.getElementById('rsvpAddr').value.trim()){alert('請填寫收件地址');return;}
+    if(card==='digital'&&!document.getElementById('rsvpEmail').value.trim()){alert('請填寫 Email 信箱');return;}
+  }
+
+  // Collect diet
+  const diets=[...document.querySelectorAll('.ci input[type=checkbox]:checked')].map(c=>c.value);
+  if(diets.includes('其他')){const other=document.getElementById('dietOther').value.trim();if(other)diets.push(other);}
+
+  const payload={
+    timestamp:new Date().toLocaleString('zh-TW'),
+    name,contact,
+    attend:attendVal==='yes'?'出席':'不出席',
+    ceremony:attendVal==='yes'?radioState.ceremony==='yes'?'參加':'不參加':'—',
+    adults:attendVal==='yes'?document.getElementById('rsvpAdult').value:'0',
+    childChairs:attendVal==='yes'?document.getElementById('rsvpChildChair').value:'0',
+    veg:attendVal==='yes'?document.getElementById('rsvpVeg').value:'0',
+    diet:diets.join('、')||'無',
+    card:document.getElementById('rsvpCard').value,
+    addr:document.getElementById('rsvpAddr').value.trim(),
+    email:document.getElementById('rsvpEmail').value.trim(),
+    message:document.getElementById('rsvpMsg').value.trim(),
+  };
+
+  // Send to Google Apps Script if configured
+  const note=document.getElementById('syncNote');
+  if(CFG.APPS_SCRIPT_URL){
+    note.textContent='傳送中...';note.className='sync-note';
+    try{
+      await fetch(CFG.APPS_SCRIPT_URL+'?action=rsvp',{
+        method:'POST',mode:'no-cors',
+        headers:{'Content-Type':'application/json'},
+        body:JSON.stringify(payload)
+      });
+      note.textContent='✓ 已同步至 Google Sheets';note.className='sync-note ok';
+    }catch(e){
+      note.textContent='⚠ 網路錯誤，請洽婚禮顧問';note.className='sync-note err';
+    }
+  }
+
+  document.getElementById('rsvpFormWrap').style.display='none';
+  document.getElementById('rsvpOK').classList.add('show');
+  // Save locally
+  IMGDB.addRSVP(payload).catch(()=>{});
+}
+
+/* ═══ CSV PARSER ═══ */
+function parseCSV(txt){
+  const rows=[];let row=[],cell='',inQ=false;
+  for(let i=0;i<txt.length;i++){
+    const c=txt[i];
+    if(inQ){if(c==='"'&&txt[i+1]==='"'){cell+='"';i++;}else if(c==='"'){inQ=false;}else{cell+=c;}}
+    else{if(c==='"'){inQ=true;}else if(c===','){row.push(cell);cell='';}else if(c==='\n'){row.push(cell);rows.push(row);row=[];cell='';}else if(c!=='\r'){cell+=c;}}
+  }
+  if(cell||row.length){row.push(cell);rows.push(row);}
+  if(rows.length<2)return[];
+  const hdrs=rows[0];
+  return rows.slice(1).filter(r=>r.some(c=>c.trim())).map(r=>{const o={};hdrs.forEach((h,i)=>{o[h.trim()]=(r[i]||'').trim();});return o;});
+}
+async function fetchSheet(){
+  if(!CFG.SHEET_CSV_URL)return null;
+  try{const r=await fetch(CFG.SHEET_CSV_URL+'&t='+Date.now());const t=await r.text();return parseCSV(t);}catch(e){return null;}
+}
+
+/* ═══ STEP CHECKIN ═══ */
+let currentGuest=null;
+function goStep(n){
+  [1,2,3].forEach(i=>{
+    document.getElementById('sp'+i).classList.toggle('active',i===n);
+    const sc=document.getElementById('sc'+i);
+    const sl=document.getElementById('sl'+i);
+    sc.className='st-circle'+(i<n?' done':i===n?' active':'');
+    sc.textContent=i<n?'✓':String(i);
+    sl.className='st-label'+(i===n?' active':'');
+  });
+  if(n>=2)document.getElementById('conn1').style.width='100%';else document.getElementById('conn1').style.width='0%';
+  if(n>=3)document.getElementById('conn2').style.width='100%';else document.getElementById('conn2').style.width='0%';
+}
+
+async function doSearch(){
+  const name=document.getElementById('seatNameInput').value.trim();
+  if(!name)return;
+  const btn=document.getElementById('searchBtn');
+  btn.innerHTML='<span class="spin"></span>查詢中...';btn.disabled=true;
+
+  if(!CFG.SHEET_CSV_URL){
+    // Demo mode
+    document.getElementById('seatDisplay').innerHTML=`
+      <div class="not-found">
+        <div class="nf-icon">⚙️</div>
+        <h3>尚未設定座位資料</h3>
+        <p>請在後台「系統設定」填入 Google Sheets CSV 連結<br>即可啟用即時座位查詢</p>
+        <button class="btn-outline-sm" onclick="document.getElementById('seatNameInput').value='';goStep(1)">← 返回</button>
+      </div>`;
+    goStep(2);btn.innerHTML='查 詢 座 位';btn.disabled=false;return;
+  }
+
+  const data=await fetchSheet();
+  btn.innerHTML='查 詢 座 位';btn.disabled=false;
+
+  if(!data){
+    document.getElementById('seatDisplay').innerHTML=`<div class="not-found"><div class="nf-icon">⚠️</div><h3>無法取得資料</h3><p>請稍後再試或洽現場工作人員</p><button class="btn-outline-sm" onclick="goStep(1)">← 返回</button></div>`;
+    goStep(2);return;
+  }
+
+  const found=data.find(g=>(g['姓名']&&g['姓名'].includes(name))||(g['Name']&&g['Name'].toLowerCase().includes(name.toLowerCase())));
+  if(!found){
+    document.getElementById('seatDisplay').innerHTML=`
+      <div class="not-found">
+        <div class="nf-icon">🔍</div>
+        <h3>找不到座位資訊</h3>
+        <p>查無「<strong style="color:var(--cream)">${name}</strong>」的座位資料<br>請確認姓名或洽現場工作人員</p>
+        <button class="btn-outline-sm" onclick="document.getElementById('seatNameInput').value='';goStep(1)">← 重新輸入</button>
+      </div>`;
+    goStep(2);return;
+  }
+
+  currentGuest=found;
+  const gName=found['姓名']||found['Name']||name;
+  const tableNum=found['桌號']||'—';
+  const tableName=found['桌名']||'';
+  const count=found['出席人數']||found['Count']||'';
+
+  // Build seat map from all guests
+  const tableMap={};
+  data.forEach(g=>{
+    const t=g['桌號']||'?';
+    if(!tableMap[t])tableMap[t]={name:g['桌名']||'',count:parseInt(g['出席人數']||1)};
+  });
+  const sortedTables=Object.keys(tableMap).sort((a,b)=>(parseInt(a)||999)-(parseInt(b)||999));
+  const mapHTML=sortedTables.length>1?`
+    <div class="seat-map">
+      <div class="seat-map-title">✦ 座位分佈圖 ✦</div>
+      <div class="seat-map-grid">
+        ${sortedTables.map(t=>`
+          <div class="seat-map-table${t===tableNum?' highlight':''}">
+            ${t===tableNum?'<div class="smt-you">您在這</div>':''}
+            <div class="smt-num">${t}</div>
+            <div class="smt-name">${tableMap[t].name||''}</div>
+          </div>`).join('')}
+      </div>
+    </div>`:'';
+
+  document.getElementById('seatDisplay').innerHTML=`
+    <div class="seat-welcome">✦ Welcome ✦</div>
+    <div class="seat-guest">${gName}</div>
+    <div class="seat-table-frame">
+      <div class="seat-num">${tableNum}</div>
+      <div class="seat-num-label">Table Number ｜ 您的桌號</div>
+    </div>
+    ${tableName?`<div style="margin:4px 0"><div class="seat-name-badge">🌸 ${tableName}</div></div>`:''}
+    ${count?`<div class="seat-meta">出席人數：${count} 位</div>`:''}
+    ${mapHTML}
+    <br>
+    <button class="btn-gold" style="max-width:300px;margin:0 auto;display:block;" onclick="doCheckin()">我已到場，完成報到 ✓</button>`;
+  goStep(2);
+}
+
+async function doCheckin(){
+  if(!currentGuest)return;
+  const btn=document.querySelector('#sp2 .btn-gold');
+  btn.innerHTML='<span class="spin"></span>報到中...';btn.disabled=true;
+
+  if(CFG.APPS_SCRIPT_URL){
+    try{
+      await fetch(CFG.APPS_SCRIPT_URL+'?action=checkin&name='+encodeURIComponent(currentGuest['姓名']||''));
+    }catch(e){}
+  }
+  // Save locally
+  const guestName=currentGuest['姓名']||'';
+  if(guestName){ await IMGDB.addCheckin(guestName).catch(()=>{}); localCheckins[guestName]=new Date().toLocaleString('zh-TW'); }
+  await new Promise(r=>setTimeout(r,700));
+
+  const gName=currentGuest['姓名']||'賓客';
+  const tableNum=currentGuest['桌號']||'—';
+  const tableName=currentGuest['桌名']||'—';
+  const now=new Date();
+  const timeStr=`${String(now.getHours()).padStart(2,'0')}:${String(now.getMinutes()).padStart(2,'0')}`;
+
+  document.getElementById('successDisplay').innerHTML=`
+    <div class="sc-icon">🎊</div>
+    <div class="sc-welcome">報到成功 · Check-in Complete</div>
+    <div class="sc-name">${gName}</div>
+    <div class="sc-title">Welcome!</div>
+    <p class="sc-msg">Tom & Rainy 非常感謝您的到來<br>祝您享有美好的婚宴時光 🥂</p>
+    <div class="sc-recap">
+      <div class="sc-recap-item"><div class="sc-recap-label">桌號</div><div class="sc-recap-val">${tableNum}</div></div>
+      <div class="sc-recap-item"><div class="sc-recap-label">桌名</div><div class="sc-recap-val">${tableName}</div></div>
+      <div class="sc-recap-item"><div class="sc-recap-label">報到時間</div><div class="sc-recap-val" style="font-size:0.9rem;">${timeStr}</div></div>
+    </div>`;
+  btn.innerHTML='我已到場，完成報到 ✓';btn.disabled=false;
+  goStep(3);
+}
+
+function restart(){
+  currentGuest=null;
+  document.getElementById('seatNameInput').value='';
+  goStep(1);
+}
+
+/* ═══ SEAT ASSIGNMENT TABLE ═══ */
+let seatingData = []; // array of {num, name, capacity, guests:[{name,veg,child}]}
+
+async function loadSeatingBoard(){
+  const saved = await IMGDB.getAllTables().catch(()=>[]);
+  seatingData = saved.sort((a,b)=>(parseInt(a.num)||999)-(parseInt(b.num)||999));
+  if(seatingData.length===0){
+    // Default: start with 1 empty table
+    seatingData=[{num:'1',name:'',capacity:10,guests:Array(10).fill(null).map(()=>({name:'',veg:false,child:false}))}];
+  }
+  renderSeatingBoard();
+}
+
+let seatingCollapsed = false;
+
+function toggleSeatingCollapse(){
+  seatingCollapsed = !seatingCollapsed;
+  const btn = document.getElementById('seatingCollapseBtn');
+  btn.textContent = seatingCollapsed ? '⊞ 展開' : '⊟ 縮小';
+  renderSeatingBoard();
+}
+
+function renderSeatingBoard(){
+  const board = document.getElementById('seatingBoard');
+  if(!board) return;
+  let totalPeople=0;
+  seatingData.forEach(t=>{
+    const filled=t.guests.filter(g=>g.name.trim()).length;
+    totalPeople+=filled;
+  });
+  document.getElementById('seatingMeta').textContent=`共 ${seatingData.length} 桌 · 已安排 ${totalPeople} 人`;
+  board.innerHTML = seatingCollapsed
+    ? seatingData.map((t,ti)=>{
+        const filled=t.guests.filter(g=>g.name.trim()).length;
+        return `<div class="t-card-mini" title="點擊展開" onclick="seatingCollapsed=false;document.getElementById('seatingCollapseBtn').textContent='⊟ 縮小';renderSeatingBoard()">
+          <div class="t-card-mini-num">${t.num}</div>
+          <div class="t-card-mini-label">${t.name||'桌'}</div>
+          <div class="t-card-mini-count">${filled}/${t.capacity}</div>
+        </div>`;
+      }).join('')
+    : seatingData.map((t,ti)=>renderTableCard(t,ti)).join('');
+}
+
+function renderTableCard(t,ti){
+  const filled=t.guests.filter(g=>g.name.trim()).length;
+  const totalVeg=t.guests.filter(g=>g.veg).length;
+  const totalChild=t.guests.filter(g=>g.child).length;
+  const guestRows=t.guests.map((g,gi)=>`
+    <div class="t-guest-row">
+      <span class="t-guest-num">${gi+1}.</span>
+      <input class="t-guest-name" placeholder="賓客姓名"
+        value="${g.name.replace(/"/g,'&quot;')}"
+        oninput="seatingData[${ti}].guests[${gi}].name=this.value;updateSeatingMeta()">
+      <button class="t-icon-btn${g.veg?' on':''}" title="素食"
+        onclick="seatingData[${ti}].guests[${gi}].veg=!seatingData[${ti}].guests[${gi}].veg;this.classList.toggle('on');updateTableFooter(${ti})">🥦</button>
+      <button class="t-icon-btn${g.child?' on':''}" title="兒童椅"
+        onclick="seatingData[${ti}].guests[${gi}].child=!seatingData[${ti}].guests[${gi}].child;this.classList.toggle('on');updateTableFooter(${ti})">🪑</button>
+    </div>`).join('');
+
+  return`<div class="t-card" id="tcard-${ti}">
+    <div class="t-card-head">
+      <div class="t-card-num">第 ${t.num} 桌</div>
+      <div class="t-card-count" id="tcount-${ti}">${filled}/${t.capacity} 人</div>
+    </div>
+    <div class="t-card-body">
+      <input class="t-name-input" placeholder="桌名（如：男方親戚）"
+        value="${(t.name||'').replace(/"/g,'&quot;')}"
+        oninput="seatingData[${ti}].name=this.value">
+      <div class="t-capacity-row">
+        <span class="t-cap-label">🪑 座位數</span>
+        <div class="t-counter">
+          <button class="t-counter-btn" onclick="changeCapacity(${ti},-1)">－</button>
+          <span class="t-counter-val" id="tcap-${ti}">${t.capacity}</span>
+          <button class="t-counter-btn" onclick="changeCapacity(${ti},1)">＋</button>
+        </div>
+      </div>
+      <div class="t-guest-list" id="tguests-${ti}">${guestRows}</div>
+      <div class="t-footer-row">
+        <div class="t-footer-item">
+          <span class="t-footer-label">🥦 素食人數</span>
+          <div class="t-counter">
+            <button class="t-counter-btn" onclick="changeVeg(${ti},-1)">－</button>
+            <span class="t-counter-val" id="tveg-${ti}">${totalVeg}</span>
+            <button class="t-counter-btn" onclick="changeVeg(${ti},1)">＋</button>
+          </div>
+        </div>
+        <div class="t-footer-item">
+          <span class="t-footer-label">🪑 兒童椅數</span>
+          <div class="t-counter">
+            <button class="t-counter-btn" onclick="changeChild(${ti},-1)">－</button>
+            <span class="t-counter-val" id="tchild-${ti}">${totalChild}</span>
+            <button class="t-counter-btn" onclick="changeChild(${ti},1)">＋</button>
+          </div>
+        </div>
+      </div>
+      <button class="t-del-btn" onclick="deleteTable(${ti})">🗑 刪除此桌</button>
+    </div>
+  </div>`;
+}
+
+function changeCapacity(ti,delta){
+  const t=seatingData[ti];
+  const newCap=Math.max(1,Math.min(30,(t.capacity||10)+delta));
+  if(newCap>t.guests.length){
+    while(t.guests.length<newCap) t.guests.push({name:'',veg:false,child:false});
+  } else if(newCap<t.guests.length){
+    t.guests=t.guests.slice(0,newCap);
+  }
+  t.capacity=newCap;
+  // Re-render this card
+  const card=document.getElementById('tcard-'+ti);
+  if(card) card.outerHTML=renderTableCard(t,ti);
+  updateSeatingMeta();
+}
+
+function updateTableFooter(ti){
+  const t=seatingData[ti];
+  const veg=t.guests.filter(g=>g.veg).length;
+  const child=t.guests.filter(g=>g.child).length;
+  const el=document.getElementById('tveg-'+ti);
+  const el2=document.getElementById('tchild-'+ti);
+  if(el)el.textContent=veg;
+  if(el2)el2.textContent=child;
+}
+
+function changeVeg(ti,delta){
+  // Toggle individual guests' veg status sequentially
+  const t=seatingData[ti];
+  const currentVeg=t.guests.filter(g=>g.veg).length;
+  const newVeg=Math.max(0,Math.min(t.capacity,currentVeg+delta));
+  // Reset all, then set first N
+  t.guests.forEach(g=>g.veg=false);
+  for(let i=0;i<newVeg;i++) t.guests[i].veg=true;
+  const card=document.getElementById('tcard-'+ti);
+  if(card) card.outerHTML=renderTableCard(t,ti);
+}
+
+function changeChild(ti,delta){
+  const t=seatingData[ti];
+  const cur=t.guests.filter(g=>g.child).length;
+  const nw=Math.max(0,Math.min(t.capacity,cur+delta));
+  t.guests.forEach(g=>g.child=false);
+  for(let i=0;i<nw;i++) t.guests[i].child=true;
+  const card=document.getElementById('tcard-'+ti);
+  if(card) card.outerHTML=renderTableCard(t,ti);
+}
+
+function updateSeatingMeta(){
+  let total=0;
+  seatingData.forEach(t=>{total+=t.guests.filter(g=>g.name.trim()).length;});
+  const el=document.getElementById('seatingMeta');
+  if(el)el.textContent=`共 ${seatingData.length} 桌 · 已安排 ${total} 人`;
+}
+
+function addTable(){
+  const nums=seatingData.map(t=>parseInt(t.num)||0);
+  const next=nums.length?Math.max(...nums)+1:1;
+  seatingData.push({num:String(next),name:'',capacity:10,guests:Array(10).fill(null).map(()=>({name:'',veg:false,child:false}))});
+  renderSeatingBoard();
+  // Scroll to end
+  const board=document.getElementById('seatingBoard');
+  if(board)setTimeout(()=>board.scrollLeft=board.scrollWidth,50);
+}
+
+function deleteTable(ti){
+  IMGDB.deleteTable(seatingData[ti].num).catch(()=>{});
+  seatingData.splice(ti,1);
+  renderSeatingBoard();
+}
+
+async function saveAllTables(){
+  for(const t of seatingData){
+    await IMGDB.putTable(t).catch(()=>{});
+  }
+  renderGuestTable(); // refresh seat info in guest list
+  showToastMsg('✓ 座位分配已儲存');
+}
+
+function showToastMsg(msg){
+  // Reuse or create a simple toast
+  let t=document.getElementById('seatToast');
+  if(!t){t=document.createElement('div');t.id='seatToast';t.style.cssText='position:fixed;bottom:80px;right:24px;background:var(--green);color:#fff;padding:11px 22px;font-size:0.75rem;letter-spacing:2px;z-index:9998;opacity:0;transition:opacity 0.3s;pointer-events:none;';document.body.appendChild(t);}
+  t.textContent=msg;t.style.opacity='1';
+  setTimeout(()=>t.style.opacity='0',2200);
+}
+
+function exportSeatingExcel(){
+  if(!seatingData.length){alert('尚無座位資料');return;}
+  const rows=[['桌號','桌名','座位數','序號','賓客姓名','素食','兒童椅']];
+  seatingData.forEach(t=>{
+    t.guests.forEach((g,i)=>{
+      rows.push([t.num,t.name,t.capacity,i+1,g.name,g.veg?'是':'',g.child?'是':'']);
+    });
+  });
+  const wb=XLSX.utils.book_new();
+  const ws=XLSX.utils.aoa_to_sheet(rows);
+  ws['!cols']=[{wch:6},{wch:14},{wch:6},{wch:4},{wch:14},{wch:5},{wch:5}];
+  XLSX.utils.book_append_sheet(wb,ws,'座位分配表');
+  XLSX.writeFile(wb,`座位分配表_${new Date().toISOString().slice(0,10)}.xlsx`);
+}
+
+/* ═══ RSVP RECORDS ═══ */
+async function loadRSVPRecords(){
+  const records=await IMGDB.getAllRSVP().catch(()=>[]);
+  // Track total count for dashboard stat #1
+  window._allRSVPCount = records.length;
+  // Update localRSVPGuests (only attendees)
+  localRSVPGuests = records.filter(r=>r.attend==='出席');
+  renderAdmin(); // refresh stats + guest table
+  const tbody=document.getElementById('rsvpRecordBody');
+  if(!records||records.length===0){
+    tbody.innerHTML='<tr><td colspan="13" style="text-align:center;padding:28px;color:var(--muted);">尚無回覆記錄</td></tr>';
+    return;
+  }
+  const cardMap={'no':'不需要','paper':'紙本','digital':'電子'};
+  tbody.innerHTML=records.map((r,i)=>`
+    <tr>
+      <td style="color:var(--muted);">${i+1}</td>
+      <td style="font-size:0.72rem;white-space:nowrap;">${r.timestamp||'—'}</td>
+      <td><strong>${r.name||'—'}</strong></td>
+      <td style="font-size:0.75rem;">${r.contact||'—'}</td>
+      <td>${r.attend==='出席'?'<span class="chip chip-y">出席</span>':'<span class="chip chip-n">不出席</span>'}</td>
+      <td style="font-size:0.75rem;">${r.ceremony||'—'}</td>
+      <td style="text-align:center;">${r.adults||'—'}</td>
+      <td style="text-align:center;">${r.childChairs||'0'}</td>
+      <td style="text-align:center;">${r.veg||'0'}</td>
+      <td style="font-size:0.72rem;">${r.diet||'—'}</td>
+      <td style="font-size:0.72rem;">${cardMap[r.card]||r.card||'—'}</td>
+      <td style="font-size:0.72rem;max-width:140px;word-break:break-all;">${r.addr||r.email||'—'}</td>
+      <td style="font-size:0.72rem;max-width:160px;">${r.message||'—'}</td>
+    </tr>`).join('');
+}
+
+async function downloadRSVPExcel(){
+  const records=await IMGDB.getAllRSVP().catch(()=>[]);
+  if(!records||records.length===0){alert('尚無出席回覆記錄');return;}
+  const cardMap={'no':'不需要','paper':'需要紙本','digital':'需要電子'};
+  const wsData=[
+    ['#','填寫時間','姓名','聯絡方式（LINE/手機）','是否出席','是否參加儀式','出席人數','兒童椅數量','素食人數','特殊飲食需求','喜帖方式','收件地址','Email信箱','留言'],
+    ...records.map((r,i)=>[
+      i+1,
+      r.timestamp||'',
+      r.name||'',
+      r.contact||'',
+      r.attend||'',
+      r.ceremony||'',
+      r.adults||'',
+      r.childChairs||'0',
+      r.veg||'0',
+      r.diet||'',
+      cardMap[r.card]||r.card||'',
+      r.addr||'',
+      r.email||'',
+      r.message||'',
+    ])
+  ];
+  const wb=XLSX.utils.book_new();
+  const ws=XLSX.utils.aoa_to_sheet(wsData);
+  // Column widths
+  ws['!cols']=[{wch:4},{wch:20},{wch:10},{wch:20},{wch:8},{wch:12},{wch:8},{wch:8},{wch:8},{wch:20},{wch:10},{wch:24},{wch:24},{wch:30}];
+  XLSX.utils.book_append_sheet(wb,ws,'出席回覆');
+  const date=new Date().toISOString().slice(0,10);
+  XLSX.writeFile(wb,`出席回覆_${date}.xlsx`);
+}
+
+async function clearRSVPConfirm(){
+  await IMGDB.clearRSVP().catch(()=>{});
+  loadRSVPRecords();
+  showToastMsg('✓ 已清除所有回覆記錄');
+}
+
+/* ═══ QR CODE ═══ */
+let qrInstance=null;
+function genQR(type){
+  const base=window.location.href.replace(/#.*$/,'').replace(/[?].*$/,'');
+  const urls={
+    rsvp: base+'#s-rsvp',
+    checkin: base+'#s-checkin',
+    home: base
+  };
+  const labels={rsvp:'出席回覆表單',checkin:'座位查詢 & 報到',home:'婚禮網站首頁'};
+  const url=urls[type]||base;
+
+  document.getElementById('qrLabel').textContent='🔗 '+url;
+  document.getElementById('qrDownloadRow').style.display='block';
+  const box=document.getElementById('qrBox');
+  box.style.display='inline-block';
+  box.innerHTML='';
+  try{
+    qrInstance=new QRCode(box,{
+      text:url,width:180,height:180,
+      colorDark:'#000000',colorLight:'#ffffff',
+      correctLevel:QRCode.CorrectLevel.H
+    });
+    // small label under QR
+    const lbl=document.createElement('div');
+    lbl.style.cssText='font-size:11px;color:#555;margin-top:6px;text-align:center;font-family:sans-serif;';
+    lbl.textContent=labels[type];
+    box.appendChild(lbl);
+  }catch(e){box.innerHTML='<p style="color:red;font-size:0.75rem;">QR Code 產生失敗</p>';}
+}
+
+function downloadQR(){
+  const canvas=document.querySelector('#qrBox canvas');
+  if(!canvas){alert('請先產生 QR Code');return;}
+  const a=document.createElement('a');
+  a.download='wedding_qrcode.png';
+  a.href=canvas.toDataURL('image/png');
+  a.click();
+}
+
+/* ═══ MANUAL CHECKIN ═══ */
+let localCheckins={};  // name -> time
+async function loadLocalCheckins(){
+  const list=await IMGDB.getAllCheckins().catch(()=>[]);
+  localCheckins={};
+  list.forEach(c=>{localCheckins[c.name]=c.time;});
+}
+
+async function manualCheckin(name){
+  if(localCheckins[name]){
+    // Already checked in → toggle off
+    await IMGDB.removeCheckin(name).catch(()=>{});
+    delete localCheckins[name];
+  } else {
+    // Not checked in → check in
+    await IMGDB.addCheckin(name).catch(()=>{});
+    localCheckins[name]=new Date().toLocaleString('zh-TW');
+    if(CFG.APPS_SCRIPT_URL){
+      fetch(CFG.APPS_SCRIPT_URL+'?action=checkin&name='+encodeURIComponent(name)).catch(()=>{});
+    }
+  }
+  renderGuestTable();
+  renderAdmin();
+}
+
+/* ═══ BUILD GUEST LIST FROM LOCAL DATA ═══ */
+let localRSVPGuests = [];
+let guestOverrides = {}; // name -> {tableNum, adults, veg, hidden}
+let manualGuests = [];   // [{id, name, tableNum, adults, veg, childChairs, diet}]
+
+async function loadLocalGuestList(){
+  const records = await IMGDB.getAllRSVP().catch(()=>[]);
+  localRSVPGuests = records.filter(r=>r.attend==='出席');
+  const ovList = await IMGDB.getAllOverrides().catch(()=>[]);
+  guestOverrides = {};
+  ovList.forEach(o=>{ guestOverrides[o.name]=o; });
+  manualGuests = await IMGDB.getAllManualGuests().catch(()=>[]);
+  renderGuestTable();
+}
+
+async function addGuestRow(){
+  const g={name:'',tableNum:'',adults:1,veg:0,childChairs:0,diet:'—'};
+  const saved=await IMGDB.addManualGuest(g).catch(()=>null);
+  if(saved){ manualGuests.push(saved); renderGuestTable(); }
+}
+
+async function removeGuestRow(type, key){
+  if(type==='rsvp'){
+    if(!guestOverrides[key]) guestOverrides[key]={name:key};
+    guestOverrides[key].hidden=true;
+    await IMGDB.putOverride(guestOverrides[key]).catch(()=>{});
+  } else {
+    const id=parseInt(key);
+    await IMGDB.deleteManualGuest(id).catch(()=>{});
+    manualGuests=manualGuests.filter(g=>g.id!==id);
+  }
+  renderGuestTable();
+}
+
+async function removeLastGuestRow(){
+  const visibleRSVP=localRSVPGuests.filter(r=>!(guestOverrides[r.name]&&guestOverrides[r.name].hidden));
+  if(manualGuests.length>0){
+    const last=manualGuests[manualGuests.length-1];
+    await IMGDB.deleteManualGuest(last.id).catch(()=>{});
+    manualGuests.pop();
+  } else if(visibleRSVP.length>0){
+    const last=visibleRSVP[visibleRSVP.length-1];
+    if(!guestOverrides[last.name]) guestOverrides[last.name]={name:last.name};
+    guestOverrides[last.name].hidden=true;
+    await IMGDB.putOverride(guestOverrides[last.name]).catch(()=>{});
+  }
+  renderGuestTable();
+}
+
+async function updateManualGuest(id, field, value){
+  const g=manualGuests.find(m=>m.id===id);
+  if(!g) return;
+  g[field]=value;
+  // Rebuild the object without auto-increment issues
+  await IMGDB.deleteManualGuest(id).catch(()=>{});
+  const saved=await IMGDB.addManualGuest({...g,id}).catch(()=>null);
+  renderGuestTable();
+}
+
+async function manualGuestCounter(id, field, delta){
+  const g=manualGuests.find(m=>m.id===id);
+  if(!g) return;
+  g[field]=Math.max(0,(parseInt(g[field])||0)+delta);
+  await IMGDB.deleteManualGuest(id).catch(()=>{});
+  await IMGDB.addManualGuest({...g}).catch(()=>{});
+  renderGuestTable();
+}
+
+async function updateGuestOverride(name, field, value){
+  if(!guestOverrides[name]) guestOverrides[name]={name};
+  guestOverrides[name][field]=value;
+  await IMGDB.putOverride(guestOverrides[name]).catch(()=>{});
+}
+
+function buildSeatMap(){
+  const map = {};
+  seatingData.forEach(t=>{
+    t.guests.forEach(g=>{
+      if(g.name && g.name.trim()){
+        map[g.name.trim()] = {num: t.num, tableName: t.name||''};
+      }
+    });
+  });
+  return map;
+}
+
+/* ═══ ADMIN TABS ═══ */
+function switchAdminTab(name, btn){
+  document.querySelectorAll('.admin-tab').forEach(b=>b.classList.remove('active'));
+  document.querySelectorAll('.admin-tab-panel').forEach(p=>p.classList.remove('active'));
+  btn.classList.add('active');
+  document.getElementById('atab-'+name).classList.add('active');
+  if(name==='winfo') loadWInfoFields();
+}
+
+/* ═══ WEDDING INFO EDITOR ═══ */
+const WI_KEYS=['hero_name1','hero_name2','parents_groom_label','parents_groom',
+  'parents_bride_label','parents_bride','hero_date','info_date','wedding_date_iso',
+  'venue_name','venue_addr','map_address',
+  'save_ceremony_time','save_ceremony_sub',
+  'ceremony_venue_name','ceremony_venue_addr','save_banquet_time','save_banquet_sub',
+  'banquet_venue_name','banquet_venue_addr','invite_text',
+  'transport_title','transport_car_label','transport_car_content',
+  'transport_bus_label','transport_bus_content',
+  'transport_transit_label','transport_transit_content'];
+
+function loadWInfoFields(){
+  const data=getSiteData();
+  WI_KEYS.forEach(k=>{
+    const el=document.getElementById('wi-'+k);
+    if(!el)return;
+    if(el.type==='hidden'){el.value=data[k]||'';}
+    else el.value=data[k]||'';
+  });
+  // Date picker: use wedding_date_iso if available, else parse hero_date
+  const isoSrc=data.wedding_date_iso||'';
+  let isoVal='';
+  if(isoSrc){isoVal=isoSrc.slice(0,10);}
+  else if(data.hero_date){
+    const match=data.hero_date.match(/(\d{4})\s*[.．]\s*(\d{1,2})\s*[.．]\s*(\d{1,2})/);
+    if(match) isoVal=`${match[1]}-${match[2].padStart(2,'0')}-${match[3].padStart(2,'0')}`;
+  }
+  if(isoVal){
+    document.getElementById('wi-wedding_date_picker').value=isoVal;
+    updateDatePreviews(isoVal);
+  }
+  // Map
+  if(data.map_address) previewMap(data.map_address);
+  // ceremony toggle
+  const cb=document.getElementById('wi-show_ceremony');
+  if(cb) cb.checked=data.show_ceremony!=='false';
+}
+
+const DAY_ZH=['週日','週一','週二','週三','週四','週五','週六'];
+function onDatePickerChange(iso){
+  if(!iso)return;
+  updateDatePreviews(iso);
+  // Also update hidden ISO field for countdown
+  const isoFull=iso+'T12:00:00+08:00';
+  CFG.WEDDING_DATE=new Date(isoFull);
+  // Store in a temp hidden field so saveWInfo picks it up
+  let hiddenISO=document.getElementById('wi-wedding_date_iso');
+  if(!hiddenISO){hiddenISO=document.createElement('input');hiddenISO.type='hidden';hiddenISO.id='wi-wedding_date_iso';document.body.appendChild(hiddenISO);}
+  hiddenISO.value=isoFull;
+  tick();
+}
+function updateDatePreviews(iso){
+  if(!iso)return;
+  const [y,m,d]=iso.split('-');
+  const dow=new Date(iso+'T12:00:00').getDay();
+  const simple=`${y} . ${m} . ${d}（${DAY_ZH[dow]}）`;
+  const full=`${y} 年 ${parseInt(m)} 月 ${parseInt(d)} 日（${DAY_ZH[dow]}）`;
+  document.getElementById('wi-hero_date').value=simple;
+  document.getElementById('wi-info_date').value=full;
+  const sp=document.getElementById('wi-hero_date-preview');
+  const fp=document.getElementById('wi-info_date-preview');
+  if(sp)sp.textContent=simple;
+  if(fp)fp.textContent=full;
+}
+
+let mapPreviewTimer=null;
+function previewMap(addr){
+  clearTimeout(mapPreviewTimer);
+  if(!addr||addr.length<4)return;
+  mapPreviewTimer=setTimeout(()=>{
+    const encoded=encodeURIComponent(addr);
+    fetch(`https://nominatim.openstreetmap.org/search?q=${encoded}&format=json&limit=1`,{headers:{'Accept-Language':'zh-TW'}})
+    .then(r=>r.json())
+    .then(data=>{
+      if(!data||!data.length)return;
+      const lat=parseFloat(data[0].lat),lon=parseFloat(data[0].lon),d=0.003;
+      const bbox=`${lon-d},${lat-d},${lon+d},${lat+d}`;
+      const src=`https://www.openstreetmap.org/export/embed.html?bbox=${bbox}&layer=mapnik&marker=${lat},${lon}`;
+      const iframe=document.getElementById('mapPreviewIframe');
+      if(iframe){iframe.src=src;document.getElementById('mapPreviewWrap').style.display='block';}
+    }).catch(()=>{});
+  },1000);
+}
+
+function applyMapToPage(addr){
+  if(!addr)return;
+  const encoded=encodeURIComponent(addr);
+  const mapsUrl=`https://www.google.com/maps/search/?api=1&query=${encoded}`;
+  const tLink=document.getElementById('transportMapExtLink');
+  if(tLink)tLink.href=mapsUrl;
+
+  // Geocode with Nominatim (OpenStreetMap) → free, no API key needed
+  fetch(`https://nominatim.openstreetmap.org/search?q=${encoded}&format=json&limit=1`,{
+    headers:{'Accept-Language':'zh-TW'}
+  })
+  .then(r=>r.json())
+  .then(data=>{
+    if(!data||!data.length)return;
+    const lat=parseFloat(data[0].lat);
+    const lon=parseFloat(data[0].lon);
+    const delta=0.003; // zoom level
+    const bbox=`${lon-delta},${lat-delta},${lon+delta},${lat+delta}`;
+    const osmSrc=`https://www.openstreetmap.org/export/embed.html?bbox=${bbox}&layer=mapnik&marker=${lat},${lon}`;
+    const tBlock=document.getElementById('transportMapBlock');
+    const tIframe=document.getElementById('transportMapIframe');
+    if(tIframe){
+      tIframe.src=osmSrc;
+      tIframe.style.filter='grayscale(20%) contrast(1.05) brightness(0.88) sepia(10%)';
+      if(tBlock)tBlock.style.display='block';
+    }
+  })
+  .catch(()=>{});
+}
+
+function saveWInfo(){
+  const data=getSiteData();
+  WI_KEYS.forEach(k=>{
+    const el=document.getElementById('wi-'+k);
+    if(!el)return;
+    const v=(el.tagName==='TEXTAREA'?el.value:el.value).trim();
+    if(v) data[k]=v; else delete data[k];
+  });
+  // ceremony toggle
+  const cb=document.getElementById('wi-show_ceremony');
+  if(cb) data.show_ceremony=cb.checked?'true':'false';
+  localStorage.setItem(STORAGE_KEY,JSON.stringify(data));
+  applyContent();
+  showToastMsg('✓ 婚禮資訊已儲存並套用');
+}
+
+function resetWInfoFields(){
+  const data=getSiteData();
+  WI_KEYS.forEach(k=>delete data[k]);
+  delete data.show_ceremony;
+  localStorage.setItem(STORAGE_KEY,JSON.stringify(data));
+  loadWInfoFields();
+  applyContent();
+  showToastMsg('已重設為預設值');
+}
+
+/* ═══ ADMIN ═══ */
+function toggleAdmin(){
+  const s=document.getElementById('s-admin');
+  s.classList.toggle('show');
+  if(s.classList.contains('show'))s.scrollIntoView({behavior:'smooth'});
+}
+function adminLogin(){
+  const d=getSiteData();
+  const pwd=d.admin_password||'wedding2024';
+  if(document.getElementById('adminPwd').value===pwd){
+    document.getElementById('adminLoginCard').style.display='none';
+    document.getElementById('adminDash').classList.add('show');
+    loadAdminData();
+    loadRSVPRecords();
+    loadLocalCheckins();
+    loadSeatingBoard();
+    loadLocalGuestList(); // loads RSVP + overrides
+  } else {alert('密碼錯誤');document.getElementById('adminPwd').value='';}
+}
+
+let allGuests=[],gFilter='all';
+const DEMO=[
+  {姓名:'張小明',桌號:'1',桌名:'玫瑰桌',出席人數:'2',素食人數:'0',報到:'Y'},
+  {姓名:'李美華',桌號:'1',桌名:'玫瑰桌',出席人數:'3',素食人數:'1',報到:'N'},
+  {姓名:'王大偉',桌號:'2',桌名:'牡丹桌',出席人數:'2',素食人數:'0',報到:'Y'},
+  {姓名:'陳淑芬',桌號:'2',桌名:'牡丹桌',出席人數:'4',素食人數:'2',報到:'N'},
+  {姓名:'林志明',桌號:'3',桌名:'蘭花桌',出席人數:'2',素食人數:'0',報到:'N'},
+];
+
+async function loadAdminData(){
+  const data=CFG.SHEET_CSV_URL?await fetchSheet():null;
+  allGuests=data||DEMO;
+  renderAdmin();
+}
+
+function renderAdmin(){
+  // 1. 已填寫回覆 → RSVP records total count (all, including non-attendees)
+  const totalReplies = window._allRSVPCount || 0;
+
+  // 2. 確認出席人數 → RSVP records where attend=出席, sum of adults
+  const attendCount = localRSVPGuests.reduce((s,r)=>s+(parseInt(r.adults)||0),0);
+
+  // 3. 已報到 → guest list (RSVP visible + manual), count localCheckins matches
+  const seatMap = buildSeatMap();
+  const visibleRSVP = localRSVPGuests.filter(r=>!(guestOverrides[r.name]&&guestOverrides[r.name].hidden));
+  const allGuestNames = [
+    ...visibleRSVP.map(r=>r.name),
+    ...manualGuests.map(m=>m.name).filter(Boolean)
+  ];
+  const checkedCount = allGuestNames.filter(n=>!!localCheckins[n]).length;
+  const guestTotal = allGuestNames.length;
+
+  // 4. 素食人數 → guest list, sum veg (with overrides applied)
+  const vegCount = visibleRSVP.reduce((s,r)=>{
+    const ov=guestOverrides[r.name]||{};
+    return s+(ov.veg!==undefined?ov.veg:(parseInt(r.veg)||0));
+  },0) + manualGuests.reduce((s,m)=>s+(parseInt(m.veg)||0),0);
+
+  // 5. 兒童椅 → guest list, sum childChairs from RSVP records
+  const childCount = visibleRSVP.reduce((s,r)=>s+(parseInt(r.childChairs)||0),0)
+    + manualGuests.reduce((s,m)=>s+(parseInt(m.childChairs)||0),0);
+
+  // 6. 桌次數 → seatingData length
+  const tableCount = seatingData.length;
+
+  document.getElementById('dTotal').textContent = totalReplies;
+  document.getElementById('dAttend').textContent = attendCount;
+  document.getElementById('dChecked').textContent = `${checkedCount}/${guestTotal}`;
+  document.getElementById('dBar').style.width = (guestTotal>0?Math.round(checkedCount/guestTotal*100):0)+'%';
+  document.getElementById('dVeg').textContent = vegCount;
+  document.getElementById('dChild').textContent = childCount;
+  document.getElementById('dTables').textContent = tableCount;
+
+  // Seating summary (from seatingData)
+  const tGrid = document.getElementById('tablesGrid');
+  if(tGrid){
+    if(seatingData.length===0){
+      tGrid.innerHTML='<div style="font-size:0.75rem;color:var(--muted);letter-spacing:1px;">尚未建立座位分配表</div>';
+    } else {
+      tGrid.innerHTML=seatingData.sort((a,b)=>(parseInt(a.num)||999)-(parseInt(b.num)||999)).map(t=>{
+        const filled=t.guests.filter(g=>g.name&&g.name.trim()).length;
+        const chk=t.guests.filter(g=>g.name&&localCheckins[g.name.trim()]).length;
+        return`<div class="t-item">
+          <div class="t-item-left">
+            <div class="t-name">${t.num}桌${t.name?' · '+t.name:''}</div>
+            <div class="t-sub">${chk}人已報到</div>
+          </div>
+          <div class="t-num">${filled}/${t.capacity}</div>
+        </div>`;
+      }).join('');
+    }
+  }
+
+  renderGuestTable();
+}
+
+function filterG(f,btn){gFilter=f;document.querySelectorAll('.fbtn').forEach(b=>b.classList.remove('active'));btn.classList.add('active');renderGuestTable();}
+
+function renderGuestTable(){
+  const seatMap = buildSeatMap();
+
+  // RSVP guests (filtered, not hidden)
+  let rsvpRows = localRSVPGuests
+    .filter(r=>!(guestOverrides[r.name]&&guestOverrides[r.name].hidden))
+    .map(r=>{
+      const ov=guestOverrides[r.name]||{};
+      const seatable=seatMap[r.name]||{};
+      const tableNum=ov.tableNum!==undefined?ov.tableNum:(seatable.num||'');
+      const tableByNum=seatingData.find(t=>t.num===tableNum);
+      const tableName=tableByNum?tableByNum.name:(seatable.tableName||'');
+      return {
+        _type:'rsvp', _key:r.name,
+        name:r.name||'—', tableNum, tableName,
+        adults:ov.adults!==undefined?ov.adults:(parseInt(r.adults)||0),
+        veg:ov.veg!==undefined?ov.veg:(parseInt(r.veg)||0),
+        childChairs:parseInt(r.childChairs)||0,
+        diet:r.diet||'—',
+        checked:!!localCheckins[r.name],
+        checkinTime:localCheckins[r.name]||'',
+      };
+    });
+
+  // Manual guests
+  let manualRows = manualGuests.map(m=>{
+    const tableByNum=seatingData.find(t=>t.num===m.tableNum);
+    return {
+      _type:'manual', _key:m.id,
+      name:m.name||'', tableNum:m.tableNum||'', tableName:tableByNum?tableByNum.name:'',
+      adults:parseInt(m.adults)||0, veg:parseInt(m.veg)||0,
+      childChairs:parseInt(m.childChairs)||0, diet:m.diet||'—',
+      checked:!!localCheckins[m.name], checkinTime:localCheckins[m.name]||'',
+      id:m.id,
+    };
+  });
+
+  let data=[...rsvpRows,...manualRows];
+  if(gFilter==='checked') data=data.filter(g=>g.checked);
+  if(gFilter==='veg') data=data.filter(g=>g.veg>0);
+
+  const tbody=document.getElementById('guestTbody');
+  if(!tbody) return;
+  if(data.length===0){
+    tbody.innerHTML=`<tr><td colspan="10" style="text-align:center;padding:28px;color:var(--muted);">
+      ${localRSVPGuests.length===0&&manualGuests.length===0?'尚無出席回覆記錄':'無符合條件的資料'}</td></tr>`;
+    return;
+  }
+
+  const delBtn=(type,key)=>`<button
+    onclick="removeGuestRow('${type}','${key}')"
+    style="background:none;border:1px solid rgba(158,90,90,0.3);color:rgba(158,90,90,0.55);
+           width:22px;height:22px;cursor:pointer;font-size:0.75rem;
+           display:inline-flex;align-items:center;justify-content:center;transition:all 0.2s;"
+    onmouseover="this.style.borderColor='var(--red)';this.style.color='var(--red)'"
+    onmouseout="this.style.borderColor='rgba(158,90,90,0.3)';this.style.color='rgba(158,90,90,0.55)'"
+    title="刪除此列">✕</button>`;
+
+  const counter=(clickFn,val)=>`<span style="display:inline-flex;align-items:center;gap:3px;">
+    <button onclick="${clickFn}(-1)" style="background:none;border:1px solid var(--border2);color:var(--muted);width:20px;height:20px;cursor:pointer;font-size:0.9rem;display:inline-flex;align-items:center;justify-content:center;">－</button>
+    <span style="min-width:18px;text-align:center;font-size:0.82rem;">${val}</span>
+    <button onclick="${clickFn}(1)" style="background:none;border:1px solid var(--border2);color:var(--muted);width:20px;height:20px;cursor:pointer;font-size:0.9rem;display:inline-flex;align-items:center;justify-content:center;">＋</button>
+  </span>`;
+
+  tbody.innerHTML=data.map(g=>{
+    const isManual=g._type==='manual';
+    const sn=String(g.name).replace(/'/g,"\\'");
+    const key=g._key;
+
+    // Name cell
+    const nameCell=isManual
+      ?`<input value="${g.name.replace(/"/g,'&quot;')}" placeholder="賓客姓名"
+          style="width:80px;background:transparent;border:none;border-bottom:1px solid var(--border2);
+                 color:var(--cream);font-size:0.82rem;font-family:'Noto Serif TC',serif;outline:none;padding:2px 0;"
+          onchange="manualGuests.find(m=>m.id===${key}).name=this.value;IMGDB.deleteManualGuest(${key}).then(()=>IMGDB.addManualGuest({...manualGuests.find(m=>m.id===${key})})).catch(()=>{});">`
+      :g.name;
+
+    // Table num cell
+    const tableNumCell=isManual
+      ?`<input value="${g.tableNum}" placeholder="桌號"
+          style="width:36px;background:transparent;border:none;border-bottom:1px solid var(--border2);
+                 color:var(--cream);font-size:0.82rem;font-family:'Noto Serif TC',serif;outline:none;text-align:center;padding:2px 0;"
+          onchange="updateManualGuest(${key},'tableNum',this.value)">`
+      :`<input value="${g.tableNum}"
+          style="width:36px;background:transparent;border:none;border-bottom:1px solid var(--border2);
+                 color:var(--cream);font-size:0.82rem;font-family:'Noto Serif TC',serif;outline:none;text-align:center;padding:2px 0;"
+          onchange="updateGuestOverride('${sn}','tableNum',this.value).then(()=>renderGuestTable())"
+          title="可自行輸入桌號">`;
+
+    // Counters
+    const adultsCounter=isManual
+      ?counter(`manualGuestCounter(${key},'adults',`,g.adults)
+      :counter(`guestCounter('${sn}','adults',`,g.adults);
+    const vegCounter=isManual
+      ?counter(`manualGuestCounter(${key},'veg',`,g.veg)
+      :counter(`guestCounter('${sn}','veg',`,g.veg);
+
+    const checkinBtn=g.checked
+      ?`<button class="btn-checkin-manual done" onclick="manualCheckin('${sn}')" title="點擊取消報到">✓ 已報到${g.checkinTime?`<span style="font-size:0.52rem;letter-spacing:0;display:block;">${g.checkinTime}</span>`:''}</button>`
+      :`<button class="btn-checkin-manual" onclick="manualCheckin('${sn}')">報到</button>`;
+
+    const dietDisplay=g.diet&&g.diet!=='無'&&g.diet!=='—'
+      ?`<span style="font-size:0.7rem;color:#b58ac8;">${g.diet}</span>`
+      :`<span style="color:var(--muted);font-size:0.75rem;">—</span>`;
+
+    return`<tr>
+      <td>${nameCell}</td>
+      <td>${tableNumCell}</td>
+      <td style="font-size:0.78rem;color:var(--muted);">${g.tableName||'—'}</td>
+      <td>${adultsCounter}</td>
+      <td>${vegCounter}</td>
+      <td style="text-align:center;font-size:0.82rem;">${g.childChairs>0?`<span class="chip" style="border-color:#5a7a9a;color:#8ab0c8;">${g.childChairs}</span>`:'—'}</td>
+      <td style="max-width:120px;">${dietDisplay}</td>
+      <td>${g.checked?'<span class="chip chip-y">✓ 到</span>':'<span class="chip chip-n">未到</span>'}</td>
+      <td>${checkinBtn}</td>
+      <td>${delBtn(g._type,g._key)}</td>
+    </tr>`;
+  }).join('');
+}
+
+async function guestCounter(name, field, delta){
+  if(!guestOverrides[name]) guestOverrides[name]={name};
+  // Get current value: override or from RSVP
+  const rsvp=localRSVPGuests.find(r=>r.name===name)||{};
+  const base=guestOverrides[name][field]!==undefined
+    ? guestOverrides[name][field]
+    : (field==='adults'?parseInt(rsvp.adults)||0:parseInt(rsvp.veg)||0);
+  const newVal=Math.max(0,base+delta);
+  guestOverrides[name][field]=newVal;
+  await IMGDB.putOverride(guestOverrides[name]).catch(()=>{});
+  renderGuestTable();
+}
+</script>
+</body>
+</html>

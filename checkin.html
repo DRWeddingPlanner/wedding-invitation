@@ -1,0 +1,793 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Tom & Rainy ｜ 婚禮報到</title>
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,200;0,300;0,400;0,500;1,200;1,300;1,400&family=Noto+Serif+TC:wght@200;300;400&display=swap" rel="stylesheet">
+<style>
+*{margin:0;padding:0;box-sizing:border-box}
+:root{
+  --bg:#0C0906;
+  --bg2:#120E0A;
+  --bg3:#1A1410;
+  --cream:#EDE4D4;
+  --cream2:#D4C9B5;
+  --gold:#C4A44A;
+  --gold2:#A88A35;
+  --gold-dim:rgba(196,164,74,0.15);
+  --muted:#8C7B68;
+  --border:rgba(196,164,74,0.25);
+  --border2:rgba(196,164,74,0.1);
+  --green:#5a9e6a;
+}
+html,body{height:100%}
+body{
+  background:var(--bg);
+  color:var(--cream);
+  font-family:'Noto Serif TC',serif;
+  min-height:100vh;
+  overflow-x:hidden;
+}
+
+/* ─── PARTICLE BG ─── */
+#particles{
+  position:fixed;inset:0;z-index:0;
+  pointer-events:none;overflow:hidden;
+}
+.particle{
+  position:absolute;border-radius:50%;
+  background:var(--gold);opacity:0;
+  animation:float linear infinite;
+}
+@keyframes float{
+  0%{transform:translateY(100vh) scale(0);opacity:0}
+  10%{opacity:0.4}
+  90%{opacity:0.1}
+  100%{transform:translateY(-20px) scale(1);opacity:0}
+}
+
+/* ─── HEADER ─── */
+header{
+  position:fixed;top:0;left:0;right:0;z-index:100;
+  padding:0 32px;height:56px;
+  display:flex;align-items:center;justify-content:space-between;
+  background:rgba(12,9,6,0.8);
+  backdrop-filter:blur(16px);
+  border-bottom:1px solid var(--border2);
+}
+.h-logo{
+  font-family:'Cormorant Garamond',serif;
+  font-size:1.1rem;font-weight:300;
+  color:var(--gold);letter-spacing:3px;font-style:italic;
+  text-decoration:none;
+}
+.h-back{
+  font-size:0.7rem;letter-spacing:3px;
+  color:var(--muted);cursor:pointer;
+  background:none;border:none;
+  font-family:'Noto Serif TC',serif;
+  transition:color 0.2s;
+}
+.h-back:hover{color:var(--gold);}
+
+/* ─── MAIN LAYOUT ─── */
+main{
+  position:relative;z-index:10;
+  min-height:100vh;
+  display:flex;flex-direction:column;
+  align-items:center;justify-content:center;
+  padding:80px 24px 60px;
+}
+
+/* ─── STEP INDICATOR ─── */
+.steps{
+  display:flex;align-items:center;gap:0;
+  margin-bottom:48px;
+}
+.step{
+  display:flex;flex-direction:column;align-items:center;gap:8px;
+}
+.step-circle{
+  width:32px;height:32px;border-radius:50%;
+  border:1px solid var(--border);
+  display:flex;align-items:center;justify-content:center;
+  font-family:'Cormorant Garamond',serif;font-size:0.85rem;
+  color:var(--muted);transition:all 0.5s;
+  position:relative;
+}
+.step-circle.active{
+  border-color:var(--gold);color:var(--gold);
+  box-shadow:0 0 20px rgba(196,164,74,0.2);
+}
+.step-circle.done{
+  background:var(--gold);border-color:var(--gold);color:var(--bg);
+}
+.step-label{
+  font-size:0.62rem;letter-spacing:3px;
+  color:var(--muted);text-align:center;
+  transition:color 0.5s;white-space:nowrap;
+}
+.step-label.active{color:var(--gold);}
+.step-connector{
+  width:60px;height:1px;
+  background:var(--border);
+  margin:0 8px;margin-bottom:28px;
+  position:relative;overflow:hidden;
+}
+.step-connector-fill{
+  position:absolute;left:0;top:0;bottom:0;
+  background:var(--gold);width:0%;
+  transition:width 0.6s ease;
+}
+
+/* ─── CARDS ─── */
+.card{
+  width:100%;max-width:480px;
+  border:1px solid var(--border);
+  background:rgba(26,20,16,0.8);
+  backdrop-filter:blur(20px);
+  padding:48px 40px;
+  position:relative;overflow:hidden;
+}
+.card::before{
+  content:'';position:absolute;
+  top:-60%;left:-20%;right:-20%;
+  height:60%;
+  background:radial-gradient(ellipse,rgba(196,164,74,0.05) 0%,transparent 70%);
+  pointer-events:none;
+}
+
+/* ─── STEP 1: SEARCH ─── */
+#step1{display:flex;flex-direction:column;align-items:center;}
+.page-tag{
+  font-size:0.62rem;letter-spacing:8px;
+  color:var(--gold);text-transform:uppercase;
+  margin-bottom:16px;text-align:center;
+}
+.page-title{
+  font-family:'Cormorant Garamond',serif;
+  font-size:clamp(2rem,5vw,3rem);
+  font-weight:200;color:var(--cream);
+  letter-spacing:3px;text-align:center;
+  margin-bottom:8px;line-height:1.1;
+}
+.page-sub{
+  font-size:0.78rem;color:var(--muted);
+  letter-spacing:2px;text-align:center;
+  margin-bottom:40px;line-height:1.8;
+}
+.divider{
+  display:flex;align-items:center;gap:16px;
+  width:100%;margin-bottom:32px;
+}
+.divider-line{height:1px;flex:1;background:var(--border);}
+.divider-star{color:var(--gold);font-size:0.7rem;}
+
+.name-input-wrap{
+  position:relative;width:100%;margin-bottom:8px;
+}
+.name-input{
+  width:100%;background:transparent;
+  border:none;border-bottom:1px solid var(--border);
+  padding:14px 0;font-size:1.1rem;
+  font-family:'Cormorant Garamond',serif;
+  color:var(--cream);outline:none;
+  letter-spacing:2px;text-align:center;
+  transition:border-color 0.3s;
+}
+.name-input:focus{border-color:var(--gold);}
+.name-input::placeholder{color:var(--muted);font-size:0.9rem;letter-spacing:3px;}
+.input-hint{
+  font-size:0.68rem;color:var(--muted);
+  letter-spacing:2px;text-align:center;
+  margin-bottom:32px;
+}
+.btn-search{
+  width:100%;background:transparent;
+  border:1px solid var(--gold);
+  color:var(--gold);padding:16px;
+  font-size:0.78rem;letter-spacing:5px;
+  font-family:'Noto Serif TC',serif;
+  cursor:pointer;transition:all 0.3s;
+  text-transform:uppercase;
+}
+.btn-search:hover{background:var(--gold);color:var(--bg);}
+.btn-search:disabled{opacity:0.5;cursor:not-allowed;}
+
+/* ─── STEP 2: SEAT RESULT ─── */
+#step2{display:none;flex-direction:column;align-items:center;}
+
+.seat-display{
+  width:100%;text-align:center;
+  padding-bottom:32px;
+  border-bottom:1px solid var(--border2);
+  margin-bottom:32px;
+}
+.seat-welcome{
+  font-size:0.62rem;letter-spacing:8px;
+  color:var(--gold);text-transform:uppercase;
+  margin-bottom:16px;
+}
+.seat-guest{
+  font-family:'Cormorant Garamond',serif;
+  font-size:2.2rem;font-weight:300;
+  color:var(--cream);letter-spacing:3px;
+  margin-bottom:28px;
+}
+.seat-table-wrap{
+  display:inline-flex;flex-direction:column;
+  align-items:center;
+  border:1px solid var(--border);
+  padding:28px 48px;
+  background:rgba(196,164,74,0.04);
+  position:relative;margin-bottom:24px;
+}
+.seat-table-wrap::before,.seat-table-wrap::after{
+  content:'';position:absolute;
+  width:8px;height:8px;
+  border-color:var(--gold);border-style:solid;
+}
+.seat-table-wrap::before{top:-1px;left:-1px;border-width:1px 0 0 1px;}
+.seat-table-wrap::after{bottom:-1px;right:-1px;border-width:0 1px 1px 0;}
+.table-number{
+  font-family:'Cormorant Garamond',serif;
+  font-size:6rem;font-weight:200;
+  color:var(--gold);line-height:1;
+}
+.table-label{
+  font-size:0.6rem;letter-spacing:6px;
+  color:var(--muted);text-transform:uppercase;
+  margin-top:4px;
+}
+.table-name-badge{
+  display:inline-block;
+  border:1px solid var(--border);
+  padding:6px 20px;font-size:0.9rem;
+  color:var(--cream2);letter-spacing:2px;
+  margin-bottom:8px;
+}
+.seat-meta{
+  font-size:0.72rem;color:var(--muted);
+  letter-spacing:2px;line-height:2;
+}
+
+/* Check-in sub-block */
+.checkin-block{text-align:center;}
+.checkin-block h3{
+  font-family:'Cormorant Garamond',serif;
+  font-size:1.4rem;font-weight:300;
+  color:var(--cream);letter-spacing:3px;
+  margin-bottom:8px;
+}
+.checkin-block p{
+  font-size:0.78rem;color:var(--muted);
+  letter-spacing:1px;line-height:2;
+  margin-bottom:24px;
+}
+.btn-arrive{
+  width:100%;
+  border:1px solid var(--gold);
+  background:transparent;color:var(--gold);
+  padding:18px;font-size:0.82rem;
+  font-family:'Noto Serif TC',serif;
+  letter-spacing:4px;cursor:pointer;
+  transition:all 0.4s;
+  position:relative;overflow:hidden;
+}
+.btn-arrive::before{
+  content:'';position:absolute;
+  inset:0;background:var(--gold);
+  transform:translateX(-100%);
+  transition:transform 0.4s ease;
+  z-index:-1;
+}
+.btn-arrive:hover::before{transform:translateX(0);}
+.btn-arrive:hover{color:var(--bg);}
+.btn-arrive:disabled{opacity:0.5;cursor:not-allowed;}
+.btn-search-again{
+  width:100%;margin-top:12px;
+  background:none;border:none;
+  font-size:0.7rem;letter-spacing:3px;
+  color:var(--muted);cursor:pointer;
+  font-family:'Noto Serif TC',serif;
+  padding:10px;transition:color 0.2s;
+}
+.btn-search-again:hover{color:var(--cream);}
+
+/* ─── STEP 3: SUCCESS ─── */
+#step3{display:none;flex-direction:column;align-items:center;text-align:center;}
+
+.confetti-wrap{
+  font-size:2.5rem;margin-bottom:24px;
+  animation:bounce 0.6s ease;
+}
+@keyframes bounce{
+  0%{transform:scale(0)}
+  60%{transform:scale(1.2)}
+  100%{transform:scale(1)}
+}
+.success-name{
+  font-size:0.65rem;letter-spacing:6px;
+  color:var(--muted);text-transform:uppercase;
+  margin-bottom:8px;
+}
+.success-guest{
+  font-family:'Cormorant Garamond',serif;
+  font-size:2rem;font-weight:300;
+  color:var(--cream);letter-spacing:3px;
+  margin-bottom:24px;
+}
+.success-main{
+  font-family:'Cormorant Garamond',serif;
+  font-size:3rem;font-weight:200;
+  color:var(--gold);letter-spacing:4px;
+  font-style:italic;line-height:1.1;
+  margin-bottom:8px;
+}
+.success-sub{
+  font-size:0.8rem;color:var(--muted);
+  letter-spacing:2px;line-height:2.2;
+  margin-bottom:32px;
+}
+.success-divider{
+  width:60px;height:1px;
+  background:var(--border);
+  margin:0 auto 24px;
+}
+
+/* Seat recap in success */
+.seat-recap{
+  display:flex;gap:0;
+  border:1px solid var(--border);
+  margin-bottom:28px;width:100%;
+}
+.recap-item{
+  flex:1;padding:16px;text-align:center;
+  border-right:1px solid var(--border);
+}
+.recap-item:last-child{border-right:none;}
+.recap-label{
+  font-size:0.58rem;letter-spacing:4px;
+  color:var(--gold);text-transform:uppercase;
+  margin-bottom:8px;
+}
+.recap-val{
+  font-family:'Cormorant Garamond',serif;
+  font-size:1.4rem;color:var(--cream);
+  font-weight:300;
+}
+
+.success-time{
+  font-size:0.68rem;color:var(--muted);
+  letter-spacing:3px;margin-bottom:32px;
+}
+.btn-restart{
+  background:none;border:1px solid var(--border);
+  color:var(--muted);padding:12px 32px;
+  font-size:0.7rem;letter-spacing:3px;
+  cursor:pointer;font-family:'Noto Serif TC',serif;
+  transition:all 0.3s;
+}
+.btn-restart:hover{border-color:var(--gold);color:var(--gold);}
+
+/* ─── NOT FOUND ─── */
+.not-found{text-align:center;padding:8px 0 16px;}
+.not-found .icon{font-size:2.5rem;margin-bottom:16px;}
+.not-found h3{
+  font-family:'Cormorant Garamond',serif;
+  font-size:1.4rem;color:var(--cream);
+  letter-spacing:2px;margin-bottom:8px;
+}
+.not-found p{
+  font-size:0.78rem;color:var(--muted);
+  letter-spacing:1px;line-height:2.2;
+  margin-bottom:24px;
+}
+.btn-retry{
+  width:100%;background:none;
+  border:1px solid var(--border);color:var(--cream2);
+  padding:14px;font-size:0.75rem;letter-spacing:3px;
+  cursor:pointer;font-family:'Noto Serif TC',serif;
+  transition:all 0.3s;
+}
+.btn-retry:hover{border-color:var(--gold);color:var(--gold);}
+
+/* ─── FADE TRANSITION ─── */
+.fade-in{animation:fadeIn 0.5s ease forwards;}
+@keyframes fadeIn{from{opacity:0;transform:translateY(16px)}to{opacity:1;transform:translateY(0)}}
+
+/* ─── CONFIG NOTE ─── */
+.config-note{
+  width:100%;max-width:480px;margin-top:16px;
+  border:1px solid var(--border2);
+  padding:14px 18px;
+  background:rgba(196,164,74,0.03);
+}
+.config-note p{
+  font-size:0.68rem;color:var(--muted);
+  letter-spacing:1px;line-height:1.8;
+}
+.config-note code{color:var(--gold);}
+
+/* ─── SPINNER ─── */
+.spin{
+  display:inline-block;width:14px;height:14px;
+  border:1px solid rgba(196,164,74,0.3);
+  border-top-color:var(--gold);border-radius:50%;
+  animation:_spin 0.8s linear infinite;
+  vertical-align:middle;margin-right:8px;
+}
+@keyframes _spin{to{transform:rotate(360deg)}}
+
+/* ─── RESPONSIVE ─── */
+@media(max-width:500px){
+  .card{padding:36px 24px;}
+  .step-connector{width:32px;}
+  .step-label{font-size:0.55rem;}
+  .seat-table-wrap{padding:20px 32px;}
+  .table-number{font-size:4.5rem;}
+  .seat-recap{flex-direction:column;}
+  .recap-item{border-right:none;border-bottom:1px solid var(--border);}
+  .recap-item:last-child{border-bottom:none;}
+}
+</style>
+</head>
+<body>
+
+<!-- Particle background -->
+<div id="particles"></div>
+
+<!-- Header -->
+<header>
+  <a href="index.html" class="h-logo">T & R</a>
+  <button class="h-back" onclick="window.close()">✕ 關閉</button>
+</header>
+
+<main>
+  <!-- Step indicator -->
+  <div class="steps">
+    <div class="step">
+      <div class="step-circle active" id="sc1">1</div>
+      <div class="step-label active" id="sl1">搜尋座位</div>
+    </div>
+    <div class="step-connector"><div class="step-connector-fill" id="conn1"></div></div>
+    <div class="step">
+      <div class="step-circle" id="sc2">2</div>
+      <div class="step-label" id="sl2">確認資訊</div>
+    </div>
+    <div class="step-connector"><div class="step-connector-fill" id="conn2"></div></div>
+    <div class="step">
+      <div class="step-circle" id="sc3">3</div>
+      <div class="step-label" id="sl3">完成報到</div>
+    </div>
+  </div>
+
+  <!-- ── STEP 1: Search ── -->
+  <div class="card fade-in" id="step1">
+    <div class="page-tag">Guest Check-in</div>
+    <h1 class="page-title">查詢座位<br>& 婚禮報到</h1>
+    <p class="page-sub">
+      歡迎蒞臨 Tom & Rainy 的婚禮<br>
+      請輸入您的姓名查詢座位並完成報到
+    </p>
+    <div class="divider">
+      <div class="divider-line"></div>
+      <div class="divider-star">✦</div>
+      <div class="divider-line"></div>
+    </div>
+    <div class="name-input-wrap">
+      <input
+        type="text"
+        class="name-input"
+        id="nameInput"
+        placeholder="請輸入您的姓名"
+        autocomplete="off"
+        onkeydown="if(event.key==='Enter')doSearch()"
+      >
+    </div>
+    <p class="input-hint">✦ 請輸入與出席意願表單相同的姓名</p>
+    <button class="btn-search" id="searchBtn" onclick="doSearch()">查 詢 座 位</button>
+  </div>
+
+  <!-- ── STEP 2: Seat + Check-in ── -->
+  <div class="card fade-in" id="step2">
+
+    <!-- Seat info -->
+    <div class="seat-display">
+      <div class="seat-welcome">✦ Your Seat ✦</div>
+      <div class="seat-guest" id="displayName">—</div>
+      <div class="seat-table-wrap">
+        <div class="table-number" id="displayTable">—</div>
+        <div class="table-label">Table Number ｜ 桌號</div>
+      </div>
+      <br>
+      <div class="table-name-badge" id="displayTableName" style="display:none;"></div>
+      <br>
+      <div class="seat-meta" id="displayMeta"></div>
+    </div>
+
+    <!-- Check-in action -->
+    <div class="checkin-block">
+      <h3>確認到場</h3>
+      <p>請確認座位資訊無誤後<br>按下報到按鈕完成簽到</p>
+      <button class="btn-arrive" id="arriveBtn" onclick="doCheckin()">
+        我已到場，完成報到 ✓
+      </button>
+      <button class="btn-search-again" onclick="goToStep1()">← 重新搜尋</button>
+    </div>
+  </div>
+
+  <!-- ── STEP 3: Success ── -->
+  <div class="card fade-in" id="step3">
+    <div class="confetti-wrap">🎊</div>
+    <div class="success-name">Welcome</div>
+    <div class="success-guest" id="successName">—</div>
+    <div class="success-main">報到成功！</div>
+    <p class="success-sub">
+      Tom & Rainy 非常感謝您的到來<br>
+      祝您享有一個美好的婚宴時光 🥂
+    </p>
+    <div class="success-divider"></div>
+
+    <!-- Seat recap -->
+    <div class="seat-recap">
+      <div class="recap-item">
+        <div class="recap-label">桌號</div>
+        <div class="recap-val" id="successTable">—</div>
+      </div>
+      <div class="recap-item">
+        <div class="recap-label">桌名</div>
+        <div class="recap-val" id="successTableName">—</div>
+      </div>
+      <div class="recap-item">
+        <div class="recap-label">報到時間</div>
+        <div class="recap-val" id="successTime" style="font-size:0.9rem;">—</div>
+      </div>
+    </div>
+
+    <button class="btn-restart" onclick="restart()">為下一位賓客報到</button>
+  </div>
+
+  <!-- Config note -->
+  <div class="config-note">
+    <p>⚙ 新人設定：請填入 <code>CONFIG.SHEET_CSV_URL</code>（Google Sheets 發布的 CSV 連結）啟用即時座位查詢。可選填 <code>CONFIG.APPS_SCRIPT_URL</code> 將報到狀態自動寫回試算表。</p>
+  </div>
+</main>
+
+<script>
+/* ═══════════════════════════════
+   CONFIG
+═══════════════════════════════ */
+const CONFIG = {
+  SHEET_CSV_URL: '',      // Google Sheets → 發布到網路 → CSV 連結
+  APPS_SCRIPT_URL: '',    // Google Apps Script Web App URL（選填）
+  DEMO_MODE: true,        // true = 使用示範資料（未設定 CSV 時自動啟用）
+};
+
+/* 示範資料（正式使用時由 Google Sheets 取代） */
+const DEMO_DATA = [
+  {姓名:'張小明',桌號:'1', 桌名:'玫瑰桌', 出席人數:'2', 素食人數:'0', 報到:'N'},
+  {姓名:'李美華',桌號:'1', 桌名:'玫瑰桌', 出席人數:'3', 素食人數:'1', 報到:'N'},
+  {姓名:'王大偉',桌號:'2', 桌名:'牡丹桌', 出席人數:'2', 素食人數:'0', 報到:'N'},
+  {姓名:'陳淑芬',桌號:'2', 桌名:'牡丹桌', 出席人數:'4', 素食人數:'2', 報到:'N'},
+  {姓名:'林志明',桌號:'3', 桌名:'蘭花桌', 出席人數:'2', 素食人數:'0', 報到:'N'},
+  {姓名:'黃雅婷',桌號:'3', 桌名:'蘭花桌', 出席人數:'2', 素食人數:'1', 報到:'N'},
+  {姓名:'吳建志',桌號:'4', 桌名:'梔子桌', 出席人數:'3', 素食人數:'0', 報到:'N'},
+  {姓名:'劉佳穎',桌號:'4', 桌名:'梔子桌', 出席人數:'2', 素食人數:'0', 報到:'N'},
+];
+
+/* ═══════════════════════════════
+   STATE
+═══════════════════════════════ */
+let state = { step: 1, guest: null };
+
+/* ═══════════════════════════════
+   PARTICLES
+═══════════════════════════════ */
+(function createParticles(){
+  const wrap = document.getElementById('particles');
+  for(let i=0;i<18;i++){
+    const p=document.createElement('div');
+    p.className='particle';
+    const size=Math.random()*2+1;
+    p.style.cssText=`
+      width:${size}px;height:${size}px;
+      left:${Math.random()*100}%;
+      animation-duration:${8+Math.random()*12}s;
+      animation-delay:${Math.random()*8}s;
+    `;
+    wrap.appendChild(p);
+  }
+})();
+
+/* ═══════════════════════════════
+   CSV PARSER
+═══════════════════════════════ */
+function parseCSV(text){
+  const rows=[]; let row=[],cell='',inQ=false;
+  for(let i=0;i<text.length;i++){
+    const c=text[i];
+    if(inQ){
+      if(c==='"'&&text[i+1]==='"'){cell+='"';i++;}
+      else if(c==='"'){inQ=false;}
+      else{cell+=c;}
+    } else {
+      if(c==='"'){inQ=true;}
+      else if(c===','){row.push(cell);cell='';}
+      else if(c==='\n'){row.push(cell);rows.push(row);row=[];cell='';}
+      else if(c!=='\r'){cell+=c;}
+    }
+  }
+  if(cell||row.length){row.push(cell);rows.push(row);}
+  if(rows.length<2) return [];
+  const hdrs=rows[0];
+  return rows.slice(1).filter(r=>r.some(c=>c.trim())).map(r=>{
+    const o={};
+    hdrs.forEach((h,i)=>{o[h.trim()]=(r[i]||'').trim();});
+    return o;
+  });
+}
+
+async function getGuestData(){
+  if(CONFIG.SHEET_CSV_URL){
+    try{
+      const r=await fetch(CONFIG.SHEET_CSV_URL);
+      const txt=await r.text();
+      return parseCSV(txt);
+    }catch(e){}
+  }
+  return DEMO_DATA;
+}
+
+/* ═══════════════════════════════
+   STEP UTILITIES
+═══════════════════════════════ */
+function setStep(n){
+  [1,2,3].forEach(i=>{
+    const el=document.getElementById('step'+i);
+    el.style.display='none';
+  });
+  const el=document.getElementById('step'+n);
+  el.style.display='flex';
+  el.classList.remove('fade-in');
+  void el.offsetWidth;
+  el.classList.add('fade-in');
+  state.step=n;
+  updateStepIndicator(n);
+}
+
+function updateStepIndicator(n){
+  [1,2,3].forEach(i=>{
+    const circle=document.getElementById('sc'+i);
+    const label=document.getElementById('sl'+i);
+    circle.className='step-circle';
+    label.className='step-label';
+    if(i<n){circle.classList.add('done');circle.textContent='✓';}
+    else if(i===n){circle.classList.add('active');circle.textContent=i;label.classList.add('active');}
+    else{circle.textContent=i;}
+  });
+  // connectors
+  if(n>=2) document.getElementById('conn1').style.width='100%';
+  else document.getElementById('conn1').style.width='0%';
+  if(n>=3) document.getElementById('conn2').style.width='100%';
+  else document.getElementById('conn2').style.width='0%';
+}
+
+/* ═══════════════════════════════
+   SEARCH
+═══════════════════════════════ */
+async function doSearch(){
+  const raw=document.getElementById('nameInput').value.trim();
+  if(!raw) return;
+
+  const btn=document.getElementById('searchBtn');
+  btn.innerHTML='<span class="spin"></span>查詢中...';
+  btn.disabled=true;
+
+  const data=await getGuestData();
+  const found=data.find(g=>{
+    const n=g['姓名']||g['Name']||'';
+    return n.includes(raw)||raw.includes(n.slice(0,2));
+  });
+
+  btn.innerHTML='查 詢 座 位';
+  btn.disabled=false;
+
+  if(!found){
+    showNotFound(raw);
+    return;
+  }
+
+  state.guest=found;
+  renderSeatCard(found, raw);
+  setStep(2);
+}
+
+function showNotFound(name){
+  const card=document.getElementById('step1');
+  // replace content temporarily
+  card.innerHTML=`
+    <div class="not-found fade-in">
+      <div class="icon">🔍</div>
+      <h3>找不到座位資訊</h3>
+      <p>查無「<strong style="color:var(--cream)">${name}</strong>」的座位資料<br>請確認姓名是否與報名時填寫的相同<br>或洽現場工作人員協助查詢</p>
+      <button class="btn-retry" onclick="location.reload()">← 重新輸入</button>
+    </div>
+  `;
+  updateStepIndicator(1);
+}
+
+function renderSeatCard(g, searchName){
+  const gName=g['姓名']||g['Name']||searchName;
+  const tableNum=g['桌號']||g['Table']||'—';
+  const tableName=g['桌名']||g['TableName']||'';
+  const count=g['出席人數']||g['Count']||'';
+  const veg=parseInt(g['素食人數']||0);
+
+  document.getElementById('displayName').textContent=gName;
+  document.getElementById('displayTable').textContent=tableNum;
+
+  const nameEl=document.getElementById('displayTableName');
+  if(tableName){nameEl.textContent='🌸 '+tableName;nameEl.style.display='inline-block';}
+  else{nameEl.style.display='none';}
+
+  let meta='';
+  if(count) meta+=`出席人數：${count} 位`;
+  if(veg>0) meta+=(meta?'　｜　':'')+`素食：${veg} 份`;
+  document.getElementById('displayMeta').textContent=meta;
+}
+
+/* ═══════════════════════════════
+   CHECK-IN
+═══════════════════════════════ */
+async function doCheckin(){
+  const btn=document.getElementById('arriveBtn');
+  btn.innerHTML='<span class="spin"></span>報到中...';
+  btn.disabled=true;
+
+  const g=state.guest;
+  const gName=g['姓名']||g['Name']||'賓客';
+  const tableNum=g['桌號']||'—';
+  const tableName=g['桌名']||'—';
+
+  // Call Apps Script if configured
+  if(CONFIG.APPS_SCRIPT_URL){
+    try{
+      await fetch(CONFIG.APPS_SCRIPT_URL+'?action=checkin&name='+encodeURIComponent(gName));
+    }catch(e){}
+  }
+
+  await new Promise(r=>setTimeout(r,800));
+
+  // Populate success screen
+  document.getElementById('successName').textContent=gName;
+  document.getElementById('successTable').textContent=tableNum;
+  document.getElementById('successTableName').textContent=tableName||'—';
+  const now=new Date();
+  document.getElementById('successTime').textContent=
+    `${String(now.getHours()).padStart(2,'0')}:${String(now.getMinutes()).padStart(2,'0')}`;
+
+  btn.innerHTML='我已到場，完成報到 ✓';
+  btn.disabled=false;
+  setStep(3);
+}
+
+/* ═══════════════════════════════
+   NAVIGATION
+═══════════════════════════════ */
+function goToStep1(){
+  document.getElementById('nameInput').value='';
+  setStep(1);
+}
+function restart(){
+  document.getElementById('nameInput').value='';
+  state.guest=null;
+  setStep(1);
+}
+
+/* ── Init ── */
+setStep(1);
+</script>
+</body>
+</html>

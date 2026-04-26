@@ -1,0 +1,532 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>DR Wedding ｜ 後台編輯器</title>
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;1,300&family=Noto+Serif+TC:wght@300;400;500&display=swap" rel="stylesheet">
+<style>
+*{margin:0;padding:0;box-sizing:border-box}
+:root{
+  --bg:#0A0806;--bg2:#100D09;--bg3:#181310;--bg4:#201810;
+  --cream:#EDE4D4;--cream2:#C8BBAA;--cream3:#9A8B7A;
+  --gold:#C4A44A;--gold2:#A88A35;--gold-dim:rgba(196,164,74,0.1);
+  --border:rgba(196,164,74,0.2);--border2:rgba(196,164,74,0.08);
+  --green:#5a9e6a;--red:#9e5a5a;--sidebar:220px;
+}
+html,body{height:100%}
+body{background:var(--bg);color:var(--cream);font-family:'Noto Serif TC',serif;display:flex;flex-direction:column;}
+#loginScreen{position:fixed;inset:0;z-index:9999;background:var(--bg);display:flex;flex-direction:column;align-items:center;justify-content:center;}
+.login-brand{font-size:0.62rem;letter-spacing:8px;color:var(--gold);text-transform:uppercase;margin-bottom:20px;font-family:'Cormorant Garamond',serif;}
+.login-title{font-family:'Cormorant Garamond',serif;font-size:2.2rem;font-weight:300;color:var(--cream);letter-spacing:3px;margin-bottom:6px;}
+.login-sub{font-size:0.72rem;color:var(--cream3);letter-spacing:2px;margin-bottom:36px;}
+.login-card{width:320px;border:1px solid var(--border);background:var(--bg3);padding:36px 28px;}
+.login-label{font-size:0.6rem;letter-spacing:4px;color:var(--gold);text-transform:uppercase;margin-bottom:10px;display:block;}
+.login-input{width:100%;background:transparent;border:none;border-bottom:1px solid var(--border);padding:10px 0;font-size:1rem;color:var(--cream);font-family:'Noto Serif TC',serif;outline:none;transition:border-color 0.3s;margin-bottom:24px;}
+.login-input:focus{border-color:var(--gold);}
+.login-input::placeholder{color:var(--cream3);}
+.login-btn{width:100%;background:transparent;border:1px solid var(--gold);color:var(--gold);padding:13px;font-size:0.75rem;letter-spacing:4px;cursor:pointer;font-family:'Noto Serif TC',serif;transition:all 0.3s;}
+.login-btn:hover{background:var(--gold);color:var(--bg);}
+.login-err{font-size:0.7rem;color:var(--red);margin-top:12px;text-align:center;height:16px;letter-spacing:1px;}
+#app{display:flex;flex:1;height:100vh;overflow:hidden;}
+aside{width:var(--sidebar);flex-shrink:0;background:var(--bg2);border-right:1px solid var(--border2);display:flex;flex-direction:column;overflow:hidden;}
+.aside-brand{padding:22px 20px;border-bottom:1px solid var(--border2);}
+.aside-brand-name{font-family:'Cormorant Garamond',serif;font-size:1rem;color:var(--gold);letter-spacing:3px;font-style:italic;}
+.aside-brand-sub{font-size:0.58rem;color:var(--cream3);letter-spacing:2px;margin-top:2px;}
+.aside-nav{flex:1;padding:8px 0;overflow-y:auto;}
+.aside-sec{font-size:0.52rem;letter-spacing:4px;color:var(--cream3);text-transform:uppercase;padding:14px 20px 5px;}
+.aside-btn{display:flex;align-items:center;gap:10px;width:100%;background:none;border:none;padding:10px 20px;cursor:pointer;font-size:0.76rem;color:var(--cream3);font-family:'Noto Serif TC',serif;letter-spacing:1px;text-align:left;transition:all 0.2s;position:relative;}
+.aside-btn:hover{color:var(--cream);background:var(--gold-dim);}
+.aside-btn.active{color:var(--gold);background:rgba(196,164,74,0.07);}
+.aside-btn.active::before{content:'';position:absolute;left:0;top:0;bottom:0;width:2px;background:var(--gold);}
+.aside-icon{font-size:0.88rem;width:18px;text-align:center;}
+.aside-footer{padding:14px 20px;border-top:1px solid var(--border2);}
+.aside-footer-btns{display:flex;gap:8px;}
+.aside-f-btn{flex:1;background:none;border:1px solid var(--border);color:var(--cream3);padding:8px 6px;font-size:0.62rem;letter-spacing:1px;cursor:pointer;font-family:'Noto Serif TC',serif;transition:all 0.2s;}
+.aside-f-btn:hover{border-color:var(--gold);color:var(--gold);}
+main{flex:1;overflow-y:auto;display:flex;flex-direction:column;}
+.topbar{position:sticky;top:0;z-index:100;background:rgba(10,8,6,0.95);backdrop-filter:blur(12px);border-bottom:1px solid var(--border2);padding:0 32px;height:54px;display:flex;align-items:center;justify-content:space-between;flex-shrink:0;}
+.topbar-title{font-family:'Cormorant Garamond',serif;font-size:1.05rem;font-weight:300;color:var(--cream);letter-spacing:2px;}
+.topbar-actions{display:flex;gap:8px;align-items:center;}
+.save-status{font-size:0.62rem;color:var(--cream3);letter-spacing:2px;margin-right:8px;}
+.save-status.saved{color:var(--green);}
+.btn-preview{background:none;border:1px solid var(--border);color:var(--cream3);padding:7px 16px;font-size:0.68rem;letter-spacing:2px;cursor:pointer;font-family:'Noto Serif TC',serif;transition:all 0.2s;}
+.btn-preview:hover{border-color:var(--gold);color:var(--gold);}
+.btn-save{background:var(--gold);border:none;color:var(--bg);padding:7px 22px;font-size:0.68rem;letter-spacing:3px;cursor:pointer;font-family:'Noto Serif TC',serif;transition:background 0.2s;}
+.btn-save:hover{background:var(--gold2);}
+.panel{display:none;padding:32px;max-width:760px;}
+.panel.active{display:block;}
+.panel-header{margin-bottom:28px;padding-bottom:18px;border-bottom:1px solid var(--border2);}
+.panel-title{font-family:'Cormorant Garamond',serif;font-size:1.7rem;font-weight:300;color:var(--cream);letter-spacing:2px;margin-bottom:5px;}
+.panel-desc{font-size:0.72rem;color:var(--cream3);letter-spacing:1px;line-height:1.8;}
+.fg{background:var(--bg3);border:1px solid var(--border2);margin-bottom:14px;overflow:hidden;}
+.fg-head{padding:12px 20px;background:var(--bg4);border-bottom:1px solid var(--border2);font-size:0.6rem;letter-spacing:4px;color:var(--gold);text-transform:uppercase;}
+.fr{display:grid;align-items:start;border-bottom:1px solid var(--border2);}
+.fr:last-child{border-bottom:none;}
+.fr.c2{grid-template-columns:1fr 1fr;}
+.fr.c3{grid-template-columns:1fr 1fr 1fr;}
+.fi{padding:14px 20px;border-right:1px solid var(--border2);}
+.fi:last-child{border-right:none;}
+.fl{font-size:0.58rem;letter-spacing:3px;color:var(--gold);text-transform:uppercase;margin-bottom:8px;display:flex;justify-content:space-between;align-items:center;}
+.fh{font-size:0.52rem;color:var(--cream3);font-family:monospace;text-transform:none;letter-spacing:0;}
+.fi input,.fi textarea{width:100%;background:transparent;border:none;font-size:0.85rem;color:var(--cream);font-family:'Noto Serif TC',serif;outline:none;padding:3px 0;line-height:1.6;border-bottom:1px solid transparent;transition:border-color 0.2s;resize:none;}
+.fi input:focus,.fi textarea:focus{border-color:var(--gold);}
+.fi input::placeholder,.fi textarea::placeholder{color:var(--cream3);font-size:0.76rem;}
+.fi textarea{line-height:1.8;min-height:52px;}
+.fi .url{font-family:monospace;font-size:0.76rem;color:var(--cream2);}
+.fn{padding:14px 20px;font-size:0.7rem;color:var(--cream3);line-height:1.8;background:var(--bg4);}
+.fn code{color:var(--gold);font-family:monospace;}
+.cn{font-size:0.55rem;color:var(--cream3);margin-top:4px;}
+.toggle-row{display:flex;align-items:center;justify-content:space-between;padding:14px 20px;}
+.tl-name{font-size:0.58rem;letter-spacing:3px;color:var(--gold);text-transform:uppercase;}
+.tl-desc{font-size:0.7rem;color:var(--cream3);margin-top:3px;}
+.sw{position:relative;width:44px;height:24px;flex-shrink:0;}
+.sw input{opacity:0;width:0;height:0;}
+.sl{position:absolute;inset:0;background:var(--border);cursor:pointer;transition:.3s;border-radius:24px;}
+.sl:before{content:'';position:absolute;height:18px;width:18px;left:3px;bottom:3px;background:var(--cream3);transition:.3s;border-radius:50%;}
+input:checked+.sl{background:var(--gold);}
+input:checked+.sl:before{transform:translateX(20px);background:var(--bg);}
+#toast{position:fixed;bottom:24px;right:24px;background:var(--green);color:#fff;padding:11px 22px;font-size:0.75rem;letter-spacing:2px;z-index:9998;opacity:0;transition:opacity 0.3s;pointer-events:none;}
+#toast.show{opacity:1;}
+.overlay{position:fixed;inset:0;background:rgba(10,8,6,0.85);z-index:9000;display:none;align-items:center;justify-content:center;}
+.overlay.show{display:flex;}
+.cb{background:var(--bg3);border:1px solid var(--border);padding:36px;max-width:360px;text-align:center;}
+.cb h3{font-family:'Cormorant Garamond',serif;font-size:1.3rem;color:var(--cream);letter-spacing:2px;margin-bottom:8px;}
+.cb p{font-size:0.75rem;color:var(--cream3);line-height:1.8;margin-bottom:22px;}
+.cb-btns{display:flex;gap:10px;}
+.cb-btn{flex:1;background:none;border:1px solid var(--border);color:var(--cream3);padding:11px;font-size:0.72rem;letter-spacing:2px;cursor:pointer;font-family:'Noto Serif TC',serif;transition:all 0.2s;}
+.cb-btn:hover{border-color:var(--gold);color:var(--gold);}
+.cb-btn.danger{border-color:var(--red);color:var(--red);}
+.cb-btn.danger:hover{background:var(--red);color:#fff;}
+@media(max-width:600px){
+  aside{width:56px;}
+  .aside-btn span:not(.aside-icon){display:none;}
+  .aside-sec,.aside-brand-sub,.aside-brand-name{display:none;}
+  .aside-brand{padding:14px;text-align:center;}
+  .panel{padding:16px;}
+  .fr.c2,.fr.c3{grid-template-columns:1fr;}
+  .fi{border-right:none;}
+}
+</style>
+</head>
+<body>
+
+<div id="loginScreen">
+  <div class="login-brand">DR Wedding Studio</div>
+  <div class="login-title">後台編輯器</div>
+  <div class="login-sub">Website Content Manager</div>
+  <div class="login-card">
+    <label class="login-label">管理員密碼</label>
+    <input type="password" class="login-input" id="loginPwd" placeholder="請輸入密碼" onkeydown="if(event.key==='Enter')doLogin()">
+    <button class="login-btn" onclick="doLogin()">進入後台</button>
+    <div class="login-err" id="loginErr"></div>
+  </div>
+</div>
+
+<div id="app" style="display:none">
+<aside>
+  <div class="aside-brand">
+    <div class="aside-brand-name">DR Wedding</div>
+    <div class="aside-brand-sub">Content Editor</div>
+  </div>
+  <nav class="aside-nav">
+    <div class="aside-sec">頁面內容</div>
+    <button class="aside-btn active" onclick="showPanel('basic')" id="tab-basic"><span class="aside-icon">💑</span><span>新人與日期</span></button>
+    <button class="aside-btn" onclick="showPanel('venue')" id="tab-venue"><span class="aside-icon">📍</span><span>婚宴地點</span></button>
+    <button class="aside-btn" onclick="showPanel('ceremony')" id="tab-ceremony"><span class="aside-icon">💒</span><span>儀式與宴席</span></button>
+    <button class="aside-btn" onclick="showPanel('rsvp')" id="tab-rsvp"><span class="aside-icon">✉️</span><span>出席回覆</span></button>
+    <button class="aside-btn" onclick="showPanel('footer')" id="tab-footer"><span class="aside-icon">🦶</span><span>頁尾</span></button>
+    <div class="aside-sec">系統</div>
+    <button class="aside-btn" onclick="showPanel('system')" id="tab-system"><span class="aside-icon">⚙️</span><span>系統設定</span></button>
+  </nav>
+  <div class="aside-footer">
+    <div class="aside-footer-btns">
+      <button class="aside-f-btn" onclick="exportData()" title="匯出備份">📤</button>
+      <button class="aside-f-btn" onclick="document.getElementById('importFile').click()" title="匯入">📥</button>
+      <button class="aside-f-btn" onclick="showReset()" title="重設">🗑</button>
+    </div>
+    <input type="file" id="importFile" accept=".json" style="display:none" onchange="importData(event)">
+  </div>
+</aside>
+
+<main>
+  <div class="topbar">
+    <div class="topbar-title" id="topbarTitle">新人與日期</div>
+    <div class="topbar-actions">
+      <span class="save-status" id="saveStatus">未儲存變更</span>
+      <button class="btn-preview" onclick="window.open('wedding_ribbon.html','_blank')">預覽 ↗</button>
+      <button class="btn-save" onclick="saveAll()">儲存</button>
+    </div>
+  </div>
+
+  <!-- 新人與日期 -->
+  <div class="panel active" id="panel-basic">
+    <div class="panel-header"><div class="panel-title">💑 新人與日期</div><div class="panel-desc">頁面頂部標題區的新人姓名與婚禮日期</div></div>
+    <div class="fg">
+      <div class="fg-head">新人名字字體</div>
+      <div class="fr">
+        <div class="fi">
+          <div class="fl">字體選擇 <span class="fh">names_font</span></div>
+          <select class="fsel" id="namesFontSel" onchange="previewFont(this.value)">
+            <option value="">── 請選擇字體 ──</option>
+            <option value="Cormorant Garamond">Cormorant Garamond（優雅細線）</option>
+            <option value="Playfair Display">Playfair Display（經典襯線）</option>
+            <option value="Great Vibes">Great Vibes（浪漫手寫）</option>
+            <option value="Dancing Script">Dancing Script（活潑手寫）</option>
+            <option value="Libre Baskerville">Libre Baskerville（正式古典）</option>
+            <option value="Italiana">Italiana（義式優雅）</option>
+            <option value="Noto Serif TC">Noto Serif TC（中文相容）</option>
+          </select>
+          <div id="fontPreview" style="margin-top:14px;padding:16px;border:1px solid var(--border2);text-align:center;display:none;">
+            <span id="fontPreviewText" style="font-size:2rem;color:var(--cream);letter-spacing:4px;">Tom &amp; Rainy</span>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="fg">
+      <div class="fg-head">新人姓名</div>
+      <div class="fr c2">
+        <div class="fi"><div class="fl">新郎姓名 <span class="fh">hero_name1</span></div><input data-key="hero_name1" placeholder="Tom"></div>
+        <div class="fi"><div class="fl">新娘姓名 <span class="fh">hero_name2</span></div><input data-key="hero_name2" placeholder="Rainy"></div>
+      </div>
+    </div>
+    <div class="fg">
+      <div class="fg-head">日期顯示</div>
+      <div class="fr c2">
+        <div class="fi"><div class="fl">頂部小標籤 <span class="fh">header_tag</span></div><input data-key="header_tag" placeholder="Wedding Invitation"></div>
+        <div class="fi"><div class="fl">標題日期（精簡）<span class="fh">hero_date</span></div><input data-key="hero_date" placeholder="2024 . 11 . 02（週六）"></div>
+      </div>
+      <div class="fr c2">
+        <div class="fi"><div class="fl">日期欄位標籤 <span class="fh">info_date_label</span></div><input data-key="info_date_label" placeholder="日期"></div>
+        <div class="fi"><div class="fl">日期（完整）<span class="fh">info_date</span></div><input data-key="info_date" placeholder="2024 年 11 月 2 日（週六）"></div>
+      </div>
+    </div>
+    <div class="fg">
+      <div class="fg-head">邀請信內文</div>
+      <div class="fr">
+        <div class="fi">
+          <div class="fl">邀請文字 <span class="fh">invite_text</span></div>
+          <textarea data-key="invite_text" placeholder="親愛的朋友們：..." style="min-height:120px;"></textarea>
+        </div>
+      </div>
+    </div>
+    <div class="fg">
+      <div class="fg-head">雙方父母姓名</div>
+      <div class="fr c2">
+        <div class="fi"><div class="fl">新郎方標籤 <span class="fh">parents_groom_label</span></div><input data-key="parents_groom_label" placeholder="新郎父母"></div>
+        <div class="fi"><div class="fl">新郎方父母姓名 <span class="fh">parents_groom</span></div><input data-key="parents_groom" placeholder="父親姓名 ・ 母親姓名"></div>
+      </div>
+      <div class="fr c2">
+        <div class="fi"><div class="fl">新娘方標籤 <span class="fh">parents_bride_label</span></div><input data-key="parents_bride_label" placeholder="新娘父母"></div>
+        <div class="fi"><div class="fl">新娘方父母姓名 <span class="fh">parents_bride</span></div><input data-key="parents_bride" placeholder="父親姓名 ・ 母親姓名"></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- 婚宴地點 -->
+  <div class="panel" id="panel-venue">
+    <div class="panel-header"><div class="panel-title">📍 婚宴地點</div><div class="panel-desc">婚宴場地名稱與地址</div></div>
+    <div class="fg">
+      <div class="fg-head">場地資訊</div>
+      <div class="fr c2">
+        <div class="fi"><div class="fl">地點欄位標籤 <span class="fh">info_venue_label</span></div><input data-key="info_venue_label" placeholder="地點"></div>
+        <div class="fi"><div class="fl">場地名稱 <span class="fh">venue_name</span></div><input data-key="venue_name" placeholder="婚宴場地名稱"></div>
+      </div>
+      <div class="fr">
+        <div class="fi"><div class="fl">地址 <span class="fh">venue_addr</span></div><input data-key="venue_addr" placeholder="完整地址"></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- 儀式與宴席 -->
+  <div class="panel" id="panel-ceremony">
+    <div class="panel-header"><div class="panel-title">💒 儀式與宴席</div><div class="panel-desc">婚禮儀式（可開關）與宴席時間資訊</div></div>
+    <div class="fg">
+      <div class="fg-head">婚禮儀式</div>
+      <div class="toggle-row">
+        <div>
+          <div class="tl-name">顯示儀式資訊</div>
+          <div class="tl-desc">關閉後儀式欄位將從頁面上隱藏</div>
+        </div>
+        <label class="sw"><input type="checkbox" id="showCeremonyToggle" checked onchange="handleCeremonyToggle(this)"><span class="sl"></span></label>
+      </div>
+      <div id="ceremonyFields">
+        <div class="fr c2">
+          <div class="fi"><div class="fl">儀式欄位標籤 <span class="fh">info_ceremony_label</span></div><input data-key="info_ceremony_label" placeholder="儀式"></div>
+          <div class="fi"><div class="fl">儀式時間 <span class="fh">save_ceremony_time</span></div><input data-key="save_ceremony_time" placeholder="10：00"></div>
+        </div>
+        <div class="fr">
+          <div class="fi"><div class="fl">儀式補充說明 <span class="fh">save_ceremony_sub</span></div><input data-key="save_ceremony_sub" placeholder="歡迎提早入座"></div>
+        </div>
+        <div class="fr c2">
+          <div class="fi"><div class="fl">儀式地點名稱 <span class="fh">ceremony_venue_name</span></div><input data-key="ceremony_venue_name" placeholder="儀式場地名稱"></div>
+          <div class="fi"><div class="fl">儀式地點地址 <span class="fh">ceremony_venue_addr</span></div><input data-key="ceremony_venue_addr" placeholder="地址或樓層說明"></div>
+        </div>
+      </div>
+    </div>
+    <div class="fg">
+      <div class="fg-head">宴席時間</div>
+      <div class="fr c2">
+        <div class="fi"><div class="fl">宴席欄位標籤 <span class="fh">info_banquet_label</span></div><input data-key="info_banquet_label" placeholder="宴席"></div>
+        <div class="fi"><div class="fl">宴席時間 <span class="fh">save_banquet_time</span></div><input data-key="save_banquet_time" placeholder="12：00"></div>
+      </div>
+      <div class="fr">
+        <div class="fi"><div class="fl">宴席補充說明 <span class="fh">save_banquet_sub</span></div><input data-key="save_banquet_sub" placeholder="準時開席"></div>
+      </div>
+      <div class="fr c2">
+        <div class="fi"><div class="fl">宴席地點名稱 <span class="fh">banquet_venue_name</span></div><input data-key="banquet_venue_name" placeholder="宴席場地名稱"></div>
+        <div class="fi"><div class="fl">宴席地點地址 <span class="fh">banquet_venue_addr</span></div><input data-key="banquet_venue_addr" placeholder="地址或樓層說明"></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- 出席回覆 -->
+  <div class="panel" id="panel-rsvp">
+    <div class="panel-header"><div class="panel-title">✉️ 出席回覆</div><div class="panel-desc">RSVP 表單的所有文字與 Google 表單連結</div></div>
+    <div class="fg">
+      <div class="fg-head">標題與說明</div>
+      <div class="fr c2">
+        <div class="fi"><div class="fl">表單標題 <span class="fh">rsvp_title</span></div><input data-key="rsvp_title" placeholder="出席回覆"></div>
+        <div class="fi"><div class="fl">說明文字 <span class="fh">rsvp_desc</span></div><input data-key="rsvp_desc" placeholder="請於婚禮前回覆，感謝您"></div>
+      </div>
+    </div>
+    <div class="fg">
+      <div class="fg-head">按鈕文字</div>
+      <div class="fr c2">
+        <div class="fi"><div class="fl">出席按鈕 <span class="fh">rsvp_yes_btn</span></div><input data-key="rsvp_yes_btn" placeholder="一定出席！"></div>
+        <div class="fi"><div class="fl">不出席按鈕 <span class="fh">rsvp_no_btn</span></div><input data-key="rsvp_no_btn" placeholder="無法出席"></div>
+      </div>
+      <div class="fr c2">
+        <div class="fi"><div class="fl">送出按鈕 <span class="fh">rsvp_submit_btn</span></div><input data-key="rsvp_submit_btn" placeholder="確認送出"></div>
+        <div class="fi"><div class="fl">分隔文字 <span class="fh">rsvp_or</span></div><input data-key="rsvp_or" placeholder="或"></div>
+      </div>
+      <div class="fr">
+        <div class="fi"><div class="fl">Google 表單按鈕 <span class="fh">rsvp_gform_btn</span></div><input data-key="rsvp_gform_btn" placeholder="前往 Google 表單填寫 →"></div>
+      </div>
+    </div>
+    <div class="fg">
+      <div class="fg-head">表單欄位標籤</div>
+      <div class="fr c3">
+        <div class="fi"><div class="fl">姓名 <span class="fh">rsvp_l_name</span></div><input data-key="rsvp_l_name" placeholder="姓名"></div>
+        <div class="fi"><div class="fl">大人人數 <span class="fh">rsvp_l_adult</span></div><input data-key="rsvp_l_adult" placeholder="大人人數"></div>
+        <div class="fi"><div class="fl">兒童人數 <span class="fh">rsvp_l_child</span></div><input data-key="rsvp_l_child" placeholder="兒童人數"></div>
+      </div>
+      <div class="fr c3">
+        <div class="fi"><div class="fl">素食人數 <span class="fh">rsvp_l_veg</span></div><input data-key="rsvp_l_veg" placeholder="素食人數"></div>
+        <div class="fi"><div class="fl">紙本喜帖 <span class="fh">rsvp_l_card</span></div><input data-key="rsvp_l_card" placeholder="紙本喜帖"></div>
+        <div class="fi"><div class="fl">留言 <span class="fh">rsvp_l_msg</span></div><input data-key="rsvp_l_msg" placeholder="留言"></div>
+      </div>
+    </div>
+    <div class="fg">
+      <div class="fg-head">送出後顯示</div>
+      <div class="fr c2">
+        <div class="fi"><div class="fl">成功標題 <span class="fh">rsvp_success_title</span></div><input data-key="rsvp_success_title" placeholder="期待與您見面！"></div>
+      </div>
+      <div class="fr">
+        <div class="fi"><div class="fl">成功訊息 <span class="fh">rsvp_success_msg</span></div><textarea data-key="rsvp_success_msg" placeholder="謝謝您的回覆..."></textarea></div>
+      </div>
+    </div>
+    <div class="fg">
+      <div class="fg-head">Google 表單連結</div>
+      <div class="fr">
+        <div class="fi"><div class="fl">Google Form URL <span class="fh">gform_url</span></div><input class="url" data-key="gform_url" placeholder="https://forms.gle/..."></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- 頁尾 -->
+  <div class="panel" id="panel-footer">
+    <div class="panel-header"><div class="panel-title">🦶 頁尾</div><div class="panel-desc">頁面底部的版權文字</div></div>
+    <div class="fg">
+      <div class="fg-head">文字</div>
+      <div class="fr">
+        <div class="fi"><div class="fl">版權文字 <span class="fh">footer_copy</span></div><input data-key="footer_copy" placeholder="With Love, Tom & Rainy"></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- 系統設定 -->
+  <div class="panel" id="panel-system">
+    <div class="panel-header"><div class="panel-title">⚙️ 系統設定</div><div class="panel-desc">瀏覽器標籤標題與 Google 整合</div></div>
+    <div class="fg">
+      <div class="fg-head">基本</div>
+      <div class="fr">
+        <div class="fi"><div class="fl">瀏覽器標籤標題 <span class="fh">site_title</span></div><input data-key="site_title" placeholder="Tom & Rainy ｜ 出席回覆"></div>
+      </div>
+    </div>
+    <div class="fg">
+      <div class="fg-head">Google Sheets 座位表（供報到頁使用）</div>
+      <div class="fr">
+        <div class="fi">
+          <div class="fl">CSV 連結 <span class="fh">sheet_csv_url</span></div>
+          <input class="url" data-key="sheet_csv_url" placeholder="https://docs.google.com/spreadsheets/d/.../export?format=csv">
+          <div class="cn">Google Sheets → 檔案 → 共用 → 發布到網路 → CSV 格式</div>
+        </div>
+      </div>
+    </div>
+    <div class="fn">💾 <strong style="color:var(--cream2)">資料儲存說明：</strong>所有內容儲存於瀏覽器 <code>localStorage</code>，不上傳任何伺服器。建議定期使用左側 📤 匯出備份，更換裝置時 📥 匯入還原。</div>
+  </div>
+</main>
+</div>
+
+<div id="toast"></div>
+<div class="overlay" id="resetOverlay">
+  <div class="cb">
+    <h3>重設確認</h3>
+    <p>此操作將清除所有已編輯的內容，恢復網站預設文字。建議先匯出備份。</p>
+    <div class="cb-btns">
+      <button class="cb-btn" onclick="document.getElementById('resetOverlay').classList.remove('show')">取消</button>
+      <button class="cb-btn danger" onclick="doReset()">確認重設</button>
+    </div>
+  </div>
+</div>
+
+<script>
+const STORAGE_KEY='dr_wedding_content';
+const ADMIN_PWD_KEY='dr_wedding_admin_pwd';
+let currentData={},isDirty=false;
+
+function getAdminPwd(){return localStorage.getItem(ADMIN_PWD_KEY)||'wedding2024';}
+
+const FONT_URLS={
+  'Cormorant Garamond':'https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,200;0,300;1,200;1,300&display=swap',
+  'Playfair Display':'https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,700;1,400&display=swap',
+  'Great Vibes':'https://fonts.googleapis.com/css2?family=Great+Vibes&display=swap',
+  'Dancing Script':'https://fonts.googleapis.com/css2?family=Dancing+Script:wght@400;700&display=swap',
+  'Libre Baskerville':'https://fonts.googleapis.com/css2?family=Libre+Baskerville:ital,wght@0,400;0,700;1,400&display=swap',
+  'Italiana':'https://fonts.googleapis.com/css2?family=Italiana&display=swap',
+  'Noto Serif TC':'https://fonts.googleapis.com/css2?family=Noto+Serif+TC:wght@200;300;400&display=swap',
+};
+let previewLink=null;
+function previewFont(font){
+  const preview=document.getElementById('fontPreview');
+  const text=document.getElementById('fontPreviewText');
+  if(!font){preview.style.display='none';return;}
+  if(!previewLink){previewLink=document.createElement('link');previewLink.rel='stylesheet';document.head.appendChild(previewLink);}
+  previewLink.href=FONT_URLS[font]||'';
+  text.style.fontFamily="'"+font+"', serif";
+  preview.style.display='block';
+  isDirty=true;updateSaveStatus(true);
+}
+
+function doLogin(){
+  const pwd=document.getElementById('loginPwd').value;
+  if(pwd===getAdminPwd()){
+    document.getElementById('loginScreen').style.display='none';
+    document.getElementById('app').style.display='flex';
+    initEditor();
+  } else {
+    document.getElementById('loginErr').textContent='密碼錯誤，請再試一次';
+    document.getElementById('loginPwd').value='';
+    document.getElementById('loginPwd').focus();
+  }
+}
+document.getElementById('loginPwd').addEventListener('keydown',e=>{if(e.key==='Enter')doLogin();});
+
+function initEditor(){
+  try{currentData=JSON.parse(localStorage.getItem(STORAGE_KEY)||'{}')}catch(e){currentData={};}
+  populateFields();
+  const showCeremony=currentData.show_ceremony!=='false';
+  document.getElementById('showCeremonyToggle').checked=showCeremony;
+  document.getElementById('ceremonyFields').style.display=showCeremony?'':'none';
+  // Populate font selector
+  const saved_font=currentData.names_font||'';
+  document.getElementById('namesFontSel').value=saved_font;
+  if(saved_font)previewFont(saved_font);
+  attachChangeListeners();
+  updateSaveStatus(false);
+}
+
+function populateFields(){
+  document.querySelectorAll('[data-key]').forEach(el=>{
+    if(el.tagName==='INPUT'||el.tagName==='TEXTAREA'){
+      const k=el.getAttribute('data-key');
+      if(currentData[k]!==undefined)el.value=currentData[k];
+    }
+  });
+}
+
+function attachChangeListeners(){
+  document.querySelectorAll('[data-key]').forEach(el=>{
+    if(el.tagName==='INPUT'||el.tagName==='TEXTAREA'){
+      el.addEventListener('input',()=>{isDirty=true;updateSaveStatus(true);});
+    }
+  });
+}
+
+function handleCeremonyToggle(el){
+  document.getElementById('ceremonyFields').style.display=el.checked?'':'none';
+  currentData.show_ceremony=el.checked?'true':'false';
+  isDirty=true;updateSaveStatus(true);
+}
+
+function saveAll(){
+  document.querySelectorAll('[data-key]').forEach(el=>{
+    if(el.tagName==='INPUT'||el.tagName==='TEXTAREA'){
+      const k=el.getAttribute('data-key'),v=el.value.trim();
+      if(v)currentData[k]=v;else delete currentData[k];
+    }
+  });
+  // Save font
+  const font=document.getElementById('namesFontSel').value;
+  if(font)currentData.names_font=font;else delete currentData.names_font;
+  currentData.show_ceremony=document.getElementById('showCeremonyToggle').checked?'true':'false';
+  localStorage.setItem(STORAGE_KEY,JSON.stringify(currentData));
+  isDirty=false;updateSaveStatus(false);showToast('✓ 已儲存');
+}
+
+function updateSaveStatus(dirty){
+  const el=document.getElementById('saveStatus');
+  el.textContent=dirty?'有未儲存的變更 ●':'已儲存';
+  el.className='save-status'+(dirty?'':' saved');
+}
+
+function showToast(msg){
+  const t=document.getElementById('toast');t.textContent=msg;t.classList.add('show');
+  setTimeout(()=>t.classList.remove('show'),2200);
+}
+
+const PANEL_NAMES={basic:'新人與日期',venue:'婚宴地點',ceremony:'儀式與宴席',rsvp:'出席回覆',footer:'頁尾',system:'系統設定'};
+function showPanel(name){
+  document.querySelectorAll('.panel').forEach(p=>p.classList.remove('active'));
+  document.querySelectorAll('.aside-btn').forEach(b=>b.classList.remove('active'));
+  document.getElementById('panel-'+name).classList.add('active');
+  document.getElementById('tab-'+name).classList.add('active');
+  document.getElementById('topbarTitle').textContent=PANEL_NAMES[name]||name;
+}
+
+function exportData(){
+  const blob=new Blob([JSON.stringify(currentData,null,2)],{type:'application/json'});
+  const a=document.createElement('a');a.href=URL.createObjectURL(blob);
+  a.download='dr_wedding_backup_'+new Date().toISOString().slice(0,10)+'.json';a.click();
+  showToast('✓ 備份已下載');
+}
+
+function importData(e){
+  const file=e.target.files[0];if(!file)return;
+  const reader=new FileReader();
+  reader.onload=ev=>{
+    try{
+      const data=JSON.parse(ev.target.result);
+      currentData={...currentData,...data};
+      localStorage.setItem(STORAGE_KEY,JSON.stringify(currentData));
+      populateFields();showToast('✓ 備份已匯入');
+    }catch(err){alert('檔案格式錯誤');}
+  };
+  reader.readAsText(file);e.target.value='';
+}
+
+function showReset(){document.getElementById('resetOverlay').classList.add('show');}
+function doReset(){
+  localStorage.removeItem(STORAGE_KEY);currentData={};
+  document.querySelectorAll('[data-key]').forEach(el=>{if(el.tagName==='INPUT'||el.tagName==='TEXTAREA')el.value='';});
+  document.getElementById('showCeremonyToggle').checked=true;
+  document.getElementById('ceremonyFields').style.display='';
+  document.getElementById('resetOverlay').classList.remove('show');
+  showToast('已重設為預設值');
+}
+
+document.addEventListener('keydown',e=>{if((e.ctrlKey||e.metaKey)&&e.key==='s'){e.preventDefault();saveAll();}});
+</script>
+</body>
+</html>
