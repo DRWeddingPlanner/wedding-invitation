@@ -4612,6 +4612,10 @@ function switchAdminTab(name, btn){
   if(name==='export'){
     // ★ 公開網址 + QR Code（僅子網站有 _SUB.public_url 時顯示）
     renderExportPublicUrl();
+    // ★ 若為子網站且有公開網址 → 自動彈出 QR 對話框
+    if(_SUB&&_SUB.public_url){
+      setTimeout(()=>showSubsiteShare(),250);
+    }
     const gasNote=document.getElementById('exportGasNote');
     if(gasNote){
       const data=getSiteData();
