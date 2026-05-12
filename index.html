@@ -809,10 +809,6 @@ footer{text-align:center;padding:60px 24px;border-top:1px solid var(--border2);p
         <button class="btn-outline-sm" onclick="restart()">為下一位賓客報到</button>
       </div>
     </div>
-
-    <div style="margin-top:16px;border:1px solid var(--border2);padding:14px 18px;background:rgba(196,164,74,0.02);">
-      <p style="font-size:0.65rem;color:var(--muted);letter-spacing:1px;line-height:2;">⚙ 新人設定：在後台「系統設定」填入 Google Sheets CSV 連結即可啟用即時座位查詢。</p>
-    </div>
   </div>
 </section>
 
@@ -1559,14 +1555,19 @@ function showAutoSaveToast(msg='✓ 已自動儲存'){
   _toastTimer=setTimeout(()=>{t.style.opacity='0';t.style.transform='translateX(-50%) translateY(20px)';},2200);
 }
 
+/* ★ 子網站硬編碼設定（由 downloadSubsite 注入到 window.__WEDGO_SUBSITE__）
+   優先順序：window.__WEDGO_SUBSITE__ > localStorage > 預設值
+   這樣可避免 file:// origin 共享 localStorage 造成的跨子網站污染 */
+const _SUB=(typeof window!=='undefined'&&window.__WEDGO_SUBSITE__)?window.__WEDGO_SUBSITE__:null;
+
 let CFG={
   WEDDING_DATE: new Date('2024-11-02T12:00:00+08:00'),
   SHEET_CSV_URL: '',
   APPS_SCRIPT_URL: '',
-  SUPABASE_URL: '',
-  SUPABASE_KEY: '',
-  ADMIN_PASSWORD: 'wego@2026',
-  TENANT_ID: '_master',  // 預設母網站；子網站下載時會覆寫
+  SUPABASE_URL: (_SUB&&_SUB.supabase_url)?_SUB.supabase_url.replace(/\/$/,''):'',
+  SUPABASE_KEY: (_SUB&&_SUB.supabase_anon_key)||'',
+  ADMIN_PASSWORD: (_SUB&&_SUB.admin_password)||'wego@2026',
+  TENANT_ID: (_SUB&&_SUB.tenant_id)||'_master',
 };
 
 function applyHeroImgUrl(src){
@@ -1600,9 +1601,13 @@ function applyContent(){
   if(d.wedding_date_iso)CFG.WEDDING_DATE=new Date(d.wedding_date_iso);
   if(d.sheet_csv_url)CFG.SHEET_CSV_URL=d.sheet_csv_url;
   if(d.apps_script_url)CFG.APPS_SCRIPT_URL=d.apps_script_url;
-  if(d.supabase_url)CFG.SUPABASE_URL=d.supabase_url.replace(/\/$/,'');
-  if(d.supabase_anon_key)CFG.SUPABASE_KEY=d.supabase_anon_key;
-  if(d.tenant_id)CFG.TENANT_ID=d.tenant_id;
+  // ★ 子網站（有 __WEDGO_SUBSITE__）優先用硬編碼，不從 localStorage 讀以下欄位
+  // 避免 file:// origin 共用 localStorage 造成的跨子網站污染
+  if(!_SUB){
+    if(d.supabase_url)CFG.SUPABASE_URL=d.supabase_url.replace(/\/$/,'');
+    if(d.supabase_anon_key)CFG.SUPABASE_KEY=d.supabase_anon_key;
+    if(d.tenant_id)CFG.TENANT_ID=d.tenant_id;
+  }
   }catch(e){console.warn('applyContent error:',e);}
 }
 applyContent();
@@ -1671,8 +1676,18 @@ function applyNamesFont(font){
 
 /* ═══ HERO IMAGE + RSVP DB (IndexedDB) — 多租戶分庫 ═══ */
 const IMGDB={db:null,
-  /* ★ 取得當前 tenant 的 DB 名稱（從 localStorage 讀，因為 IMGDB.init 可能早於 CFG 載入） */
+  /* ★ 取得當前 tenant 的 DB 名稱
+     優先順序：window.__WEDGO_SUBSITE__ > CFG.TENANT_ID > localStorage > '_master' */
   _getDbName(){
+    // 1) 子網站硬編碼（最可靠，不受 file:// origin 共享 localStorage 影響）
+    if(typeof window!=='undefined'&&window.__WEDGO_SUBSITE__&&window.__WEDGO_SUBSITE__.tenant_id){
+      return 'dr_wedding_'+window.__WEDGO_SUBSITE__.tenant_id;
+    }
+    // 2) CFG（若 CFG 已載入）
+    if(typeof CFG!=='undefined'&&CFG.TENANT_ID){
+      return 'dr_wedding_'+CFG.TENANT_ID;
+    }
+    // 3) localStorage（備用）
     let tid='_master';
     try{
       const raw=localStorage.getItem('dr_wedding_content');
@@ -1681,8 +1696,6 @@ const IMGDB={db:null,
         if(d.tenant_id) tid=d.tenant_id;
       }
     }catch(e){}
-    // 若 CFG 已載入，以 CFG 為準（保證一致）
-    if(typeof CFG!=='undefined'&&CFG.TENANT_ID) tid=CFG.TENANT_ID;
     return 'dr_wedding_'+tid;
   },
   init(){return new Promise((res,rej)=>{
@@ -4425,10 +4438,20 @@ function switchAdminTab(name, btn){
   if(name==='export'){
     const gasNote=document.getElementById('exportGasNote');
     if(gasNote){
-      const hasGas=!!(getSiteData().apps_script_url);
-      gasNote.style.display=hasGas?'none':'block';
-      gasNote.innerHTML=hasGas?'':
-        '⚠ 尚未設定 GAS 網址。賓客提交的 RSVP 資料將<strong>無法</strong>自動同步至此後台。<br>請前往「婚禮資訊 → 系統設定」填入 GAS 網址後再匯出。';
+      const data=getSiteData();
+      const hasSupabase=!!(data.supabase_url&&data.supabase_anon_key);
+      const hasGas=!!(data.apps_script_url);
+      // 已有 Supabase 設定 → 完全不顯示警告（這是主要雲端同步機制）
+      // 兩者都沒有 → 顯示「未啟用雲端同步」提醒
+      // 只有 GAS → 顯示已啟用 GAS
+      if(hasSupabase){
+        gasNote.style.display='none';
+      } else if(hasGas){
+        gasNote.style.display='none';
+      } else {
+        gasNote.style.display='block';
+        gasNote.innerHTML='⚠ 尚未設定雲端同步。賓客提交的 RSVP 資料將<strong>僅儲存在本地</strong>，無法跨裝置同步。<br>請前往「婚禮資訊 → 系統設定」填入 Supabase URL + Anon Key（或 GAS 網址）。';
+      }
     }
   }
 }
@@ -4535,7 +4558,8 @@ function submitAdminPwd(){
   }
 
   // 子網站後台：輸入管理員密碼
-  const correct=d.admin_password||'wego@2026';
+  // ★ 優先用子網站硬編碼的密碼（避免 file:// origin 共享 localStorage 污染）
+  const correct=(_SUB&&_SUB.admin_password)||d.admin_password||'wego@2026';
   if(pwd===correct){
     closeAdminModal();
     const s=document.getElementById('s-admin');
@@ -4790,7 +4814,7 @@ async function downloadSubsite(id){
       html=await r.text();
     }catch(e){html=document.documentElement.outerHTML;}
 
-    // Build inject script: pre-set admin_password + tenant_id + Supabase config for this sub-site
+    // Build inject script: 用全域變數儲存子網站設定，避免 file:// origin 共享 localStorage 造成污染
     const masterData=getSiteData();
     const subData={
       admin_password: s.pwd,
@@ -4799,15 +4823,13 @@ async function downloadSubsite(id){
       supabase_anon_key: masterData.supabase_anon_key || ''
     };
     const inject=`<script id="_subsite_inject">
-(function(){
-  try{
-    var d=JSON.parse(localStorage.getItem('dr_wedding_content')||'{}');
-    var sub=${JSON.stringify(subData)};
-    Object.keys(sub).forEach(function(k){ if(sub[k]) d[k]=sub[k]; });
-    localStorage.setItem('dr_wedding_content',JSON.stringify(d));
-  }catch(e){}
-  var el=document.getElementById('_subsite_inject');if(el)el.remove();
-})();
+window.__WEDGO_SUBSITE__=${JSON.stringify(subData)};
+try{
+  var d=JSON.parse(localStorage.getItem('dr_wedding_content')||'{}');
+  Object.keys(window.__WEDGO_SUBSITE__).forEach(function(k){ d[k]=window.__WEDGO_SUBSITE__[k]; });
+  localStorage.setItem('dr_wedding_content',JSON.stringify(d));
+}catch(e){}
+var el=document.getElementById('_subsite_inject');if(el)el.remove();
 <\/script>`;
 
     // Inject right after <head>

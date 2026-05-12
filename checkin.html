@@ -474,35 +474,42 @@ main{
 <script>
 /* ═══════════════════════════════
    CONFIG（可被 URL 參數 ?tenant=xxx 或 localStorage 覆寫）
+   優先順序：window.__WEDGO_SUBSITE__ > URL param > localStorage > 預設
    ═══════════════════════════════ */
+const _SUB=(typeof window!=='undefined'&&window.__WEDGO_SUBSITE__)?window.__WEDGO_SUBSITE__:null;
+
 const CONFIG = {
   SHEET_CSV_URL: '',
   APPS_SCRIPT_URL: '',
-  SUPABASE_URL: '',
-  SUPABASE_KEY: '',
-  TENANT_ID: '_master',
+  SUPABASE_URL: (_SUB&&_SUB.supabase_url)?_SUB.supabase_url.replace(/\/$/,''):'',
+  SUPABASE_KEY: (_SUB&&_SUB.supabase_anon_key)||'',
+  TENANT_ID: (_SUB&&_SUB.tenant_id)||'_master',
 };
 
-// 從 localStorage 載入設定
+// 從 localStorage 載入設定（子網站不讀以下欄位）
 (function loadConfigFromStorage(){
   try{
     const raw = localStorage.getItem('dr_wedding_content');
     if(raw){
       const d = JSON.parse(raw);
-      if(d.supabase_url) CONFIG.SUPABASE_URL = d.supabase_url.replace(/\/$/,'');
-      if(d.supabase_anon_key) CONFIG.SUPABASE_KEY = d.supabase_anon_key;
-      if(d.tenant_id) CONFIG.TENANT_ID = d.tenant_id;
+      if(!_SUB){
+        if(d.supabase_url) CONFIG.SUPABASE_URL = d.supabase_url.replace(/\/$/,'');
+        if(d.supabase_anon_key) CONFIG.SUPABASE_KEY = d.supabase_anon_key;
+        if(d.tenant_id) CONFIG.TENANT_ID = d.tenant_id;
+      }
       if(d.sheet_csv_url) CONFIG.SHEET_CSV_URL = d.sheet_csv_url;
       if(d.apps_script_url) CONFIG.APPS_SCRIPT_URL = d.apps_script_url;
     }
   }catch(e){}
-  // URL 參數覆寫（?tenant=xxx&sb_url=xxx&sb_key=xxx）
-  try{
-    const p = new URLSearchParams(location.search);
-    if(p.get('tenant')) CONFIG.TENANT_ID = p.get('tenant');
-    if(p.get('sb_url')) CONFIG.SUPABASE_URL = p.get('sb_url').replace(/\/$/,'');
-    if(p.get('sb_key')) CONFIG.SUPABASE_KEY = p.get('sb_key');
-  }catch(e){}
+  // URL 參數覆寫（?tenant=xxx&sb_url=xxx&sb_key=xxx）— 只在非子網站時生效
+  if(!_SUB){
+    try{
+      const p = new URLSearchParams(location.search);
+      if(p.get('tenant')) CONFIG.TENANT_ID = p.get('tenant');
+      if(p.get('sb_url')) CONFIG.SUPABASE_URL = p.get('sb_url').replace(/\/$/,'');
+      if(p.get('sb_key')) CONFIG.SUPABASE_KEY = p.get('sb_key');
+    }catch(e){}
+  }
 })();
 
 /* 示範資料（兩個來源都空時才會用到） */
@@ -525,6 +532,12 @@ let state = { step: 1, guest: null };
 const IMGDB = {
   db: null,
   _getDbName(){
+    if(typeof window!=='undefined'&&window.__WEDGO_SUBSITE__&&window.__WEDGO_SUBSITE__.tenant_id){
+      return 'dr_wedding_'+window.__WEDGO_SUBSITE__.tenant_id;
+    }
+    if(typeof CONFIG!=='undefined'&&CONFIG.TENANT_ID){
+      return 'dr_wedding_'+CONFIG.TENANT_ID;
+    }
     let tid='_master';
     try{
       const raw=localStorage.getItem('dr_wedding_content');
@@ -533,7 +546,6 @@ const IMGDB = {
         if(d.tenant_id) tid=d.tenant_id;
       }
     }catch(e){}
-    if(typeof CONFIG!=='undefined'&&CONFIG.TENANT_ID) tid=CONFIG.TENANT_ID;
     return 'dr_wedding_'+tid;
   },
   init(){
