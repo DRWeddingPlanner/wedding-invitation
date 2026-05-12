@@ -524,10 +524,22 @@ let state = { step: 1, guest: null };
    ═══════════════════════════════ */
 const IMGDB = {
   db: null,
+  _getDbName(){
+    let tid='_master';
+    try{
+      const raw=localStorage.getItem('dr_wedding_content');
+      if(raw){
+        const d=JSON.parse(raw);
+        if(d.tenant_id) tid=d.tenant_id;
+      }
+    }catch(e){}
+    if(typeof CONFIG!=='undefined'&&CONFIG.TENANT_ID) tid=CONFIG.TENANT_ID;
+    return 'dr_wedding_'+tid;
+  },
   init(){
     if(this.db) return Promise.resolve();
     return new Promise((res, rej)=>{
-      const r = indexedDB.open('dr_wedding', 9);
+      const r = indexedDB.open(this._getDbName(), 9);
       r.onupgradeneeded = e=>{
         // 跟 admin_editor 完全一致的 stores（避免版本衝突）
         const db = e.target.result;

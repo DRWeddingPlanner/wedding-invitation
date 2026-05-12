@@ -1669,10 +1669,24 @@ function applyNamesFont(font){
   document.querySelector('.header-names').style.fontFamily="'"+font+"', serif";
 }
 
-/* ═══ HERO IMAGE + RSVP DB (IndexedDB) ═══ */
+/* ═══ HERO IMAGE + RSVP DB (IndexedDB) — 多租戶分庫 ═══ */
 const IMGDB={db:null,
+  /* ★ 取得當前 tenant 的 DB 名稱（從 localStorage 讀，因為 IMGDB.init 可能早於 CFG 載入） */
+  _getDbName(){
+    let tid='_master';
+    try{
+      const raw=localStorage.getItem('dr_wedding_content');
+      if(raw){
+        const d=JSON.parse(raw);
+        if(d.tenant_id) tid=d.tenant_id;
+      }
+    }catch(e){}
+    // 若 CFG 已載入，以 CFG 為準（保證一致）
+    if(typeof CFG!=='undefined'&&CFG.TENANT_ID) tid=CFG.TENANT_ID;
+    return 'dr_wedding_'+tid;
+  },
   init(){return new Promise((res,rej)=>{
-    const r=indexedDB.open('dr_wedding',9);
+    const r=indexedDB.open(this._getDbName(),9);
     r.onupgradeneeded=e=>{
       const db=e.target.result;
       if(!db.objectStoreNames.contains('assets'))db.createObjectStore('assets');
