@@ -53,7 +53,7 @@ section{padding:100px 24px 80px;position:relative;z-index:1;}
 /* HEADER */
 #s-header{min-height:100vh;display:flex;align-items:center;justify-content:center;text-align:center;padding:80px 24px;}
 .header-tag{font-size:0.6rem;letter-spacing:8px;color:var(--gold);text-transform:uppercase;margin-bottom:20px;font-family:'Cormorant Garamond',serif;}
-.header-names{font-family:'Cormorant Garamond',serif;font-size:clamp(3.5rem,12vw,8rem);font-weight:200;color:var(--cream);letter-spacing:4px;line-height:1;margin-bottom:12px;}
+.header-names{font-family:'Cormorant Garamond','Noto Serif TC',serif;font-size:clamp(2.2rem,7vw,4.5rem);font-weight:200;color:var(--cream);letter-spacing:2px;line-height:1.15;margin:0 auto 12px;word-break:keep-all;max-width:92vw;text-wrap:balance;}
 .header-amp{color:var(--gold);font-style:italic;}
 .h-divider{display:flex;align-items:center;gap:16px;margin:20px auto;justify-content:center;}
 .h-line{height:1px;width:60px;background:linear-gradient(to right,transparent,var(--gold));}
@@ -1358,6 +1358,22 @@ footer{text-align:center;padding:60px 24px;border-top:1px solid var(--border2);p
               <div style="font-size:0.62rem;color:var(--muted);margin-top:6px;letter-spacing:1px;">下載後的檔名（自動加上 .html）</div>
             </div>
 
+            <!-- ★ 公開網址區塊（僅子網站有 public_url 時顯示）-->
+            <div id="exportPublicUrlBox" style="display:none;border:2px solid var(--gold);background:linear-gradient(135deg,rgba(196,164,74,0.08),rgba(196,164,74,0.02));padding:20px 22px;margin-bottom:20px;text-align:center;">
+              <div style="font-size:0.6rem;letter-spacing:4px;color:var(--gold);text-transform:uppercase;margin-bottom:14px;">🌐 賓客專屬網址</div>
+              <div id="exportQrBox" style="background:#fff;padding:14px;display:inline-block;margin-bottom:14px;border-radius:4px;"></div>
+              <div id="exportPublicUrl" style="font-size:0.72rem;color:var(--cream);word-break:break-all;background:rgba(255,255,255,0.04);padding:12px;border:1px solid var(--border2);margin-bottom:14px;letter-spacing:1px;"></div>
+              <div style="display:flex;gap:10px;justify-content:center;flex-wrap:wrap;">
+                <button onclick="copyExportUrl()" id="copyExportUrlBtn"
+                  style="background:var(--gold);border:none;color:var(--bg);padding:11px 24px;font-size:0.78rem;letter-spacing:3px;cursor:pointer;font-family:'Noto Serif TC',serif;">📋 複製連結</button>
+                <button onclick="openExportUrl()"
+                  style="background:none;border:1px solid var(--gold);color:var(--gold);padding:11px 24px;font-size:0.78rem;letter-spacing:3px;cursor:pointer;font-family:'Noto Serif TC',serif;">🔗 在新分頁開啟</button>
+              </div>
+              <div style="font-size:0.62rem;color:var(--muted);margin-top:14px;letter-spacing:1px;line-height:1.8;">
+                把這個網址或 QR Code 分享給賓客<br>賓客用手機掃描或點擊連結即可開啟
+              </div>
+            </div>
+
             <div style="border:1px solid var(--border2);background:var(--bg4);padding:14px 16px;margin-bottom:20px;">
               <div style="font-size:0.6rem;letter-spacing:4px;color:var(--gold);text-transform:uppercase;margin-bottom:10px;">匯出內容</div>
               <div style="display:flex;flex-direction:column;gap:6px;">
@@ -1377,18 +1393,16 @@ footer{text-align:center;padding:60px 24px;border-top:1px solid var(--border2);p
             </div>
 
             <button onclick="exportSite()"
-              style="width:100%;background:var(--gold);border:none;color:var(--bg);padding:16px;font-size:0.85rem;font-family:'Noto Serif TC',serif;letter-spacing:4px;cursor:pointer;transition:background 0.2s;"
-              onmouseover="this.style.background='var(--gold2)'" onmouseout="this.style.background='var(--gold)'">
-              📥 下載賓客版網站
+              style="width:100%;background:none;border:1px solid var(--gold);color:var(--gold);padding:14px;font-size:0.78rem;font-family:'Noto Serif TC',serif;letter-spacing:3px;cursor:pointer;transition:background 0.2s;">
+              📥 下載本機 HTML（備用）
             </button>
             <p style="font-size:0.62rem;color:var(--muted);text-align:center;margin-top:10px;letter-spacing:1px;" id="exportStatus"></p>
           </div>
 
           <div style="border:1px solid var(--border2);background:var(--bg4);padding:16px 18px;font-size:0.72rem;color:var(--muted);line-height:2;letter-spacing:1px;">
-            💡 <strong style="color:var(--cream2);">分享給新人的方式：</strong><br>
-            下載後直接透過 LINE、Email 傳送 .html 檔案給賓客<br>
-            賓客點擊檔案 → 用瀏覽器開啟即可看到完整婚禮網站<br>
-            若需要固定網址（可分享連結），再上傳到 GitHub Pages 即可
+            💡 <strong style="color:var(--cream2);">兩種分享方式：</strong><br>
+            <strong style="color:var(--gold);">A. 公開網址（推薦）</strong>：直接複製上方網址，賓客用手機開瀏覽器即可<br>
+            <strong style="color:var(--cream2);">B. HTML 檔案</strong>：下載後用 Email 傳給賓客，賓客下載後用瀏覽器開啟
           </div>
           <div id="exportGasNote" style="margin-top:10px;padding:10px 14px;border:1px solid rgba(196,164,74,0.25);background:rgba(196,164,74,0.04);font-size:0.7rem;color:var(--gold);letter-spacing:1px;line-height:1.8;"></div>
         </div>
@@ -1665,6 +1679,44 @@ if(_SUB&&_SUB.public_url){
     if(btn) btn.style.display='inline-block';
   },100);
 }
+/* ★ 匯出 tab 中顯示公開網址 + QR Code */
+function renderExportPublicUrl(){
+  const box=document.getElementById('exportPublicUrlBox');
+  if(!box) return;
+  if(!_SUB||!_SUB.public_url){
+    box.style.display='none';
+    return;
+  }
+  box.style.display='block';
+  const url=_SUB.public_url;
+  document.getElementById('exportPublicUrl').textContent=url;
+  const qrBox=document.getElementById('exportQrBox');
+  qrBox.innerHTML=''; // 清空再重畫
+  try{
+    new QRCode(qrBox,{
+      text:url,width:200,height:200,
+      colorDark:'#000000',colorLight:'#ffffff',correctLevel:QRCode.CorrectLevel.H
+    });
+  }catch(e){
+    qrBox.textContent='⚠ 無法生成 QR Code';
+  }
+}
+function copyExportUrl(){
+  if(!_SUB||!_SUB.public_url)return;
+  navigator.clipboard.writeText(_SUB.public_url).then(()=>{
+    const btn=document.getElementById('copyExportUrlBtn');
+    if(btn){
+      const orig=btn.textContent;
+      btn.textContent='✓ 已複製';
+      setTimeout(()=>{btn.textContent=orig;},1500);
+    }
+  });
+}
+function openExportUrl(){
+  if(!_SUB||!_SUB.public_url)return;
+  window.open(_SUB.public_url,'_blank');
+}
+
 function showSubsiteShare(){
   if(!_SUB||!_SUB.public_url){alert('未設定公開網址');return;}
   const url=_SUB.public_url;
@@ -4567,6 +4619,12 @@ function switchAdminTab(name, btn){
   if(name==='cake') loadCakeList();
   if(name==='stats'){ renderAdmin(); }
   if(name==='export'){
+    // ★ 公開網址 + QR Code（僅子網站有 _SUB.public_url 時顯示）
+    renderExportPublicUrl();
+    // ★ 若為子網站且有公開網址 → 自動彈出 QR 對話框
+    if(_SUB&&_SUB.public_url){
+      setTimeout(()=>showSubsiteShare(),250);
+    }
     const gasNote=document.getElementById('exportGasNote');
     if(gasNote){
       const data=getSiteData();
@@ -4871,6 +4929,10 @@ function openDevSettings(){
     const o=document.getElementById('devGhOwner'); if(o) o.value=d.github_owner||'';
     const r=document.getElementById('devGhRepo'); if(r) r.value=d.github_repo||'';
     const t=document.getElementById('devGhPat'); if(t) t.value=d.github_pat||'';
+    // 自動滾動到面板
+    setTimeout(()=>{
+      p.scrollIntoView({behavior:'smooth',block:'center'});
+    },50);
   }
 }
 
@@ -4963,7 +5025,9 @@ async function createSubsite(){
       entry.published_at=new Date().toISOString();
       saveDevData(d);
       renderDevDashboard();
-      showAutoSaveToast('✓ 已建立並發布！1-2 分鐘後可訪問');
+      showAutoSaveToast('✓ 已建立並發布！');
+      // ★ 自動彈出分享對話框（含 QR Code + 公開網址）
+      setTimeout(()=>showShareDialog(entry.id),600);
     }catch(e){
       showAutoSaveToast('⚠ 已建立，但發布失敗：'+e.message);
     }
