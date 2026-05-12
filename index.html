@@ -1462,6 +1462,7 @@ footer{text-align:center;padding:60px 24px;border-top:1px solid var(--border2);p
   <div class="footer-copy" data-key="footer_copy">DR Wedding 婚禮顧問</div>
   <div style="margin-top:16px;display:flex;justify-content:center;gap:12px;">
     <button class="footer-link" onclick="window.open('admin_editor.html','_blank')" style="font-size:0.58rem;">後台編輯</button>
+    <button id="subsiteShareBtn" class="footer-link" onclick="showSubsiteShare()" style="font-size:0.58rem;display:none;">📱 分享給賓客</button>
   </div>
   <button class="admin-trigger" onclick="toggleAdmin()">▲ 管理後台</button>
 </footer>
@@ -1520,6 +1521,37 @@ footer{text-align:center;padding:60px 24px;border-top:1px solid var(--border2);p
             style="flex:1;background:transparent;border:none;border-bottom:1px solid var(--border);color:var(--cream);font-size:0.85rem;font-family:'Noto Serif TC',serif;outline:none;padding:6px 0;">
           <button onclick="changeDevPwd()" style="background:none;border:1px solid var(--gold);color:var(--gold);padding:7px 16px;font-size:0.72rem;letter-spacing:2px;cursor:pointer;font-family:'Noto Serif TC',serif;">儲存</button>
         </div>
+      </div>
+
+      <!-- GitHub 自動發布設定 -->
+      <div style="margin-top:24px;border-top:1px solid rgba(196,164,74,0.15);padding-top:18px;">
+        <div style="font-size:0.58rem;letter-spacing:4px;color:var(--gold);text-transform:uppercase;margin-bottom:12px;">🚀 GitHub 自動發布</div>
+        <p style="font-size:0.62rem;color:var(--muted);line-height:1.8;letter-spacing:1px;margin-bottom:14px;">
+          設定後，建立子網站時將自動上傳到 GitHub Pages 並產生公開網址，賓客可直接用網址打開。<br>
+          → <a href="https://github.com/settings/tokens?type=beta" target="_blank" style="color:var(--gold);text-decoration:underline;">取得 GitHub Personal Access Token</a>（需 contents:write 權限）
+        </p>
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:14px;margin-bottom:10px;">
+          <div>
+            <div style="font-size:0.55rem;color:var(--muted);letter-spacing:2px;margin-bottom:4px;">GITHUB OWNER</div>
+            <input id="devGhOwner" placeholder="DRWeddingPlanner"
+              onchange="saveGhSettings()"
+              style="width:100%;background:transparent;border:none;border-bottom:1px solid var(--border);color:var(--cream);font-size:0.85rem;font-family:'Noto Serif TC',serif;outline:none;padding:6px 0;">
+          </div>
+          <div>
+            <div style="font-size:0.55rem;color:var(--muted);letter-spacing:2px;margin-bottom:4px;">GITHUB REPO</div>
+            <input id="devGhRepo" placeholder="wedding-invitation"
+              onchange="saveGhSettings()"
+              style="width:100%;background:transparent;border:none;border-bottom:1px solid var(--border);color:var(--cream);font-size:0.85rem;font-family:'Noto Serif TC',serif;outline:none;padding:6px 0;">
+          </div>
+        </div>
+        <div style="margin-bottom:10px;">
+          <div style="font-size:0.55rem;color:var(--muted);letter-spacing:2px;margin-bottom:4px;">PERSONAL ACCESS TOKEN（PAT）</div>
+          <input id="devGhPat" type="password" placeholder="ghp_xxxxxxxxxxxxxxxx"
+            onchange="saveGhSettings()"
+            style="width:100%;background:transparent;border:none;border-bottom:1px solid var(--border);color:var(--cream);font-size:0.85rem;font-family:'Noto Serif TC',serif;outline:none;padding:6px 0;">
+        </div>
+        <div id="ghTestResult" style="font-size:0.65rem;color:var(--muted);letter-spacing:1px;margin-top:8px;"></div>
+        <button onclick="testGhConnection()" style="margin-top:8px;background:none;border:1px solid var(--gold);color:var(--gold);padding:7px 16px;font-size:0.7rem;letter-spacing:2px;cursor:pointer;font-family:'Noto Serif TC',serif;">🔌 測試連線</button>
       </div>
     </div>
   </div>
@@ -1612,7 +1644,50 @@ function applyContent(){
 }
 applyContent();
 
-/* ═══ NAV ═══ */
+/* ★ 若為子網站（有 __WEDGO_SUBSITE__）且有 public_url，顯示「分享給賓客」按鈕 */
+if(_SUB&&_SUB.public_url){
+  document.addEventListener('DOMContentLoaded',()=>{
+    const btn=document.getElementById('subsiteShareBtn');
+    if(btn) btn.style.display='inline-block';
+  });
+  // 若 DOMContentLoaded 已過，立即試一次
+  setTimeout(()=>{
+    const btn=document.getElementById('subsiteShareBtn');
+    if(btn) btn.style.display='inline-block';
+  },100);
+}
+function showSubsiteShare(){
+  if(!_SUB||!_SUB.public_url){alert('未設定公開網址');return;}
+  const url=_SUB.public_url;
+  const name=_SUB.site_name||'婚禮網站';
+  const overlay=document.createElement('div');
+  overlay.style.cssText='position:fixed;inset:0;z-index:100000;background:rgba(0,0,0,0.85);display:flex;align-items:center;justify-content:center;padding:20px;';
+  overlay.onclick=(e)=>{if(e.target===overlay)overlay.remove();};
+  overlay.innerHTML=`
+    <div style="background:var(--bg2);border:1px solid var(--gold);padding:24px 28px;max-width:420px;width:100%;text-align:center;">
+      <div style="font-family:'Cormorant Garamond',serif;font-size:1.4rem;color:var(--gold);letter-spacing:3px;margin-bottom:6px;">分享給賓客</div>
+      <div style="font-size:0.65rem;color:var(--muted);letter-spacing:2px;margin-bottom:18px;">${name}</div>
+      <div id="ssQrBox2" style="background:#fff;padding:14px;display:inline-block;margin-bottom:14px;"></div>
+      <div style="font-size:0.7rem;color:var(--cream);word-break:break-all;background:rgba(255,255,255,0.04);padding:10px;border:1px solid var(--border2);margin-bottom:14px;">${url}</div>
+      <div style="display:flex;gap:10px;justify-content:center;flex-wrap:wrap;">
+        <button onclick="navigator.clipboard.writeText('${url}').then(()=>this.textContent='✓ 已複製')"
+          style="background:var(--gold);border:none;color:var(--bg);padding:9px 22px;font-size:0.72rem;letter-spacing:2px;cursor:pointer;font-family:'Noto Serif TC',serif;">📋 複製連結</button>
+        <button onclick="window.open('${url}','_blank')"
+          style="background:none;border:1px solid var(--gold);color:var(--gold);padding:9px 22px;font-size:0.72rem;letter-spacing:2px;cursor:pointer;font-family:'Noto Serif TC',serif;">🔗 開啟</button>
+        <button onclick="this.closest('div[style*=\\'fixed\\']').remove()"
+          style="background:none;border:1px solid var(--border);color:var(--muted);padding:9px 22px;font-size:0.72rem;letter-spacing:2px;cursor:pointer;font-family:'Noto Serif TC',serif;">關閉</button>
+      </div>
+    </div>`;
+  document.body.appendChild(overlay);
+  setTimeout(()=>{
+    try{
+      new QRCode(document.getElementById('ssQrBox2'),{
+        text:url,width:180,height:180,
+        colorDark:'#000000',colorLight:'#ffffff',correctLevel:QRCode.CorrectLevel.H
+      });
+    }catch(e){}
+  },50);
+}
 window.addEventListener('scroll',()=>{
   document.getElementById('topNav').classList.toggle('scrolled',window.scrollY>80);
 });
@@ -3403,6 +3478,53 @@ async function sbFetchSiteStats(tenant_id){
   }catch(e){return null;}
 }
 
+/* ═══ GitHub Pages 自動發布 ═══ */
+async function ghGetFile(owner, repo, path, token){
+  // 取得檔案 sha（若存在）以便更新
+  const url=`https://api.github.com/repos/${owner}/${repo}/contents/${encodeURI(path)}`;
+  try{
+    const r=await fetch(url,{headers:{'Authorization':'token '+token,'Accept':'application/vnd.github+json'}});
+    if(!r.ok) return null;
+    const d=await r.json();
+    return d.sha||null;
+  }catch(e){return null;}
+}
+
+async function ghPutFile(owner, repo, path, content, message, token){
+  const url=`https://api.github.com/repos/${owner}/${repo}/contents/${encodeURI(path)}`;
+  const sha=await ghGetFile(owner,repo,path,token);
+  // Base64 編碼（支援 UTF-8 中文）
+  const b64=btoa(unescape(encodeURIComponent(content)));
+  const body={message:message||('publish '+path),content:b64,branch:'main'};
+  if(sha) body.sha=sha;
+  const r=await fetch(url,{
+    method:'PUT',
+    headers:{'Authorization':'token '+token,'Content-Type':'application/json','Accept':'application/vnd.github+json'},
+    body:JSON.stringify(body)
+  });
+  if(!r.ok){
+    const t=await r.text().catch(()=>'');
+    throw new Error(`GitHub upload failed: ${r.status} ${t}`);
+  }
+  return r.json();
+}
+
+function ghGetPublicUrl(owner, repo, path){
+  // GitHub Pages URL：owner.github.io/repo/path
+  return `https://${owner.toLowerCase()}.github.io/${repo}/${path}`;
+}
+
+async function ghDeleteFile(owner, repo, path, token){
+  const sha=await ghGetFile(owner,repo,path,token);
+  if(!sha) return; // 已不存在
+  const url=`https://api.github.com/repos/${owner}/${repo}/contents/${encodeURI(path)}`;
+  await fetch(url,{
+    method:'DELETE',
+    headers:{'Authorization':'token '+token,'Content-Type':'application/json','Accept':'application/vnd.github+json'},
+    body:JSON.stringify({message:'delete '+path,sha,branch:'main'})
+  }).catch(()=>{});
+}
+
 function unlockDevSettings(){
   const lockEl=document.getElementById('devSettingsLock');
   const inputEl=document.getElementById('devUnlockInput');
@@ -4732,7 +4854,15 @@ function closeDevHub(){
 
 function openDevSettings(){
   const p=document.getElementById('devSettingsPanel');
-  p.style.display=p.style.display==='none'?'block':'none';
+  const showing=p.style.display==='block';
+  p.style.display=showing?'none':'block';
+  if(!showing){
+    // 載入現有 GitHub 設定
+    const d=getDevData();
+    const o=document.getElementById('devGhOwner'); if(o) o.value=d.github_owner||'';
+    const r=document.getElementById('devGhRepo'); if(r) r.value=d.github_repo||'';
+    const t=document.getElementById('devGhPat'); if(t) t.value=d.github_pat||'';
+  }
 }
 
 function changeDevPwd(){
@@ -4745,6 +4875,44 @@ function changeDevPwd(){
   showAutoSaveToast('✓ 開發者密碼已更新');
 }
 
+/* ─── GitHub 設定 ─── */
+function saveGhSettings(){
+  const d=getDevData();
+  d.github_owner=document.getElementById('devGhOwner').value.trim();
+  d.github_repo=document.getElementById('devGhRepo').value.trim();
+  d.github_pat=document.getElementById('devGhPat').value.trim();
+  saveDevData(d);
+  showAutoSaveToast('✓ GitHub 設定已儲存');
+}
+
+async function testGhConnection(){
+  const d=getDevData();
+  const el=document.getElementById('ghTestResult');
+  if(!d.github_owner||!d.github_repo||!d.github_pat){
+    el.style.color='var(--red)';
+    el.textContent='⚠ 請先填寫 Owner / Repo / PAT';
+    return;
+  }
+  el.style.color='var(--muted)';
+  el.textContent='測試中...';
+  try{
+    const r=await fetch(`https://api.github.com/repos/${d.github_owner}/${d.github_repo}`,{
+      headers:{'Authorization':'token '+d.github_pat,'Accept':'application/vnd.github+json'}
+    });
+    if(r.ok){
+      const info=await r.json();
+      el.style.color='var(--green)';
+      el.innerHTML=`✓ 連線成功！Repo: <strong>${info.full_name}</strong>，Pages: <a href="https://${d.github_owner.toLowerCase()}.github.io/${d.github_repo}/" target="_blank" style="color:var(--gold);">${d.github_owner.toLowerCase()}.github.io/${d.github_repo}/</a>`;
+    } else {
+      el.style.color='var(--red)';
+      el.textContent='✗ 連線失敗：'+r.status+' '+r.statusText+'（請檢查 Owner/Repo/PAT 是否正確）';
+    }
+  }catch(e){
+    el.style.color='var(--red)';
+    el.textContent='✗ 網路錯誤：'+e.message;
+  }
+}
+
 /* ─── 生成隨機密碼 ─── */
 function genSubsitePwd(){
   const chars='ABCDEFGHJKLMNPQRSTUVWXYZabcdefghjkmnpqrstuvwxyz23456789';
@@ -4753,7 +4921,7 @@ function genSubsitePwd(){
 }
 
 /* ─── 建立子網站 ─── */
-function createSubsite(){
+async function createSubsite(){
   const name=document.getElementById('devNewName').value.trim();
   if(!name){document.getElementById('devNewName').focus();return;}
   const url=document.getElementById('devNewUrl').value.trim();
@@ -4776,12 +4944,33 @@ function createSubsite(){
   // ★ 雲端同步（讓 DevHub 可跨裝置看到）
   sbUpsertSite(entry).catch(()=>{});
   renderDevDashboard();
+
+  // ★ 若已設定 GitHub → 自動發布
+  if(d.github_owner&&d.github_repo&&d.github_pat){
+    try{
+      showAutoSaveToast('⏳ 正在發布到 GitHub Pages...');
+      const publicUrl=await publishSubsiteToGitHub(entry);
+      entry.public_url=publicUrl;
+      entry.published_at=new Date().toISOString();
+      saveDevData(d);
+      renderDevDashboard();
+      showAutoSaveToast('✓ 已建立並發布！1-2 分鐘後可訪問');
+    }catch(e){
+      showAutoSaveToast('⚠ 已建立，但發布失敗：'+e.message);
+    }
+  }
 }
 
 /* ─── 刪除子網站 ─── */
-function deleteSubsite(id){
+async function deleteSubsite(id){
   const d=getDevData();
-  d.subsites=(d.subsites||[]).filter(s=>s.id!==id);
+  const s=(d.subsites||[]).find(x=>x.id===id);
+  // 從 GitHub 刪除（若有發布）
+  if(s&&s.public_url&&d.github_owner&&d.github_repo&&d.github_pat){
+    const tid=s.tenant_id||s.id;
+    await ghDeleteFile(d.github_owner,d.github_repo,'sites/'+tid+'.html',d.github_pat).catch(()=>{});
+  }
+  d.subsites=(d.subsites||[]).filter(x=>x.id!==id);
   saveDevData(d);
   renderDevDashboard();
 }
@@ -4797,32 +4986,29 @@ function regenPwd(id){
   renderDevDashboard();
 }
 
-/* ─── 下載子網站 HTML ─── */
-async function downloadSubsite(id){
-  const d=getDevData();
-  const s=(d.subsites||[]).find(x=>x.id===id);
-  if(!s)return;
-
-  const btn=document.getElementById(`dl-btn-${id}`);
-  if(btn){btn.textContent='處理中...';btn.disabled=true;}
-
+/* ─── 建構子網站 HTML（含 inject script） ─── */
+async function buildSubsiteHtml(s){
+  let html='';
   try{
-    // Fetch current HTML source
-    let html='';
-    try{
-      const r=await fetch(location.href,{cache:'no-cache'});
-      html=await r.text();
-    }catch(e){html=document.documentElement.outerHTML;}
+    const r=await fetch(location.href,{cache:'no-cache'});
+    html=await r.text();
+  }catch(e){html=document.documentElement.outerHTML;}
 
-    // Build inject script: 用全域變數儲存子網站設定，避免 file:// origin 共享 localStorage 造成污染
-    const masterData=getSiteData();
-    const subData={
-      admin_password: s.pwd,
-      tenant_id: s.tenant_id || s.id,
-      supabase_url: masterData.supabase_url || '',
-      supabase_anon_key: masterData.supabase_anon_key || ''
-    };
-    const inject=`<script id="_subsite_inject">
+  const masterData=getSiteData();
+  const dev=getDevData();
+  // 計算公開網址（若已配置 GitHub）
+  const publicUrl=(dev.github_owner&&dev.github_repo)
+    ? ghGetPublicUrl(dev.github_owner,dev.github_repo,'sites/'+(s.tenant_id||s.id)+'.html')
+    : '';
+  const subData={
+    admin_password: s.pwd,
+    tenant_id: s.tenant_id || s.id,
+    supabase_url: masterData.supabase_url || '',
+    supabase_anon_key: masterData.supabase_anon_key || '',
+    public_url: publicUrl,
+    site_name: s.name || ''
+  };
+  const inject=`<script id="_subsite_inject">
 window.__WEDGO_SUBSITE__=${JSON.stringify(subData)};
 try{
   var d=JSON.parse(localStorage.getItem('dr_wedding_content')||'{}');
@@ -4832,12 +5018,36 @@ try{
 var el=document.getElementById('_subsite_inject');if(el)el.remove();
 <\/script>`;
 
-    // Inject right after <head>
-    html=html.replace('<head>','<head>'+inject);
+  html=html.replace('<head>','<head>'+inject);
+  html=html.replace('</style>','#devHub{display:none!important;}\n</style>');
+  return html;
+}
 
-    // Inject CSS to completely disable dev hub in buyer's sub-site
-    html=html.replace('</style>','#devHub{display:none!important;}\n</style>');
+/* ─── 發布到 GitHub Pages ─── */
+async function publishSubsiteToGitHub(s){
+  const dev=getDevData();
+  if(!dev.github_owner||!dev.github_repo||!dev.github_pat){
+    throw new Error('未設定 GitHub（請先到「開發者設定」配置）');
+  }
+  const html=await buildSubsiteHtml(s);
+  const path='sites/'+(s.tenant_id||s.id)+'.html';
+  await ghPutFile(dev.github_owner,dev.github_repo,path,html,
+    `publish subsite: ${s.name} (${s.tenant_id||s.id})`,dev.github_pat);
+  const publicUrl=ghGetPublicUrl(dev.github_owner,dev.github_repo,path);
+  return publicUrl;
+}
 
+/* ─── 下載子網站 HTML（本地） ─── */
+async function downloadSubsite(id){
+  const d=getDevData();
+  const s=(d.subsites||[]).find(x=>x.id===id);
+  if(!s)return;
+
+  const btn=document.getElementById(`dl-btn-${id}`);
+  if(btn){btn.textContent='處理中...';btn.disabled=true;}
+
+  try{
+    const html=await buildSubsiteHtml(s);
     const filename=`${s.name.replace(/[^a-zA-Z0-9\u4e00-\u9fff]/g,'_')}_婚禮網站.html`;
     const blob=new Blob([html],{type:'text/html;charset=utf-8'});
     const url=URL.createObjectURL(blob);
@@ -4853,8 +5063,67 @@ var el=document.getElementById('_subsite_inject');if(el)el.remove();
 
   }catch(err){
     alert('下載失敗：'+err.message);
-    if(btn){btn.textContent='📥 下載子網站';btn.disabled=false;}
+    if(btn){btn.textContent='📥 下載';btn.disabled=false;}
   }
+}
+
+/* ─── 發布到 GitHub（按鈕觸發） ─── */
+async function publishSubsite(id){
+  const d=getDevData();
+  const s=(d.subsites||[]).find(x=>x.id===id);
+  if(!s)return;
+
+  const btn=document.getElementById(`pub-btn-${id}`);
+  if(btn){btn.textContent='⏳ 發布中...';btn.disabled=true;}
+
+  try{
+    const publicUrl=await publishSubsiteToGitHub(s);
+    s.public_url=publicUrl;
+    s.published_at=new Date().toISOString();
+    saveDevData(d);
+    renderDevDashboard();
+    showAutoSaveToast('✓ 已發布到 GitHub Pages（約 1-2 分鐘後生效）');
+  }catch(err){
+    alert('發布失敗：'+err.message);
+    if(btn){btn.textContent='🚀 發布';btn.disabled=false;}
+  }
+}
+
+/* ─── 顯示分享連結 + QR Code ─── */
+function showShareDialog(id){
+  const d=getDevData();
+  const s=(d.subsites||[]).find(x=>x.id===id);
+  if(!s||!s.public_url){alert('請先發布到 GitHub');return;}
+
+  // 建一個臨時 modal
+  const overlay=document.createElement('div');
+  overlay.style.cssText='position:fixed;inset:0;z-index:100000;background:rgba(0,0,0,0.85);display:flex;align-items:center;justify-content:center;padding:20px;';
+  overlay.onclick=(e)=>{if(e.target===overlay)overlay.remove();};
+  overlay.innerHTML=`
+    <div style="background:var(--bg2);border:1px solid var(--gold);padding:24px 28px;max-width:420px;width:100%;text-align:center;">
+      <div style="font-family:'Cormorant Garamond',serif;font-size:1.4rem;color:var(--gold);letter-spacing:3px;margin-bottom:6px;">分享給賓客</div>
+      <div style="font-size:0.65rem;color:var(--muted);letter-spacing:2px;margin-bottom:18px;">${s.name}</div>
+      <div id="ssQrBox" style="background:#fff;padding:14px;display:inline-block;margin-bottom:14px;"></div>
+      <div style="font-size:0.7rem;color:var(--cream);word-break:break-all;background:rgba(255,255,255,0.04);padding:10px;border:1px solid var(--border2);margin-bottom:14px;">${s.public_url}</div>
+      <div style="display:flex;gap:10px;justify-content:center;">
+        <button onclick="navigator.clipboard.writeText('${s.public_url}').then(()=>this.textContent='✓ 已複製')"
+          style="background:var(--gold);border:none;color:var(--bg);padding:9px 22px;font-size:0.72rem;letter-spacing:2px;cursor:pointer;font-family:'Noto Serif TC',serif;">📋 複製連結</button>
+        <button onclick="window.open('${s.public_url}','_blank')"
+          style="background:none;border:1px solid var(--gold);color:var(--gold);padding:9px 22px;font-size:0.72rem;letter-spacing:2px;cursor:pointer;font-family:'Noto Serif TC',serif;">🔗 開啟</button>
+        <button onclick="this.closest('div[style*=\\'fixed\\']').remove()"
+          style="background:none;border:1px solid var(--border);color:var(--muted);padding:9px 22px;font-size:0.72rem;letter-spacing:2px;cursor:pointer;font-family:'Noto Serif TC',serif;">關閉</button>
+      </div>
+    </div>`;
+  document.body.appendChild(overlay);
+  // 生成 QR
+  setTimeout(()=>{
+    try{
+      new QRCode(document.getElementById('ssQrBox'),{
+        text:s.public_url,width:180,height:180,
+        colorDark:'#000000',colorLight:'#ffffff',correctLevel:QRCode.CorrectLevel.H
+      });
+    }catch(e){}
+  },50);
 }
 
 /* ─── 渲染 Dashboard ─── */
@@ -4885,13 +5154,15 @@ function renderDevDashboard(){
 
   listEl.innerHTML=subsites.map(s=>{
     const tid=s.tenant_id||s.id;
+    const hasGh=!!(d.github_owner&&d.github_repo&&d.github_pat);
+    const published=!!s.public_url;
     return `
     <div style="border:1px solid var(--border2);padding:16px 18px;margin-bottom:10px;background:rgba(255,255,255,0.01);">
       <div style="display:flex;align-items:flex-start;justify-content:space-between;gap:12px;flex-wrap:wrap;">
         <div style="flex:1;min-width:0;">
           <div style="display:flex;align-items:center;gap:8px;margin-bottom:6px;flex-wrap:wrap;">
             <span style="font-size:0.85rem;color:var(--cream);letter-spacing:1px;">${s.name}</span>
-            ${s.downloaded?'<span style="font-size:0.58rem;letter-spacing:2px;color:var(--green);border:1px solid rgba(90,158,106,0.4);padding:2px 7px;">已下載</span>':'<span style="font-size:0.58rem;letter-spacing:2px;color:var(--muted);border:1px solid var(--border2);padding:2px 7px;">未下載</span>'}
+            ${published?'<span style="font-size:0.58rem;letter-spacing:2px;color:var(--green);border:1px solid rgba(90,158,106,0.4);padding:2px 7px;">🌐 已發布</span>':(s.downloaded?'<span style="font-size:0.58rem;letter-spacing:2px;color:var(--muted);border:1px solid var(--border2);padding:2px 7px;">已下載（本機）</span>':'<span style="font-size:0.58rem;letter-spacing:2px;color:var(--muted);border:1px solid var(--border2);padding:2px 7px;">未發布</span>')}
             <span style="font-size:0.55rem;color:var(--muted);font-family:'Cormorant Garamond',serif;letter-spacing:1px;">ID: ${tid}</span>
           </div>
           <div style="display:flex;gap:16px;flex-wrap:wrap;">
@@ -4899,24 +5170,37 @@ function renderDevDashboard(){
               <div style="font-size:0.55rem;letter-spacing:3px;color:var(--muted);text-transform:uppercase;margin-bottom:3px;">專屬登入密碼</div>
               <div style="font-family:'Cormorant Garamond',serif;font-size:1rem;color:var(--gold);letter-spacing:3px;">${s.pwd}</div>
             </div>
-            ${s.url?`<div>
-              <div style="font-size:0.55rem;letter-spacing:3px;color:var(--muted);text-transform:uppercase;margin-bottom:3px;">子網站 URL</div>
-              <a href="${s.url}" target="_blank" style="font-size:0.75rem;color:var(--cream2);letter-spacing:1px;text-decoration:none;word-break:break-all;">${s.url}</a>
-            </div>`:''}
             <div>
               <div style="font-size:0.55rem;letter-spacing:3px;color:var(--muted);text-transform:uppercase;margin-bottom:3px;">建立日期</div>
               <div style="font-size:0.75rem;color:var(--muted);">${s.created}</div>
             </div>
           </div>
+          ${published?`
+          <div style="margin-top:10px;padding:8px 12px;background:rgba(196,164,74,0.06);border-left:2px solid var(--gold);">
+            <div style="font-size:0.55rem;color:var(--muted);letter-spacing:2px;margin-bottom:3px;">🌐 公開網址（分享給賓客）</div>
+            <a href="${s.public_url}" target="_blank" style="font-size:0.7rem;color:var(--gold);word-break:break-all;text-decoration:none;">${s.public_url}</a>
+          </div>`:''}
           <!-- 雲端統計（會被 fillSubsiteStats 填入）-->
           <div id="ss-stats-${tid}" style="display:flex;gap:14px;flex-wrap:wrap;margin-top:10px;font-size:0.68rem;color:var(--muted);letter-spacing:1px;">
             ${CFG.SUPABASE_URL?'<span style="color:var(--muted);">☁ 載入雲端統計中…</span>':'<span style="color:var(--muted);">設定 Supabase 後可顯示即時統計</span>'}
           </div>
         </div>
         <div style="display:flex;flex-direction:column;gap:6px;flex-shrink:0;">
-          <button id="dl-btn-${s.id}" onclick="downloadSubsite('${s.id}')"
+          ${hasGh&&!published?`<button id="pub-btn-${s.id}" onclick="publishSubsite('${s.id}')"
             style="background:var(--gold);border:none;color:var(--bg);padding:8px 16px;font-size:0.72rem;letter-spacing:2px;cursor:pointer;font-family:'Noto Serif TC',serif;white-space:nowrap;">
-            📥 下載子網站
+            🚀 發布到網路
+          </button>`:''}
+          ${published?`<button onclick="showShareDialog('${s.id}')"
+            style="background:var(--gold);border:none;color:var(--bg);padding:8px 16px;font-size:0.72rem;letter-spacing:2px;cursor:pointer;font-family:'Noto Serif TC',serif;white-space:nowrap;">
+            📱 分享 / QR
+          </button>
+          <button id="pub-btn-${s.id}" onclick="publishSubsite('${s.id}')"
+            style="background:none;border:1px solid var(--gold);color:var(--gold);padding:6px 16px;font-size:0.68rem;letter-spacing:2px;cursor:pointer;font-family:'Noto Serif TC',serif;">
+            ♻ 重新發布
+          </button>`:''}
+          <button id="dl-btn-${s.id}" onclick="downloadSubsite('${s.id}')"
+            style="background:none;border:1px solid var(--border2);color:var(--muted);padding:6px 16px;font-size:0.68rem;letter-spacing:2px;cursor:pointer;font-family:'Noto Serif TC',serif;white-space:nowrap;">
+            📥 下載 HTML
           </button>
           <button onclick="viewSubsiteData('${tid}','${s.name.replace(/'/g,"\\'")}')"
             style="background:none;border:1px solid var(--gold);color:var(--gold);padding:6px 16px;font-size:0.68rem;letter-spacing:2px;cursor:pointer;font-family:'Noto Serif TC',serif;${CFG.SUPABASE_URL?'':'display:none;'}">
@@ -4924,9 +5208,9 @@ function renderDevDashboard(){
           </button>
           <button onclick="regenPwd('${s.id}')"
             style="background:none;border:1px solid var(--border2);color:var(--muted);padding:6px 16px;font-size:0.68rem;letter-spacing:2px;cursor:pointer;font-family:'Noto Serif TC',serif;">
-            🔄 重新產生密碼
+            🔄 重產密碼
           </button>
-          <button onclick="if(confirm('確定刪除此子網站記錄？'))deleteSubsite('${s.id}')"
+          <button onclick="if(confirm('確定刪除此子網站？\\n（含 GitHub 上的檔案）'))deleteSubsite('${s.id}')"
             style="background:none;border:1px solid rgba(158,90,90,0.3);color:rgba(158,90,90,0.6);padding:6px 16px;font-size:0.68rem;letter-spacing:2px;cursor:pointer;font-family:'Noto Serif TC',serif;">
             🗑 刪除
           </button>
