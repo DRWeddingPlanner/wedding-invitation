@@ -1710,31 +1710,46 @@ function openExportUrl(){
 
 function showSubsiteShare(){
   if(!_SUB||!_SUB.public_url){alert('未設定公開網址');return;}
-  const url=_SUB.public_url;
+  const guestUrl=_SUB.public_url;
+  const adminUrl=_SUB.admin_url||'';
   const name=_SUB.site_name||'婚禮網站';
   const overlay=document.createElement('div');
-  overlay.style.cssText='position:fixed;inset:0;z-index:100000;background:rgba(0,0,0,0.85);display:flex;align-items:center;justify-content:center;padding:20px;';
+  overlay.style.cssText='position:fixed;inset:0;z-index:100000;background:rgba(0,0,0,0.85);display:flex;align-items:center;justify-content:center;padding:20px;overflow-y:auto;';
   overlay.onclick=(e)=>{if(e.target===overlay)overlay.remove();};
   overlay.innerHTML=`
-    <div style="background:var(--bg2);border:1px solid var(--gold);padding:24px 28px;max-width:420px;width:100%;text-align:center;">
-      <div style="font-family:'Cormorant Garamond',serif;font-size:1.4rem;color:var(--gold);letter-spacing:3px;margin-bottom:6px;">分享給賓客</div>
+    <div style="background:var(--bg2);border:1px solid var(--gold);padding:24px 28px;max-width:460px;width:100%;text-align:center;max-height:95vh;overflow-y:auto;">
+      <div style="font-family:'Cormorant Garamond',serif;font-size:1.4rem;color:var(--gold);letter-spacing:3px;margin-bottom:4px;">分享網址</div>
       <div style="font-size:0.65rem;color:var(--muted);letter-spacing:2px;margin-bottom:18px;">${name}</div>
-      <div id="ssQrBox2" style="background:#fff;padding:14px;display:inline-block;margin-bottom:14px;"></div>
-      <div style="font-size:0.7rem;color:var(--cream);word-break:break-all;background:rgba(255,255,255,0.04);padding:10px;border:1px solid var(--border2);margin-bottom:14px;">${url}</div>
-      <div style="display:flex;gap:10px;justify-content:center;flex-wrap:wrap;">
-        <button onclick="navigator.clipboard.writeText('${url}').then(()=>this.textContent='✓ 已複製')"
-          style="background:var(--gold);border:none;color:var(--bg);padding:9px 22px;font-size:0.72rem;letter-spacing:2px;cursor:pointer;font-family:'Noto Serif TC',serif;">📋 複製連結</button>
-        <button onclick="window.open('${url}','_blank')"
-          style="background:none;border:1px solid var(--gold);color:var(--gold);padding:9px 22px;font-size:0.72rem;letter-spacing:2px;cursor:pointer;font-family:'Noto Serif TC',serif;">🔗 開啟</button>
-        <button onclick="this.closest('div[style*=\\'fixed\\']').remove()"
-          style="background:none;border:1px solid var(--border);color:var(--muted);padding:9px 22px;font-size:0.72rem;letter-spacing:2px;cursor:pointer;font-family:'Noto Serif TC',serif;">關閉</button>
+
+      <!-- 賓客專屬網址 -->
+      <div style="border:2px solid var(--gold);background:rgba(196,164,74,0.06);padding:16px;margin-bottom:14px;">
+        <div style="font-size:0.62rem;letter-spacing:3px;color:var(--gold);margin-bottom:10px;">🎉 賓客專屬網址（純淨版）</div>
+        <div id="ssQrBox2" style="background:#fff;padding:12px;display:inline-block;margin-bottom:10px;"></div>
+        <div style="font-size:0.66rem;color:var(--cream);word-break:break-all;background:rgba(0,0,0,0.25);padding:8px;border:1px solid var(--border2);margin-bottom:10px;">${guestUrl}</div>
+        <div style="display:flex;gap:8px;justify-content:center;flex-wrap:wrap;">
+          <button onclick="navigator.clipboard.writeText('${guestUrl}').then(()=>this.textContent='✓ 已複製')"
+            style="background:var(--gold);border:none;color:var(--bg);padding:8px 18px;font-size:0.7rem;letter-spacing:2px;cursor:pointer;font-family:'Noto Serif TC',serif;">📋 複製</button>
+          <button onclick="window.open('${guestUrl}','_blank')"
+            style="background:none;border:1px solid var(--gold);color:var(--gold);padding:8px 18px;font-size:0.7rem;letter-spacing:2px;cursor:pointer;font-family:'Noto Serif TC',serif;">🔗 開啟</button>
+        </div>
       </div>
+
+      ${adminUrl?`<div style="border:1px solid var(--border2);background:rgba(255,255,255,0.02);padding:14px;margin-bottom:14px;">
+        <div style="font-size:0.6rem;letter-spacing:3px;color:var(--cream2);margin-bottom:8px;">🔐 後台網址（管理用）</div>
+        <div style="font-size:0.62rem;color:var(--muted);word-break:break-all;background:rgba(0,0,0,0.2);padding:8px;border:1px solid var(--border2);margin-bottom:10px;">${adminUrl}</div>
+        <button onclick="navigator.clipboard.writeText('${adminUrl}').then(()=>this.textContent='✓ 已複製')"
+          style="background:none;border:1px solid var(--gold);color:var(--gold);padding:7px 16px;font-size:0.66rem;letter-spacing:2px;cursor:pointer;font-family:'Noto Serif TC',serif;">📋 複製後台網址</button>
+        <div style="font-size:0.58rem;color:var(--muted);margin-top:8px;letter-spacing:1px;">⚠ 此網址含完整管理功能，請勿給賓客</div>
+      </div>`:''}
+
+      <button onclick="this.closest('div[style*=\\'fixed\\']').remove()"
+        style="background:none;border:1px solid var(--border);color:var(--muted);padding:9px 28px;font-size:0.72rem;letter-spacing:2px;cursor:pointer;font-family:'Noto Serif TC',serif;">關閉</button>
     </div>`;
   document.body.appendChild(overlay);
   setTimeout(()=>{
     try{
       new QRCode(document.getElementById('ssQrBox2'),{
-        text:url,width:180,height:180,
+        text:guestUrl,width:180,height:180,
         colorDark:'#000000',colorLight:'#ffffff',correctLevel:QRCode.CorrectLevel.H
       });
     }catch(e){}
@@ -5007,17 +5022,18 @@ async function createSubsite(){
   sbUpsertSite(entry).catch(()=>{});
   renderDevDashboard();
 
-  // ★ 若已設定 GitHub → 自動發布
+  // ★ 若已設定 GitHub → 自動發布（賓客版 + 管理版）
   if(d.github_owner&&d.github_repo&&d.github_pat){
     try{
-      showAutoSaveToast('⏳ 正在發布到 GitHub Pages...');
-      const publicUrl=await publishSubsiteToGitHub(entry);
-      entry.public_url=publicUrl;
+      showAutoSaveToast('⏳ 正在發布賓客版與管理版到 GitHub Pages...');
+      const r=await publishSubsiteToGitHub(entry);
+      entry.public_url=r.public_url;
+      entry.admin_url=r.admin_url;
       entry.published_at=new Date().toISOString();
       saveDevData(d);
       renderDevDashboard();
       showAutoSaveToast('✓ 已建立並發布！');
-      // ★ 自動彈出分享對話框（含 QR Code + 公開網址）
+      // ★ 自動彈出分享對話框（含 QR Code + 兩個網址）
       setTimeout(()=>showShareDialog(entry.id),600);
     }catch(e){
       showAutoSaveToast('⚠ 已建立，但發布失敗：'+e.message);
@@ -5029,10 +5045,11 @@ async function createSubsite(){
 async function deleteSubsite(id){
   const d=getDevData();
   const s=(d.subsites||[]).find(x=>x.id===id);
-  // 從 GitHub 刪除（若有發布）
-  if(s&&s.public_url&&d.github_owner&&d.github_repo&&d.github_pat){
+  // 從 GitHub 刪除（若有發布）— 兩個版本都刪
+  if(s&&(s.public_url||s.admin_url)&&d.github_owner&&d.github_repo&&d.github_pat){
     const tid=s.tenant_id||s.id;
     await ghDeleteFile(d.github_owner,d.github_repo,'sites/'+tid+'.html',d.github_pat).catch(()=>{});
+    await ghDeleteFile(d.github_owner,d.github_repo,'sites/'+tid+'_admin.html',d.github_pat).catch(()=>{});
   }
   d.subsites=(d.subsites||[]).filter(x=>x.id!==id);
   saveDevData(d);
@@ -5050,8 +5067,27 @@ function regenPwd(id){
   renderDevDashboard();
 }
 
+/* ─── 物理淨化：移除後台相關 DOM ─── */
+function stripAdminFromHtml(html){
+  try{
+    const doc=new DOMParser().parseFromString(html,'text/html');
+    // 移除後台 section、後台入口按鈕、Dev Hub、後台密碼 modal、各種後台容器
+    doc.querySelectorAll('#s-admin, .admin-trigger, #devHub, #adminPwdModal, #devHubInner').forEach(el=>el.remove());
+    // 移除 footer 中其他與後台有關的入口
+    doc.querySelectorAll('button,a').forEach(b=>{
+      const t=(b.textContent||'').trim();
+      if(t==='後台編輯'||t.includes('管理後台')||t==='⚙ 設定') b.remove();
+    });
+    return '<!DOCTYPE html>\n'+doc.documentElement.outerHTML;
+  }catch(e){
+    console.warn('stripAdminFromHtml error:',e);
+    return html;
+  }
+}
+
 /* ─── 建構子網站 HTML（含 inject script） ─── */
-async function buildSubsiteHtml(s){
+async function buildSubsiteHtml(s,mode){
+  mode=mode||'admin';
   let html='';
   try{
     const r=await fetch(location.href,{cache:'no-cache'});
@@ -5060,17 +5096,21 @@ async function buildSubsiteHtml(s){
 
   const masterData=getSiteData();
   const dev=getDevData();
-  // 計算公開網址（若已配置 GitHub）
-  const publicUrl=(dev.github_owner&&dev.github_repo)
-    ? ghGetPublicUrl(dev.github_owner,dev.github_repo,'sites/'+(s.tenant_id||s.id)+'.html')
-    : '';
+  const tid=s.tenant_id||s.id;
+  // 計算兩個公開網址
+  const guestUrl=(dev.github_owner&&dev.github_repo)
+    ? ghGetPublicUrl(dev.github_owner,dev.github_repo,'sites/'+tid+'.html'):'';
+  const adminUrl=(dev.github_owner&&dev.github_repo)
+    ? ghGetPublicUrl(dev.github_owner,dev.github_repo,'sites/'+tid+'_admin.html'):'';
   const subData={
     admin_password: s.pwd,
-    tenant_id: s.tenant_id || s.id,
+    tenant_id: tid,
     supabase_url: masterData.supabase_url || '',
     supabase_anon_key: masterData.supabase_anon_key || '',
-    public_url: publicUrl,
-    site_name: s.name || ''
+    public_url: guestUrl,  // 賓客版網址（QR Code 用）
+    admin_url: adminUrl,   // 新人後台網址
+    site_name: s.name || '',
+    mode: mode             // 'guest' or 'admin'
   };
   const inject=`<script id="_subsite_inject">
 window.__WEDGO_SUBSITE__=${JSON.stringify(subData)};
@@ -5084,21 +5124,33 @@ var el=document.getElementById('_subsite_inject');if(el)el.remove();
 
   html=html.replace('<head>','<head>'+inject);
   html=html.replace('</style>','#devHub{display:none!important;}\n</style>');
+
+  // ★ Guest mode: 物理淨化，移除後台相關 DOM（賓客 view-source 也看不到）
+  if(mode==='guest'){
+    html=stripAdminFromHtml(html);
+  }
   return html;
 }
 
-/* ─── 發布到 GitHub Pages ─── */
+/* ─── 發布到 GitHub Pages（同時上傳賓客版 + 管理版） ─── */
 async function publishSubsiteToGitHub(s){
   const dev=getDevData();
   if(!dev.github_owner||!dev.github_repo||!dev.github_pat){
     throw new Error('未設定 GitHub（請先到「開發者設定」配置）');
   }
-  const html=await buildSubsiteHtml(s);
-  const path='sites/'+(s.tenant_id||s.id)+'.html';
-  await ghPutFile(dev.github_owner,dev.github_repo,path,html,
-    `publish subsite: ${s.name} (${s.tenant_id||s.id})`,dev.github_pat);
-  const publicUrl=ghGetPublicUrl(dev.github_owner,dev.github_repo,path);
-  return publicUrl;
+  const tid=s.tenant_id||s.id;
+  // 1. 上傳賓客版（純淨，無後台）
+  const guestHtml=await buildSubsiteHtml(s,'guest');
+  await ghPutFile(dev.github_owner,dev.github_repo,'sites/'+tid+'.html',guestHtml,
+    `publish guest: ${s.name}`,dev.github_pat);
+  // 2. 上傳管理版（含後台）
+  const adminHtml=await buildSubsiteHtml(s,'admin');
+  await ghPutFile(dev.github_owner,dev.github_repo,'sites/'+tid+'_admin.html',adminHtml,
+    `publish admin: ${s.name}`,dev.github_pat);
+  return {
+    public_url: ghGetPublicUrl(dev.github_owner,dev.github_repo,'sites/'+tid+'.html'),
+    admin_url:  ghGetPublicUrl(dev.github_owner,dev.github_repo,'sites/'+tid+'_admin.html')
+  };
 }
 
 /* ─── 下載子網站 HTML（本地） ─── */
@@ -5141,12 +5193,13 @@ async function publishSubsite(id){
   if(btn){btn.textContent='⏳ 發布中...';btn.disabled=true;}
 
   try{
-    const publicUrl=await publishSubsiteToGitHub(s);
-    s.public_url=publicUrl;
+    const r=await publishSubsiteToGitHub(s);
+    s.public_url=r.public_url;
+    s.admin_url=r.admin_url;
     s.published_at=new Date().toISOString();
     saveDevData(d);
     renderDevDashboard();
-    showAutoSaveToast('✓ 已發布到 GitHub Pages（約 1-2 分鐘後生效）');
+    showAutoSaveToast('✓ 已發布賓客版與管理版（約 1-2 分鐘後生效）');
   }catch(err){
     alert('發布失敗：'+err.message);
     if(btn){btn.textContent='🚀 發布';btn.disabled=false;}
@@ -5159,31 +5212,51 @@ function showShareDialog(id){
   const s=(d.subsites||[]).find(x=>x.id===id);
   if(!s||!s.public_url){alert('請先發布到 GitHub');return;}
 
-  // 建一個臨時 modal
+  const guestUrl=s.public_url;
+  const adminUrl=s.admin_url||'';
+
   const overlay=document.createElement('div');
-  overlay.style.cssText='position:fixed;inset:0;z-index:100000;background:rgba(0,0,0,0.85);display:flex;align-items:center;justify-content:center;padding:20px;';
+  overlay.style.cssText='position:fixed;inset:0;z-index:100000;background:rgba(0,0,0,0.85);display:flex;align-items:center;justify-content:center;padding:20px;overflow-y:auto;';
   overlay.onclick=(e)=>{if(e.target===overlay)overlay.remove();};
   overlay.innerHTML=`
-    <div style="background:var(--bg2);border:1px solid var(--gold);padding:24px 28px;max-width:420px;width:100%;text-align:center;">
-      <div style="font-family:'Cormorant Garamond',serif;font-size:1.4rem;color:var(--gold);letter-spacing:3px;margin-bottom:6px;">分享給賓客</div>
+    <div style="background:var(--bg2);border:1px solid var(--gold);padding:24px 28px;max-width:460px;width:100%;text-align:center;max-height:95vh;overflow-y:auto;">
+      <div style="font-family:'Cormorant Garamond',serif;font-size:1.4rem;color:var(--gold);letter-spacing:3px;margin-bottom:4px;">分享網址</div>
       <div style="font-size:0.65rem;color:var(--muted);letter-spacing:2px;margin-bottom:18px;">${s.name}</div>
-      <div id="ssQrBox" style="background:#fff;padding:14px;display:inline-block;margin-bottom:14px;"></div>
-      <div style="font-size:0.7rem;color:var(--cream);word-break:break-all;background:rgba(255,255,255,0.04);padding:10px;border:1px solid var(--border2);margin-bottom:14px;">${s.public_url}</div>
-      <div style="display:flex;gap:10px;justify-content:center;">
-        <button onclick="navigator.clipboard.writeText('${s.public_url}').then(()=>this.textContent='✓ 已複製')"
-          style="background:var(--gold);border:none;color:var(--bg);padding:9px 22px;font-size:0.72rem;letter-spacing:2px;cursor:pointer;font-family:'Noto Serif TC',serif;">📋 複製連結</button>
-        <button onclick="window.open('${s.public_url}','_blank')"
-          style="background:none;border:1px solid var(--gold);color:var(--gold);padding:9px 22px;font-size:0.72rem;letter-spacing:2px;cursor:pointer;font-family:'Noto Serif TC',serif;">🔗 開啟</button>
-        <button onclick="this.closest('div[style*=\\'fixed\\']').remove()"
-          style="background:none;border:1px solid var(--border);color:var(--muted);padding:9px 22px;font-size:0.72rem;letter-spacing:2px;cursor:pointer;font-family:'Noto Serif TC',serif;">關閉</button>
+
+      <!-- 賓客專屬網址 -->
+      <div style="border:2px solid var(--gold);background:rgba(196,164,74,0.06);padding:16px;margin-bottom:14px;">
+        <div style="font-size:0.62rem;letter-spacing:3px;color:var(--gold);margin-bottom:10px;">🎉 賓客專屬網址（純淨版・無後台）</div>
+        <div id="ssQrBox" style="background:#fff;padding:12px;display:inline-block;margin-bottom:10px;"></div>
+        <div style="font-size:0.66rem;color:var(--cream);word-break:break-all;background:rgba(0,0,0,0.25);padding:8px;border:1px solid var(--border2);margin-bottom:10px;">${guestUrl}</div>
+        <div style="display:flex;gap:8px;justify-content:center;flex-wrap:wrap;">
+          <button onclick="navigator.clipboard.writeText('${guestUrl}').then(()=>this.textContent='✓ 已複製')"
+            style="background:var(--gold);border:none;color:var(--bg);padding:8px 18px;font-size:0.7rem;letter-spacing:2px;cursor:pointer;font-family:'Noto Serif TC',serif;">📋 複製</button>
+          <button onclick="window.open('${guestUrl}','_blank')"
+            style="background:none;border:1px solid var(--gold);color:var(--gold);padding:8px 18px;font-size:0.7rem;letter-spacing:2px;cursor:pointer;font-family:'Noto Serif TC',serif;">🔗 開啟</button>
+        </div>
       </div>
+
+      <!-- 新人後台網址 -->
+      ${adminUrl?`<div style="border:1px solid var(--border2);background:rgba(255,255,255,0.02);padding:14px;margin-bottom:14px;">
+        <div style="font-size:0.6rem;letter-spacing:3px;color:var(--cream2);margin-bottom:8px;">🔐 新人後台網址（含管理功能）</div>
+        <div style="font-size:0.62rem;color:var(--muted);word-break:break-all;background:rgba(0,0,0,0.2);padding:8px;border:1px solid var(--border2);margin-bottom:10px;">${adminUrl}</div>
+        <div style="display:flex;gap:8px;justify-content:center;flex-wrap:wrap;">
+          <button onclick="navigator.clipboard.writeText('${adminUrl}').then(()=>this.textContent='✓ 已複製')"
+            style="background:none;border:1px solid var(--gold);color:var(--gold);padding:7px 16px;font-size:0.66rem;letter-spacing:2px;cursor:pointer;font-family:'Noto Serif TC',serif;">📋 複製後台網址</button>
+          <button onclick="window.open('${adminUrl}','_blank')"
+            style="background:none;border:1px solid var(--border2);color:var(--muted);padding:7px 16px;font-size:0.66rem;letter-spacing:2px;cursor:pointer;font-family:'Noto Serif TC',serif;">🔗 開啟</button>
+        </div>
+        <div style="font-size:0.58rem;color:var(--muted);margin-top:8px;letter-spacing:1px;">⚠ 此網址含完整管理功能，請勿給賓客</div>
+      </div>`:''}
+
+      <button onclick="this.closest('div[style*=\\'fixed\\']').remove()"
+        style="background:none;border:1px solid var(--border);color:var(--muted);padding:9px 28px;font-size:0.72rem;letter-spacing:2px;cursor:pointer;font-family:'Noto Serif TC',serif;">關閉</button>
     </div>`;
   document.body.appendChild(overlay);
-  // 生成 QR
   setTimeout(()=>{
     try{
       new QRCode(document.getElementById('ssQrBox'),{
-        text:s.public_url,width:180,height:180,
+        text:guestUrl,width:180,height:180,
         colorDark:'#000000',colorLight:'#ffffff',correctLevel:QRCode.CorrectLevel.H
       });
     }catch(e){}
@@ -5240,9 +5313,11 @@ function renderDevDashboard(){
             </div>
           </div>
           ${published?`
-          <div style="margin-top:10px;padding:8px 12px;background:rgba(196,164,74,0.06);border-left:2px solid var(--gold);">
-            <div style="font-size:0.55rem;color:var(--muted);letter-spacing:2px;margin-bottom:3px;">🌐 公開網址（分享給賓客）</div>
-            <a href="${s.public_url}" target="_blank" style="font-size:0.7rem;color:var(--gold);word-break:break-all;text-decoration:none;">${s.public_url}</a>
+          <div style="margin-top:10px;padding:10px 12px;background:rgba(196,164,74,0.06);border-left:2px solid var(--gold);">
+            <div style="font-size:0.55rem;color:var(--gold);letter-spacing:2px;margin-bottom:4px;">🎉 賓客專屬網址（純淨版）</div>
+            <a href="${s.public_url}" target="_blank" style="font-size:0.68rem;color:var(--gold);word-break:break-all;text-decoration:none;">${s.public_url}</a>
+            ${s.admin_url?`<div style="font-size:0.55rem;color:var(--cream2);letter-spacing:2px;margin-top:8px;margin-bottom:4px;">🔐 後台網址（管理用，請勿給賓客）</div>
+            <a href="${s.admin_url}" target="_blank" style="font-size:0.62rem;color:var(--muted);word-break:break-all;text-decoration:none;">${s.admin_url}</a>`:''}
           </div>`:''}
           <!-- 雲端統計（會被 fillSubsiteStats 填入）-->
           <div id="ss-stats-${tid}" style="display:flex;gap:14px;flex-wrap:wrap;margin-top:10px;font-size:0.68rem;color:var(--muted);letter-spacing:1px;">
