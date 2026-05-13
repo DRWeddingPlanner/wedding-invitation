@@ -2,9 +2,9 @@
 <html lang="zh-TW"><head><script id="_subsite_inject">
 window.__WEDGO_SUBSITE__={"admin_password":"WG-v3J5-DADc","tenant_id":"wg_mp4hwjh1_mvxoq7","supabase_url":"https://fnikmxbqjioyyynkrrvb.supabase.co","supabase_anon_key":"eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImZuaWtteGJxamlveXl5bmtycnZiIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzcwOTc2MTEsImV4cCI6MjA5MjY3MzYxMX0.y0Vyx1hqlkrkElfg5erOUupUqr5TEnDXPOb0iCSn78A","public_url":"https://drweddingplanner.github.io/wedding-invitation/sites/wg_mp4hwjh1_mvxoq7.html","site_name":"測試EE","mode":"guest"};
 try{
-var snapshot={};
-Object.keys(window.__WEDGO_SUBSITE__).forEach(function(k){ snapshot[k]=window.__WEDGO_SUBSITE__[k]; });
-localStorage.setItem('dr_wedding_content__'+window.__WEDGO_SUBSITE__.tenant_id,JSON.stringify(snapshot));
+  var snapshot={"hero_name1":"張先生","hero_name2":"吳小姐","parents_groom":"張爸爸","parents_bride":"吳爸爸","public_url":"https://drweddingplanner.github.io/wedding-invitation/sites/wg_mp4hwjh1_mvxoq7.html","site_name":"測試EE","mode":"admin","show_ceremony":"true"};
+  Object.keys(window.__WEDGO_SUBSITE__).forEach(function(k){ snapshot[k]=window.__WEDGO_SUBSITE__[k]; });
+  localStorage.setItem('dr_wedding_content__'+window.__WEDGO_SUBSITE__.tenant_id,JSON.stringify(snapshot));
 }catch(e){}
 var el=document.getElementById('_subsite_inject');if(el)el.remove();
 </script>
@@ -540,7 +540,7 @@ footer{text-align:center;padding:60px 24px;border-top:1px solid var(--border2);p
 <body>
 
 <!-- NAV -->
-<nav id="topNav">
+<nav id="topNav" class="scrolled">
   <div class="nav-logo" data-key="nav_logo">WedGo智慧宴客管家</div>
   <div class="nav-links">
     <button class="nav-a" onclick="smoothTo('#s-info')">婚禮資訊</button>
@@ -560,26 +560,26 @@ footer{text-align:center;padding:60px 24px;border-top:1px solid var(--border2);p
 
 <!-- HEADER -->
 <section id="s-header">
-  <div class="reveal">
+  <div class="reveal visible">
     <div class="header-tag" data-key="header_tag">Wedding Invitation</div>
     <div class="header-names">
-      <span data-key="hero_name1">Tom</span>
+      <span data-key="hero_name1">張先生</span>
       <span class="header-amp"> &amp; </span>
-      <span data-key="hero_name2">Rainy</span>
+      <span data-key="hero_name2">吳小姐</span>
     </div>
     <div class="parents-row">
       <div class="parents-block">
         <div class="parents-label" data-key="parents_groom_label">新郎父母</div>
-        <div class="parents-names" data-key="parents_groom">父親姓名 ・ 母親姓名</div>
+        <div class="parents-names" data-key="parents_groom">張爸爸</div>
       </div>
       <div class="parents-sep">✦</div>
       <div class="parents-block">
         <div class="parents-label" data-key="parents_bride_label">新娘父母</div>
-        <div class="parents-names" data-key="parents_bride">父親姓名 ・ 母親姓名</div>
+        <div class="parents-names" data-key="parents_bride">吳爸爸</div>
       </div>
     </div>
     <div class="scroll-hint" style="position:relative;bottom:auto;left:auto;transform:none;margin:28px auto 0;">scroll<div class="scroll-line"></div></div>
-    <div class="invite-letter reveal" style="max-width:520px;margin:24px auto 0;text-align:center;">
+    <div class="invite-letter reveal visible" style="max-width:520px;margin:24px auto 0;text-align:center;">
       <div class="h-divider" style="margin:24px auto;"><div class="h-line"></div><div class="h-star">✦</div><div class="h-line r"></div></div>
       <p class="invite-text" data-key="invite_text">親愛的朋友們：<br>婚禮的日子一天天接近了<br>在這個對我們來說格外重要的時刻<br>誠摯地邀請您——我們珍惜的朋友<br>一同來見證與分享這份喜悅：)<br><br>在人生的每一段旅程中<br>因為有你們的陪伴與出現<br>才更加完整而溫暖<br><br>也因此，我們特別珍惜<br>能在這一天與你相聚的時光<br><br>為了讓您在婚禮當天能擁有愉快的體驗<br>想邀請您協助填寫以下資訊<br>讓我們能用心為您做好安排<br><br>無論當天是否方便出席<br>都很希望能收到您的回覆<br>或是一句簡單的祝福<br>對我們而言都意義非凡<br><br>期待與您相見的那一天<br>好久不見，我們婚禮見 🤍</p>
     </div>
@@ -590,8 +590,8 @@ footer{text-align:center;padding:60px 24px;border-top:1px solid var(--border2);p
 <!-- INFO -->
 <section id="s-info">
   <div class="sec-center">
-    <span class="sec-tag reveal" data-key="info_tag">Wedding Details</span>
-    <div class="info-card reveal">
+    <span class="sec-tag reveal visible" data-key="info_tag">Wedding Details</span>
+    <div class="info-card reveal visible">
       <div class="info-item">
         <div class="i-label" data-key="info_date_label">日期</div>
         <div><div class="i-val" data-key="info_date">2024 年 11 月 2 日（週六）</div></div>
@@ -631,11 +631,11 @@ footer{text-align:center;padding:60px 24px;border-top:1px solid var(--border2);p
 <!-- TRANSPORT -->
 <section id="s-transport" style="background:var(--bg);padding:80px 24px;">
   <div class="sec-center">
-    <span class="sec-tag reveal">How To Get Here</span>
-    <h2 class="sec-title reveal delay-1">交通資訊</h2>
-    <span class="gold-line reveal delay-2"></span>
+    <span class="sec-tag reveal visible">How To Get Here</span>
+    <h2 class="sec-title reveal delay-1 visible">交通資訊</h2>
+    <span class="gold-line reveal delay-2 visible"></span>
 
-    <div id="transportCards" class="reveal delay-2" style="display:flex;flex-direction:column;gap:12px;margin-top:8px;">
+    <div id="transportCards" class="reveal delay-2 visible" style="display:flex;flex-direction:column;gap:12px;margin-top:8px;">
 
       <!-- By Car -->
       <div class="transport-card" id="tc-car">
@@ -693,10 +693,10 @@ footer{text-align:center;padding:60px 24px;border-top:1px solid var(--border2);p
 <!-- RSVP -->
 <section id="s-rsvp">
   <div class="sec-center">
-    <span class="sec-tag reveal" data-key="rsvp_tag">RSVP</span>
-    <h2 class="sec-title reveal" data-key="rsvp_title">出席回覆</h2>
-    <span class="gold-line reveal"></span>
-    <div class="card reveal">
+    <span class="sec-tag reveal visible" data-key="rsvp_tag">RSVP</span>
+    <h2 class="sec-title reveal visible" data-key="rsvp_title">出席回覆</h2>
+    <span class="gold-line reveal visible"></span>
+    <div class="card reveal visible">
       <div id="rsvpFormWrap">
         <div class="attend-toggle">
           <button class="a-btn active" onclick="setAttend('yes',this)" data-key="rsvp_yes_btn">一定出席！</button>
@@ -5528,4 +5528,11 @@ async function viewSubsiteData(tenant_id, name){
 }
 </script>
 
-</body></html>
+<div id="guestMissingBanner" style="position: fixed; top: 0px; left: 0px; right: 0px; z-index: 99998; background: rgba(120, 30, 30, 0.95); color: rgb(255, 255, 255); padding: 14px 20px; font-family: &quot;Noto Serif TC&quot;, serif; font-size: 0.7rem; letter-spacing: 2px; text-align: center; border-bottom: 1px solid rgba(255, 255, 255, 0.2); backdrop-filter: blur(8px);">
+    ⚠ <strong>賓客版尚未發布</strong> — 賓客打開公開網址會看到 404 錯誤
+    <button onclick="document.getElementById('guestMissingBanner').remove();publishGuestFromSubsite();" style="margin-left:18px;background:#fff;border:none;color:rgba(120,30,30,0.95);padding:6px 16px;font-size:0.7rem;font-family:'Noto Serif TC',serif;letter-spacing:2px;cursor:pointer;font-weight:bold;">
+      📤 立即發布
+    </button>
+    <button onclick="document.getElementById('guestMissingBanner').remove()" style="margin-left:8px;background:none;border:1px solid rgba(255,255,255,0.4);color:#fff;padding:6px 12px;font-size:0.7rem;font-family:'Noto Serif TC',serif;letter-spacing:2px;cursor:pointer;">
+      稍後
+    </button></div><div id="autoSaveToast" style="position: fixed; bottom: 24px; left: 50%; transform: translateX(-50%) translateY(0px); background: rgba(22, 18, 12, 0.92); border: 1px solid rgba(196, 164, 74, 0.4); color: var(--gold); font-family: &quot;Noto Serif TC&quot;, serif; font-size: 0.7rem; letter-spacing: 3px; padding: 9px 22px; z-index: 99999; opacity: 1; transition: opacity 0.3s, transform 0.3s; pointer-events: none;">✓ 婚禮資訊已自動儲存</div><div id="autoSyncBadge" style="position: fixed; top: 18px; right: 18px; z-index: 99999; padding: 8px 14px; background: rgba(0, 0, 0, 0.85); border-color: var(--gold); border-top-style: ; border-top-width: ; border-right-style: ; border-right-width: ; border-bottom-style: ; border-bottom-width: ; border-left-style: ; border-left-width: ; border-image-source: ; border-image-slice: ; border-image-width: ; border-image-outset: ; border-image-repeat: ; border-radius: 2px; font-family: &quot;Noto Serif TC&quot;, serif; font-size: 0.65rem; letter-spacing: 2px; color: var(--gold); transition: opacity 0.3s; backdrop-filter: blur(8px); max-width: 280px; text-align: center; opacity: 1;">⏳ 正在同步至 GitHub...</div></body></html>
