@@ -1391,6 +1391,10 @@ footer{text-align:center;padding:60px 24px;border-top:1px solid var(--border2);p
               style="width:100%;background:none;border:1px solid var(--gold);color:var(--gold);padding:11px;font-size:0.72rem;font-family:'Noto Serif TC',serif;letter-spacing:3px;cursor:pointer;transition:background 0.2s;margin-bottom:8px;">
               🔍 驗證子網站 ↔ 賓客版 資料連結
             </button>
+            <button onclick="runSelfTest()" id="selfTestBtn"
+              style="width:100%;background:none;border:1px dashed rgba(196,164,74,0.5);color:rgba(196,164,74,0.8);padding:9px;font-size:0.66rem;font-family:'Noto Serif TC',serif;letter-spacing:2px;cursor:pointer;transition:background 0.2s;margin-bottom:8px;">
+              🧪 端對端自我測試（系統健康檢查）
+            </button>
             <button onclick="publishGuestFromSubsite()" id="publishGuestBtn"
               style="width:100%;background:var(--gold);border:none;color:var(--bg);padding:16px;font-size:0.85rem;font-family:'Noto Serif TC',serif;letter-spacing:4px;cursor:pointer;transition:background 0.2s;margin-bottom:8px;"
               onmouseover="this.style.background='var(--gold2)'" onmouseout="this.style.background='var(--gold)'">
@@ -1585,8 +1589,19 @@ footer{text-align:center;padding:60px 24px;border-top:1px solid var(--border2);p
 </div>
 
 <script>
+/* ★ 子網站硬編碼設定（由 downloadSubsite 注入到 window.__WEDGO_SUBSITE__）
+   優先順序：window.__WEDGO_SUBSITE__ > localStorage > 預設值
+   這樣可避免 file:// origin 共享 localStorage 造成的跨子網站污染 */
+const _SUB=(typeof window!=='undefined'&&window.__WEDGO_SUBSITE__)?window.__WEDGO_SUBSITE__:null;
+
 /* ═══ CONFIG (saved content from localStorage) ═══ */
-const STORAGE_KEY='dr_wedding_content';
+/* ★ 每個 tenant 使用獨立的 localStorage key，徹底隔離不同子網站的婚禮資料
+   - 母網站：dr_wedding_content
+   - 子網站「測試 H」：dr_wedding_content__wg_test_h
+   - 子網站「測試 I」：dr_wedding_content__wg_test_i */
+const STORAGE_KEY = _SUB && _SUB.tenant_id
+  ? 'dr_wedding_content__' + _SUB.tenant_id
+  : 'dr_wedding_content';
 const SESSION_KEY='dr_wedding_admin_session';
 
 function getSiteData(){try{return JSON.parse(localStorage.getItem(STORAGE_KEY)||'{}')}catch(e){return{}}}
@@ -1613,11 +1628,6 @@ function showAutoSaveToast(msg='✓ 已自動儲存'){
   clearTimeout(_toastTimer);
   _toastTimer=setTimeout(()=>{t.style.opacity='0';t.style.transform='translateX(-50%) translateY(20px)';},2200);
 }
-
-/* ★ 子網站硬編碼設定（由 downloadSubsite 注入到 window.__WEDGO_SUBSITE__）
-   優先順序：window.__WEDGO_SUBSITE__ > localStorage > 預設值
-   這樣可避免 file:// origin 共享 localStorage 造成的跨子網站污染 */
-const _SUB=(typeof window!=='undefined'&&window.__WEDGO_SUBSITE__)?window.__WEDGO_SUBSITE__:null;
 
 let CFG={
   WEDDING_DATE: new Date('2024-11-02T12:00:00+08:00'),
@@ -1741,6 +1751,132 @@ function safeJsonForInlineScript(obj){
   return JSON.stringify(obj)
     .replace(/<\/script/gi, '<\\/script')
     .replace(/<!--/g, '<\\!--');
+}
+
+/* ★ 端對端自我測試（一鍵驗證所有流程） */
+async function runSelfTest(){
+  if(!_SUB){alert('此功能僅限子網站使用');return;}
+  const log=[];
+  const overlay=document.createElement('div');
+  overlay.style.cssText='position:fixed;inset:0;z-index:100001;background:rgba(0,0,0,0.92);display:flex;align-items:center;justify-content:center;padding:20px;overflow-y:auto;';
+  overlay.innerHTML=`
+    <div style="background:var(--bg2);border:1px solid var(--gold);padding:24px;max-width:680px;width:100%;max-height:90vh;overflow-y:auto;">
+      <div style="font-family:'Cormorant Garamond',serif;font-size:1.2rem;color:var(--gold);letter-spacing:3px;margin-bottom:14px;">🧪 端對端自我測試</div>
+      <div id="selfTestLog" style="font-family:monospace;font-size:0.7rem;line-height:1.8;color:var(--cream);background:rgba(0,0,0,0.4);padding:14px;border:1px solid var(--border2);min-height:300px;max-height:50vh;overflow-y:auto;"></div>
+      <div style="display:flex;justify-content:flex-end;margin-top:16px;">
+        <button onclick="this.closest('div[style*=\\'fixed\\']').remove()" id="selfTestCloseBtn"
+          style="background:none;border:1px solid var(--border);color:var(--muted);padding:9px 22px;font-size:0.7rem;letter-spacing:2px;cursor:pointer;font-family:'Noto Serif TC',serif;">執行中...</button>
+      </div>
+    </div>`;
+  document.body.appendChild(overlay);
+  const logEl=document.getElementById('selfTestLog');
+  function add(msg,type){
+    const color=type==='ok'?'#7CB342':type==='fail'?'#EF5350':type==='info'?'#90CAF9':'var(--cream)';
+    const icon=type==='ok'?'✓':type==='fail'?'✗':type==='info'?'→':'·';
+    logEl.innerHTML+=`<div style="color:${color};">${icon} ${msg}</div>`;
+    logEl.scrollTop=logEl.scrollHeight;
+  }
+  let pass=0,fail=0;
+  function check(cond,desc){
+    if(cond){add(desc,'ok');pass++;}
+    else{add(desc,'fail');fail++;}
+  }
+
+  add('開始測試...','info');
+  add('═══ 1. 基礎環境檢查 ═══','info');
+  check(!!_SUB, `_SUB 全域變數存在`);
+  check(!!_SUB.tenant_id, `tenant_id: ${_SUB.tenant_id}`);
+  check(!!_SUB.admin_password, `admin_password 已設定`);
+  check(!!_SUB.public_url, `public_url: ${_SUB.public_url}`);
+  check(!!_SUB.github_owner, `github_owner: ${_SUB.github_owner}`);
+  check(!!_SUB.github_repo, `github_repo: ${_SUB.github_repo}`);
+  check(!!_SUB.github_pat, `github_pat 已設定`);
+
+  add('═══ 2. localStorage 資料隔離檢查 ═══','info');
+  check(STORAGE_KEY==='dr_wedding_content__'+_SUB.tenant_id, `STORAGE_KEY 為 tenant 專屬: ${STORAGE_KEY}`);
+  const data=getSiteData();
+  check(typeof data==='object', `getSiteData() 回傳物件`);
+  // 找其他 tenant 的 localStorage（不應該影響）
+  const otherKeys=[];
+  for(let i=0;i<localStorage.length;i++){
+    const k=localStorage.key(i);
+    if(k&&k.startsWith('dr_wedding_content__')&&k!==STORAGE_KEY){
+      otherKeys.push(k);
+    }
+  }
+  add(`偵測到其他 tenant 的 localStorage：${otherKeys.length} 個 (不影響當前)`,'info');
+  if(otherKeys.length>0) otherKeys.forEach(k=>add(`  · ${k}`,'info'));
+
+  add('═══ 3. 子網站本地資料完整性 ═══','info');
+  const fields=['hero_name1','hero_name2','hero_date'];
+  fields.forEach(f=>{
+    const v=data[f];
+    add(`localStorage.${f} = ${v||'(空)'}`,v?'ok':'info');
+  });
+
+  add('═══ 4. GitHub 賓客版檢查 ═══','info');
+  const path='sites/'+_SUB.tenant_id+'.html';
+  const rawUrl=`https://raw.githubusercontent.com/${_SUB.github_owner}/${_SUB.github_repo}/main/${path}`;
+  try{
+    const r=await fetch(rawUrl+'?v='+Date.now(),{cache:'no-store'});
+    check(r.ok, `賓客版 HTTP ${r.status}: ${r.ok?'存在':'不存在'}`);
+    if(r.ok){
+      const html=await r.text();
+      add(`HTML 大小: ${html.length} bytes`,'info');
+      const sm=html.match(/var snapshot=({[\s\S]+?});[\s\n]*Object\.keys/);
+      check(!!sm, `snapshot 結構存在`);
+      if(sm){
+        const remote=JSON.parse(sm[1]);
+        fields.forEach(f=>{
+          const lv=(data[f]||'').toString();
+          const rv=(remote[f]||'').toString();
+          check(lv===rv, `${f}: 本地="${lv||'(空)'}" / GitHub="${rv||'(空)'}"`);
+        });
+        // 檢查 inject 用的 storage key
+        const skMatch=html.match(/localStorage\.setItem\('dr_wedding_content__'\+window\.__WEDGO_SUBSITE__\.tenant_id/);
+        check(!!skMatch, `inject script 使用 tenant-specific key (隔離正常)`);
+        // 物理淨化檢查
+        const hasAdmin=html.includes('id="s-admin"');
+        const hasDevHub=html.includes('id="devHub"');
+        check(!hasAdmin, `物理淨化: 已移除 #s-admin`);
+        check(!hasDevHub, `物理淨化: 已移除 #devHub`);
+      }
+    }
+  }catch(e){
+    add(`fetch 失敗: ${e.message}`,'fail');
+    fail++;
+  }
+
+  add('═══ 5. GitHub API 連線測試 ═══','info');
+  try{
+    const apiUrl=`https://api.github.com/repos/${_SUB.github_owner}/${_SUB.github_repo}/contents/${path}`;
+    const r=await fetch(apiUrl,{headers:{'Authorization':'token '+_SUB.github_pat}});
+    check(r.ok, `GitHub API: HTTP ${r.status}`);
+    if(r.ok){
+      const j=await r.json();
+      add(`檔案 SHA: ${j.sha.substring(0,12)}...`,'info');
+      add(`檔案大小: ${j.size} bytes`,'info');
+    }
+  }catch(e){
+    add(`GitHub API 失敗: ${e.message}`,'fail');
+    fail++;
+  }
+
+  add('═══ 6. CDN 公開網址測試 ═══','info');
+  try{
+    const r=await fetch(_SUB.public_url+'?selftest='+Date.now(),{cache:'no-store'});
+    check(r.ok, `公開網址: HTTP ${r.status}`);
+  }catch(e){
+    add(`公開網址失敗: ${e.message}`,'fail');
+    fail++;
+  }
+
+  add('═══ 測試結束 ═══','info');
+  add(`通過: ${pass} 項   失敗: ${fail} 項`,fail===0?'ok':'fail');
+  if(fail===0) add('🎉 所有測試通過！系統運作正常','ok');
+  else add('⚠ 部分測試失敗，請檢查上述紅色項目','fail');
+
+  document.getElementById('selfTestCloseBtn').textContent='關閉';
 }
 
 /* ★ 驗證子網站 ↔ 賓客版 資料連結（資深工程師診斷工具） */
@@ -1923,7 +2059,7 @@ window.__WEDGO_SUBSITE__=${safeJsonForInlineScript(guestSubData)};
 try{
   var snapshot=${safeJsonForInlineScript(snapshot)};
   Object.keys(window.__WEDGO_SUBSITE__).forEach(function(k){ snapshot[k]=window.__WEDGO_SUBSITE__[k]; });
-  localStorage.setItem('dr_wedding_content',JSON.stringify(snapshot));
+  localStorage.setItem('dr_wedding_content__'+window.__WEDGO_SUBSITE__.tenant_id,JSON.stringify(snapshot));
 }catch(e){}
 var el=document.getElementById('_subsite_inject');if(el)el.remove();
 <\/script>`;
@@ -4454,7 +4590,7 @@ window.__WEDGO_SUBSITE__=${safeJsonForInlineScript(guestSubData)};
 try{
   var snapshot=${safeJsonForInlineScript(snapshot)};
   Object.keys(window.__WEDGO_SUBSITE__).forEach(function(k){ snapshot[k]=window.__WEDGO_SUBSITE__[k]; });
-  localStorage.setItem('dr_wedding_content',JSON.stringify(snapshot));
+  localStorage.setItem('dr_wedding_content__'+window.__WEDGO_SUBSITE__.tenant_id,JSON.stringify(snapshot));
 }catch(e){}
 var el=document.getElementById('_subsite_inject');if(el)el.remove();
 <\/script>`;
@@ -5668,31 +5804,18 @@ async function buildSubsiteHtml(s,mode){
   //   避免同 https origin 共用 localStorage 造成跨子網站污染
   let injectBody;
   if(mode==='guest'){
-    // 賓客版：取建立時母網站當下內容作為 snapshot
-    const snapshot={};
-    Object.keys(masterData).forEach(k=>{
-      if(['admin_password','supabase_url','supabase_anon_key','tenant_id',
-          'github_owner','github_repo','github_pat'].indexOf(k)<0){
-        snapshot[k]=masterData[k];
-      }
-    });
-    injectBody=`var snapshot=${safeJsonForInlineScript(snapshot)};
+    // ★ 賓客版初始版：給乾淨樣板（不帶入母網站殘留資料）
+    //   後續新人發布時會用實際內容覆蓋
+    injectBody=`var snapshot={};
 Object.keys(window.__WEDGO_SUBSITE__).forEach(function(k){ snapshot[k]=window.__WEDGO_SUBSITE__[k]; });
-localStorage.setItem('dr_wedding_content',JSON.stringify(snapshot));`;
+localStorage.setItem('dr_wedding_content__'+window.__WEDGO_SUBSITE__.tenant_id,JSON.stringify(snapshot));`;
   }else{
-    // ★ 管理版：自動偵測 tenant 切換 → 清空前一個子網站的婚禮資料，避免 file:// 共用 localStorage 污染
-    injectBody=`var d=JSON.parse(localStorage.getItem('dr_wedding_content')||'{}');
-var activeKey='wedgo_active_tenant';
-var lastActive=localStorage.getItem(activeKey);
-var currentTenant=window.__WEDGO_SUBSITE__.tenant_id;
-if(lastActive!==currentTenant){
-  // 切換到不同子網站 → 清空前一個子網站的婚禮資料（強制乾淨樣板）
-  var WI=${safeJsonForInlineScript(WI_KEYS.concat(['show_ceremony','image_cover','site_logo']))};
-  WI.forEach(function(k){ delete d[k]; });
-  localStorage.setItem(activeKey,currentTenant);
-}
+    // ★ 管理版：用 tenant-specific key（與賓客版同步使用相同 key）
+    //   不同子網站使用不同 key，徹底隔離資料
+    injectBody=`var sk='dr_wedding_content__'+window.__WEDGO_SUBSITE__.tenant_id;
+var d=JSON.parse(localStorage.getItem(sk)||'{}');
 Object.keys(window.__WEDGO_SUBSITE__).forEach(function(k){ d[k]=window.__WEDGO_SUBSITE__[k]; });
-localStorage.setItem('dr_wedding_content',JSON.stringify(d));`;
+localStorage.setItem(sk,JSON.stringify(d));`;
   }
   const inject=`<script id="_subsite_inject">
 window.__WEDGO_SUBSITE__=${safeJsonForInlineScript(subData)};
