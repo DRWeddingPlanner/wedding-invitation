@@ -5477,11 +5477,90 @@ async function viewSubsiteData(tenant_id, name){
 }
 </script>
 
-<div id="guestMissingBanner" style="position: fixed; top: 0px; left: 0px; right: 0px; z-index: 99998; background: rgba(120, 30, 30, 0.95); color: rgb(255, 255, 255); padding: 14px 20px; font-family: &quot;Noto Serif TC&quot;, serif; font-size: 0.7rem; letter-spacing: 2px; text-align: center; border-bottom: 1px solid rgba(255, 255, 255, 0.2); backdrop-filter: blur(8px);">
-    ⚠ <strong>賓客版尚未發布</strong> — 賓客打開公開網址會看到 404 錯誤
-    <button onclick="document.getElementById('guestMissingBanner').remove();publishGuestFromSubsite();" style="margin-left:18px;background:#fff;border:none;color:rgba(120,30,30,0.95);padding:6px 16px;font-size:0.7rem;font-family:'Noto Serif TC',serif;letter-spacing:2px;cursor:pointer;font-weight:bold;">
-      📤 立即發布
-    </button>
-    <button onclick="document.getElementById('guestMissingBanner').remove()" style="margin-left:8px;background:none;border:1px solid rgba(255,255,255,0.4);color:#fff;padding:6px 12px;font-size:0.7rem;font-family:'Noto Serif TC',serif;letter-spacing:2px;cursor:pointer;">
-      稍後
-    </button></div><div id="autoSaveToast" style="position: fixed; bottom: 24px; left: 50%; transform: translateX(-50%) translateY(20px); background: rgba(22, 18, 12, 0.92); border: 1px solid rgba(196, 164, 74, 0.4); color: var(--gold); font-family: &quot;Noto Serif TC&quot;, serif; font-size: 0.7rem; letter-spacing: 3px; padding: 9px 22px; z-index: 99999; opacity: 0; transition: opacity 0.3s, transform 0.3s; pointer-events: none;">✓ 婚禮資訊已自動儲存</div><div id="autoSyncBadge" style="position: fixed; top: 18px; right: 18px; z-index: 99999; padding: 8px 14px; background: rgba(0, 0, 0, 0.85); border-color: var(--gold); border-top-style: ; border-top-width: ; border-right-style: ; border-right-width: ; border-bottom-style: ; border-bottom-width: ; border-left-style: ; border-left-width: ; border-image-source: ; border-image-slice: ; border-image-width: ; border-image-outset: ; border-image-repeat: ; border-radius: 2px; font-family: &quot;Noto Serif TC&quot;, serif; font-size: 0.65rem; letter-spacing: 2px; color: var(--gold); transition: opacity 0.3s; backdrop-filter: blur(8px); max-width: 280px; text-align: center; opacity: 1;">⏳ 正在同步至 GitHub...</div><input type="hidden" id="wi-wedding_date_iso" value="2026-09-19T12:00:00+08:00"></body></html>
+<div id="autoSaveToast" style="position: fixed; bottom: 24px; left: 50%; transform: translateX(-50%) translateY(20px); background: rgba(22, 18, 12, 0.92); border: 1px solid rgba(196, 164, 74, 0.4); color: var(--gold); font-family: &quot;Noto Serif TC&quot;, serif; font-size: 0.7rem; letter-spacing: 3px; padding: 9px 22px; z-index: 99999; opacity: 0; transition: opacity 0.3s, transform 0.3s; pointer-events: none;">✓ 婚禮資訊已自動儲存</div><div id="autoSyncBadge" style="position: fixed; top: 18px; right: 18px; z-index: 99999; padding: 8px 14px; background: rgba(0, 0, 0, 0.85); border-color: var(--gold); border-top-style: ; border-top-width: ; border-right-style: ; border-right-width: ; border-bottom-style: ; border-bottom-width: ; border-left-style: ; border-left-width: ; border-image-source: ; border-image-slice: ; border-image-width: ; border-image-outset: ; border-image-repeat: ; border-radius: 2px; font-family: &quot;Noto Serif TC&quot;, serif; font-size: 0.65rem; letter-spacing: 2px; color: var(--gold); transition: opacity 0.3s; backdrop-filter: blur(8px); max-width: 280px; text-align: center; opacity: 1;">⏳ 正在同步至 GitHub...</div><input type="hidden" id="wi-wedding_date_iso" value="2026-09-19T12:00:00+08:00"><div style="position: fixed; inset: 0px; z-index: 100000; background: rgba(0, 0, 0, 0.85); display: flex; align-items: center; justify-content: center; padding: 20px; overflow-y: auto;">
+    <div style="background:var(--bg2);border:1px solid var(--gold);padding:24px;max-width:640px;width:100%;max-height:90vh;overflow-y:auto;">
+      <div style="font-family:'Cormorant Garamond',serif;font-size:1.2rem;color:var(--gold);letter-spacing:3px;margin-bottom:14px;">🔍 資料連結驗證報告</div>
+      
+          <div style="margin-bottom:10px;font-size:0.75rem;color:rgba(196,164,74,0.9);">
+            ⚠ 發現資料不一致（可能需要重新發布）
+          </div>
+          <div style="overflow-x:auto;">
+            <table style="width:100%;border-collapse:collapse;font-family:'Noto Serif TC',serif;">
+              <thead>
+                <tr style="background:rgba(196,164,74,0.1);">
+                  <th style="padding:6px 8px;text-align:left;font-size:0.6rem;color:var(--gold);letter-spacing:1px;">欄位</th>
+                  <th style="padding:6px 8px;text-align:left;font-size:0.6rem;color:var(--gold);letter-spacing:1px;">子網站（本地）</th>
+                  <th style="padding:6px 8px;text-align:left;font-size:0.6rem;color:var(--gold);letter-spacing:1px;">賓客版（GitHub）</th>
+                  <th style="padding:6px 8px;text-align:center;font-size:0.6rem;color:var(--gold);letter-spacing:1px;">一致</th>
+                </tr>
+              </thead>
+              <tbody><tr>
+            <td style="padding:4px 8px;color:var(--muted);font-size:0.65rem;">新郎姓名</td>
+            <td style="padding:4px 8px;font-size:0.7rem;color:var(--red);">張先生</td>
+            <td style="padding:4px 8px;font-size:0.7rem;color:var(--red);">(空)</td>
+            <td style="padding:4px 8px;text-align:center;font-size:0.85rem;"><span style="color:var(--red);">✗</span></td>
+          </tr><tr>
+            <td style="padding:4px 8px;color:var(--muted);font-size:0.65rem;">新娘姓名</td>
+            <td style="padding:4px 8px;font-size:0.7rem;color:var(--red);">謝小姐</td>
+            <td style="padding:4px 8px;font-size:0.7rem;color:var(--red);">(空)</td>
+            <td style="padding:4px 8px;text-align:center;font-size:0.85rem;"><span style="color:var(--red);">✗</span></td>
+          </tr><tr>
+            <td style="padding:4px 8px;color:var(--muted);font-size:0.65rem;">婚禮日期</td>
+            <td style="padding:4px 8px;font-size:0.7rem;color:var(--red);">2026 . 09 . 19（週六）</td>
+            <td style="padding:4px 8px;font-size:0.7rem;color:var(--red);">(空)</td>
+            <td style="padding:4px 8px;text-align:center;font-size:0.85rem;"><span style="color:var(--red);">✗</span></td>
+          </tr><tr>
+            <td style="padding:4px 8px;color:var(--muted);font-size:0.65rem;">婚禮時間</td>
+            <td style="padding:4px 8px;font-size:0.7rem;color:var(--cream);">(空)</td>
+            <td style="padding:4px 8px;font-size:0.7rem;color:var(--cream);">(空)</td>
+            <td style="padding:4px 8px;text-align:center;font-size:0.85rem;"><span style="color:var(--green);">✓</span></td>
+          </tr><tr>
+            <td style="padding:4px 8px;color:var(--muted);font-size:0.65rem;">婚禮地點</td>
+            <td style="padding:4px 8px;font-size:0.7rem;color:var(--cream);">(空)</td>
+            <td style="padding:4px 8px;font-size:0.7rem;color:var(--cream);">(空)</td>
+            <td style="padding:4px 8px;text-align:center;font-size:0.85rem;"><span style="color:var(--green);">✓</span></td>
+          </tr><tr>
+            <td style="padding:4px 8px;color:var(--muted);font-size:0.65rem;">地點地址</td>
+            <td style="padding:4px 8px;font-size:0.7rem;color:var(--cream);">(空)</td>
+            <td style="padding:4px 8px;font-size:0.7rem;color:var(--cream);">(空)</td>
+            <td style="padding:4px 8px;text-align:center;font-size:0.85rem;"><span style="color:var(--green);">✓</span></td>
+          </tr><tr>
+            <td style="padding:4px 8px;color:var(--muted);font-size:0.65rem;">邀請文字</td>
+            <td style="padding:4px 8px;font-size:0.7rem;color:var(--cream);">(空)</td>
+            <td style="padding:4px 8px;font-size:0.7rem;color:var(--cream);">(空)</td>
+            <td style="padding:4px 8px;text-align:center;font-size:0.85rem;"><span style="color:var(--green);">✓</span></td>
+          </tr><tr>
+            <td style="padding:4px 8px;color:var(--muted);font-size:0.65rem;">新郎方標籤</td>
+            <td style="padding:4px 8px;font-size:0.7rem;color:var(--cream);">(空)</td>
+            <td style="padding:4px 8px;font-size:0.7rem;color:var(--cream);">(空)</td>
+            <td style="padding:4px 8px;text-align:center;font-size:0.85rem;"><span style="color:var(--green);">✓</span></td>
+          </tr><tr>
+            <td style="padding:4px 8px;color:var(--muted);font-size:0.65rem;">新郎方姓名</td>
+            <td style="padding:4px 8px;font-size:0.7rem;color:var(--cream);">(空)</td>
+            <td style="padding:4px 8px;font-size:0.7rem;color:var(--cream);">(空)</td>
+            <td style="padding:4px 8px;text-align:center;font-size:0.85rem;"><span style="color:var(--green);">✓</span></td>
+          </tr><tr>
+            <td style="padding:4px 8px;color:var(--muted);font-size:0.65rem;">新娘方標籤</td>
+            <td style="padding:4px 8px;font-size:0.7rem;color:var(--cream);">(空)</td>
+            <td style="padding:4px 8px;font-size:0.7rem;color:var(--cream);">(空)</td>
+            <td style="padding:4px 8px;text-align:center;font-size:0.85rem;"><span style="color:var(--green);">✓</span></td>
+          </tr><tr>
+            <td style="padding:4px 8px;color:var(--muted);font-size:0.65rem;">新娘方姓名</td>
+            <td style="padding:4px 8px;font-size:0.7rem;color:var(--cream);">(空)</td>
+            <td style="padding:4px 8px;font-size:0.7rem;color:var(--cream);">(空)</td>
+            <td style="padding:4px 8px;text-align:center;font-size:0.85rem;"><span style="color:var(--green);">✓</span></td>
+          </tr></tbody>
+            </table>
+          </div>
+          <div style="font-size:0.58rem;color:var(--muted);margin-top:10px;letter-spacing:1px;">
+            ★ 來源：raw.githubusercontent.com（無快取）<br>
+            ★ tenant_id: wg_mp4etuek_4cpb6h
+          </div>
+        
+      <div style="font-size:0.65rem;color:rgba(196,164,74,0.85);background:rgba(196,164,74,0.06);border:1px dashed rgba(196,164,74,0.3);padding:10px 12px;margin-top:14px;letter-spacing:1px;line-height:1.7;">
+        💡 如需同步資料，請關閉此視窗後手動點擊上方的「📤 發布／更新賓客版」按鈕
+      </div>
+      <div style="display:flex;justify-content:flex-end;margin-top:16px;">
+        <button onclick="this.closest('div[style*=\'fixed\']').remove()" style="background:none;border:1px solid var(--border);color:var(--muted);padding:9px 22px;font-size:0.7rem;letter-spacing:2px;cursor:pointer;font-family:'Noto Serif TC',serif;">關閉</button>
+      </div>
+    </div></div></body></html>
