@@ -1383,8 +1383,13 @@ footer{text-align:center;padding:60px 24px;border-top:1px solid var(--border2);p
               </div>
             </div>
 
+            <button onclick="publishGuestFromSubsite()" id="publishGuestBtn"
+              style="width:100%;background:var(--gold);border:none;color:var(--bg);padding:16px;font-size:0.85rem;font-family:'Noto Serif TC',serif;letter-spacing:4px;cursor:pointer;transition:background 0.2s;margin-bottom:8px;"
+              onmouseover="this.style.background='var(--gold2)'" onmouseout="this.style.background='var(--gold)'">
+              📤 發布賓客版到網路（生成公開網址 + QR Code）
+            </button>
             <button onclick="exportSite()"
-              style="width:100%;background:none;border:1px solid var(--gold);color:var(--gold);padding:14px;font-size:0.78rem;font-family:'Noto Serif TC',serif;letter-spacing:3px;cursor:pointer;transition:background 0.2s;">
+              style="width:100%;background:none;border:1px solid var(--border2);color:var(--muted);padding:11px;font-size:0.72rem;font-family:'Noto Serif TC',serif;letter-spacing:3px;cursor:pointer;transition:background 0.2s;">
               📥 下載本機 HTML（備用）
             </button>
             <p style="font-size:0.62rem;color:var(--muted);text-align:center;margin-top:10px;letter-spacing:1px;" id="exportStatus"></p>
@@ -1392,7 +1397,7 @@ footer{text-align:center;padding:60px 24px;border-top:1px solid var(--border2);p
 
           <div style="border:1px solid var(--border2);background:var(--bg4);padding:16px 18px;font-size:0.72rem;color:var(--muted);line-height:2;letter-spacing:1px;">
             💡 <strong style="color:var(--cream2);">兩種分享方式：</strong><br>
-            <strong style="color:var(--gold);">A. 公開網址（推薦）</strong>：直接複製上方網址，賓客用手機開瀏覽器即可<br>
+            <strong style="color:var(--gold);">A. 公開網址（推薦）</strong>：點上方「發布賓客版」→ 賓客用手機直接打開網址<br>
             <strong style="color:var(--cream2);">B. HTML 檔案</strong>：下載後用 Email 傳給賓客，賓客下載後用瀏覽器開啟
           </div>
           <div id="exportGasNote" style="margin-top:10px;padding:10px 14px;border:1px solid rgba(196,164,74,0.25);background:rgba(196,164,74,0.04);font-size:0.7rem;color:var(--gold);letter-spacing:1px;line-height:1.8;"></div>
@@ -1670,6 +1675,86 @@ if(_SUB&&_SUB.public_url){
     if(btn) btn.style.display='inline-block';
   },100);
 }
+/* ★ 子網站內：發布賓客版到 GitHub Pages
+   流程：取當前 HTML → 重 inject 最新 localStorage 內容 → 物理淨化 → 上傳到 sites/<tenant_id>.html */
+async function publishGuestFromSubsite(){
+  if(!_SUB){alert('此功能僅限子網站使用');return;}
+  if(!_SUB.github_owner||!_SUB.github_repo||!_SUB.github_pat){
+    alert('管理員 HTML 未配置 GitHub 設定，請聯絡顧問重新下載');
+    return;
+  }
+  const btn=document.getElementById('publishGuestBtn');
+  if(btn){btn.disabled=true;btn.textContent='⏳ 發布中...';}
+  const status=document.getElementById('exportStatus');
+  if(status){status.style.color='var(--muted)';status.textContent='正在準備賓客版...';}
+
+  try{
+    // 1. 取當前 HTML（含 inject script 跟所有 DOM）
+    let html=document.documentElement.outerHTML;
+    if(!/^\s*<!DOCTYPE/i.test(html)) html='<!DOCTYPE html>\n'+html;
+
+    // 2. 移除原本的 inject script（會被新版覆蓋）
+    html=html.replace(/<script id="_subsite_inject">[\s\S]*?<\/script>/,'');
+
+    // 3. 取當前 localStorage 內容（含新人最新填寫的資料）
+    const currentContent=getSiteData();
+    // 建立給賓客版的 subData（不含 PAT！）
+    const guestSubData={
+      admin_password: _SUB.admin_password,
+      tenant_id: _SUB.tenant_id,
+      supabase_url: _SUB.supabase_url,
+      supabase_anon_key: _SUB.supabase_anon_key,
+      public_url: _SUB.public_url,
+      site_name: _SUB.site_name,
+      mode: 'guest'  // 標記為賓客模式
+      // ★ 故意不放 github_pat / github_owner / github_repo
+    };
+    // 內容快照
+    const snapshot={};
+    Object.keys(currentContent).forEach(k=>{
+      if(['admin_password','supabase_url','supabase_anon_key','tenant_id',
+          'github_owner','github_repo','github_pat'].indexOf(k)<0){
+        snapshot[k]=currentContent[k];
+      }
+    });
+
+    // 4. 注入新 inject script
+    const newInject=`<script id="_subsite_inject">
+window.__WEDGO_SUBSITE__=${JSON.stringify(guestSubData)};
+try{
+  var snapshot=${JSON.stringify(snapshot)};
+  Object.keys(window.__WEDGO_SUBSITE__).forEach(function(k){ snapshot[k]=window.__WEDGO_SUBSITE__[k]; });
+  localStorage.setItem('dr_wedding_content',JSON.stringify(snapshot));
+}catch(e){}
+var el=document.getElementById('_subsite_inject');if(el)el.remove();
+<\/script>`;
+    html=html.replace('<head>','<head>'+newInject);
+
+    // 5. 物理淨化（移除後台 DOM）
+    html=stripAdminFromHtml(html);
+
+    // 6. 上傳到 GitHub
+    if(status) status.textContent='正在上傳到 GitHub...';
+    const path='sites/'+_SUB.tenant_id+'.html';
+    await ghPutFile(_SUB.github_owner,_SUB.github_repo,path,html,
+      `publish guest: ${_SUB.site_name||_SUB.tenant_id}`,_SUB.github_pat);
+
+    // 7. 成功，顯示公開網址 + QR
+    if(status){status.style.color='var(--green)';status.textContent='✓ 已發布！1-2 分鐘後生效';}
+    if(btn){btn.disabled=false;btn.textContent='♻ 重新發布賓客版（覆蓋舊版）';}
+
+    // 渲染 + 自動彈出 QR
+    renderExportPublicUrl();
+    setTimeout(()=>showSubsiteShare(),400);
+
+  }catch(err){
+    console.error('publish guest error:',err);
+    if(status){status.style.color='var(--red)';status.textContent='✗ 發布失敗：'+err.message;}
+    if(btn){btn.disabled=false;btn.textContent='📤 發布賓客版到網路';}
+    alert('發布失敗：'+err.message);
+  }
+}
+
 /* ★ 匯出 tab 中顯示公開網址 + QR Code */
 function renderExportPublicUrl(){
   const box=document.getElementById('exportPublicUrlBox');
@@ -4627,10 +4712,7 @@ function switchAdminTab(name, btn){
   if(name==='export'){
     // ★ 公開網址 + QR Code（僅子網站有 _SUB.public_url 時顯示）
     renderExportPublicUrl();
-    // ★ 若為子網站且有公開網址 → 自動彈出 QR 對話框
-    if(_SUB&&_SUB.public_url){
-      setTimeout(()=>showSubsiteShare(),250);
-    }
+    // 不再自動彈窗 — 新人點「📤 發布賓客版」按鈕後才彈
     const gasNote=document.getElementById('exportGasNote');
     if(gasNote){
       const data=getSiteData();
@@ -5003,41 +5085,35 @@ async function createSubsite(){
   if(!name){document.getElementById('devNewName').focus();return;}
   const url=document.getElementById('devNewUrl').value.trim();
   const pwd=genSubsitePwd();
-  // ★ 產生唯一 tenant_id（可用於 Supabase 資料隔離）
+  // ★ 產生唯一 tenant_id
   const tenant_id='wg_'+Date.now().toString(36)+'_'+Math.random().toString(36).slice(2,8);
   const d=getDevData();
   if(!d.subsites)d.subsites=[];
+  // 預先算好賓客版未來的網址
+  const guestUrl=(d.github_owner&&d.github_repo)
+    ? ghGetPublicUrl(d.github_owner,d.github_repo,'sites/'+tenant_id+'.html'):'';
   const entry={
     id:tenant_id,
     tenant_id,
     name,url,pwd,
     created:new Date().toLocaleDateString('zh-TW'),
-    downloaded:false
+    downloaded:false,
+    public_url:guestUrl  // 預先註記，等新人發布後生效
   };
   d.subsites.unshift(entry);
   saveDevData(d);
   document.getElementById('devNewName').value='';
   document.getElementById('devNewUrl').value='';
-  // ★ 雲端同步（讓 DevHub 可跨裝置看到）
+  // 雲端同步
   sbUpsertSite(entry).catch(()=>{});
   renderDevDashboard();
 
-  // ★ 若已設定 GitHub → 自動發布（賓客版 + 管理版）
-  if(d.github_owner&&d.github_repo&&d.github_pat){
-    try{
-      showAutoSaveToast('⏳ 正在發布賓客版與管理版到 GitHub Pages...');
-      const r=await publishSubsiteToGitHub(entry);
-      entry.public_url=r.public_url;
-      entry.admin_url=r.admin_url;
-      entry.published_at=new Date().toISOString();
-      saveDevData(d);
-      renderDevDashboard();
-      showAutoSaveToast('✓ 已建立並發布！');
-      // ★ 自動彈出分享對話框（含 QR Code + 兩個網址）
-      setTimeout(()=>showShareDialog(entry.id),600);
-    }catch(e){
-      showAutoSaveToast('⚠ 已建立，但發布失敗：'+e.message);
-    }
+  // ★ 自動下載管理員 HTML 給新人（不上傳 GitHub）
+  if(d.github_owner&&d.github_pat){
+    showAutoSaveToast('📦 正在準備管理員 HTML...');
+    setTimeout(()=>downloadSubsite(tenant_id),300);
+  }else{
+    showAutoSaveToast('⚠ 未設定 GitHub，建立完成但新人無法發布賓客版');
   }
 }
 
@@ -5045,10 +5121,11 @@ async function createSubsite(){
 async function deleteSubsite(id){
   const d=getDevData();
   const s=(d.subsites||[]).find(x=>x.id===id);
-  // 從 GitHub 刪除（若有發布）— 兩個版本都刪
-  if(s&&(s.public_url||s.admin_url)&&d.github_owner&&d.github_repo&&d.github_pat){
+  // 從 GitHub 刪除賓客版（若新人有發布過）
+  if(s&&d.github_owner&&d.github_repo&&d.github_pat){
     const tid=s.tenant_id||s.id;
     await ghDeleteFile(d.github_owner,d.github_repo,'sites/'+tid+'.html',d.github_pat).catch(()=>{});
+    // 順便嘗試刪舊版 _admin（若有）
     await ghDeleteFile(d.github_owner,d.github_repo,'sites/'+tid+'_admin.html',d.github_pat).catch(()=>{});
   }
   d.subsites=(d.subsites||[]).filter(x=>x.id!==id);
@@ -5085,7 +5162,9 @@ function stripAdminFromHtml(html){
   }
 }
 
-/* ─── 建構子網站 HTML（含 inject script） ─── */
+/* ─── 建構子網站 HTML（含 inject script）
+   - mode='admin'：新人用，含後台 + GitHub PAT（用於發布賓客版）
+   - mode='guest'：賓客用，物理淨化，不含 PAT */
 async function buildSubsiteHtml(s,mode){
   mode=mode||'admin';
   let html='';
@@ -5097,21 +5176,25 @@ async function buildSubsiteHtml(s,mode){
   const masterData=getSiteData();
   const dev=getDevData();
   const tid=s.tenant_id||s.id;
-  // 計算兩個公開網址
+  // 預先計算未來賓客版的公開網址（新人發布時會用同一網址）
   const guestUrl=(dev.github_owner&&dev.github_repo)
     ? ghGetPublicUrl(dev.github_owner,dev.github_repo,'sites/'+tid+'.html'):'';
-  const adminUrl=(dev.github_owner&&dev.github_repo)
-    ? ghGetPublicUrl(dev.github_owner,dev.github_repo,'sites/'+tid+'_admin.html'):'';
+  // 子網站專屬資料
   const subData={
     admin_password: s.pwd,
     tenant_id: tid,
     supabase_url: masterData.supabase_url || '',
     supabase_anon_key: masterData.supabase_anon_key || '',
-    public_url: guestUrl,  // 賓客版網址（QR Code 用）
-    admin_url: adminUrl,   // 新人後台網址
+    public_url: guestUrl,    // 賓客版未來的網址（即使還沒發布也已知）
     site_name: s.name || '',
-    mode: mode             // 'guest' or 'admin'
+    mode: mode
   };
+  // ★ admin 版才注入 GitHub 設定（供新人發布賓客版用）
+  if(mode==='admin'&&dev.github_owner&&dev.github_repo&&dev.github_pat){
+    subData.github_owner=dev.github_owner;
+    subData.github_repo=dev.github_repo;
+    subData.github_pat=dev.github_pat;
+  }
   const inject=`<script id="_subsite_inject">
 window.__WEDGO_SUBSITE__=${JSON.stringify(subData)};
 try{
@@ -5125,35 +5208,14 @@ var el=document.getElementById('_subsite_inject');if(el)el.remove();
   html=html.replace('<head>','<head>'+inject);
   html=html.replace('</style>','#devHub{display:none!important;}\n</style>');
 
-  // ★ Guest mode: 物理淨化，移除後台相關 DOM（賓客 view-source 也看不到）
+  // ★ Guest mode: 物理淨化（賓客 view-source 也看不到後台）
   if(mode==='guest'){
     html=stripAdminFromHtml(html);
   }
   return html;
 }
 
-/* ─── 發布到 GitHub Pages（同時上傳賓客版 + 管理版） ─── */
-async function publishSubsiteToGitHub(s){
-  const dev=getDevData();
-  if(!dev.github_owner||!dev.github_repo||!dev.github_pat){
-    throw new Error('未設定 GitHub（請先到「開發者設定」配置）');
-  }
-  const tid=s.tenant_id||s.id;
-  // 1. 上傳賓客版（純淨，無後台）
-  const guestHtml=await buildSubsiteHtml(s,'guest');
-  await ghPutFile(dev.github_owner,dev.github_repo,'sites/'+tid+'.html',guestHtml,
-    `publish guest: ${s.name}`,dev.github_pat);
-  // 2. 上傳管理版（含後台）
-  const adminHtml=await buildSubsiteHtml(s,'admin');
-  await ghPutFile(dev.github_owner,dev.github_repo,'sites/'+tid+'_admin.html',adminHtml,
-    `publish admin: ${s.name}`,dev.github_pat);
-  return {
-    public_url: ghGetPublicUrl(dev.github_owner,dev.github_repo,'sites/'+tid+'.html'),
-    admin_url:  ghGetPublicUrl(dev.github_owner,dev.github_repo,'sites/'+tid+'_admin.html')
-  };
-}
-
-/* ─── 下載子網站 HTML（本地） ─── */
+/* ─── 下載子網站管理員 HTML（給新人本地用） ─── */
 async function downloadSubsite(id){
   const d=getDevData();
   const s=(d.subsites||[]).find(x=>x.id===id);
@@ -5163,8 +5225,9 @@ async function downloadSubsite(id){
   if(btn){btn.textContent='處理中...';btn.disabled=true;}
 
   try{
-    const html=await buildSubsiteHtml(s);
-    const filename=`${s.name.replace(/[^a-zA-Z0-9\u4e00-\u9fff]/g,'_')}_婚禮網站.html`;
+    // ★ 下載 admin 版（含後台 + GitHub PAT，新人可在子網站發布賓客版）
+    const html=await buildSubsiteHtml(s,'admin');
+    const filename=`${s.name.replace(/[^a-zA-Z0-9\u4e00-\u9fff]/g,'_')}_管理員版.html`;
     const blob=new Blob([html],{type:'text/html;charset=utf-8'});
     const url=URL.createObjectURL(blob);
     const a=document.createElement('a');
@@ -5172,38 +5235,21 @@ async function downloadSubsite(id){
     document.body.appendChild(a);a.click();
     setTimeout(()=>{document.body.removeChild(a);URL.revokeObjectURL(url);},1000);
 
-    // Mark as downloaded
     s.downloaded=true;
     saveDevData(d);
     renderDevDashboard();
 
+    if(btn){btn.textContent='📥 重新下載';btn.disabled=false;}
   }catch(err){
     alert('下載失敗：'+err.message);
     if(btn){btn.textContent='📥 下載';btn.disabled=false;}
   }
 }
 
-/* ─── 發布到 GitHub（按鈕觸發） ─── */
+/* ─── （已停用）從母網站發布
+   新流程：新人在子網站「📦 匯出網站」tab 中自行發布賓客版 */
 async function publishSubsite(id){
-  const d=getDevData();
-  const s=(d.subsites||[]).find(x=>x.id===id);
-  if(!s)return;
-
-  const btn=document.getElementById(`pub-btn-${id}`);
-  if(btn){btn.textContent='⏳ 發布中...';btn.disabled=true;}
-
-  try{
-    const r=await publishSubsiteToGitHub(s);
-    s.public_url=r.public_url;
-    s.admin_url=r.admin_url;
-    s.published_at=new Date().toISOString();
-    saveDevData(d);
-    renderDevDashboard();
-    showAutoSaveToast('✓ 已發布賓客版與管理版（約 1-2 分鐘後生效）');
-  }catch(err){
-    alert('發布失敗：'+err.message);
-    if(btn){btn.textContent='🚀 發布';btn.disabled=false;}
-  }
+  alert('提示：請改用以下流程：\n\n1. 把管理員 HTML 給新人\n2. 新人填婚禮資料\n3. 新人在「📦 匯出網站」tab 點「📤 發布賓客版」');
 }
 
 /* ─── 顯示分享連結 + QR Code ─── */
@@ -5292,19 +5338,18 @@ function renderDevDashboard(){
   listEl.innerHTML=subsites.map(s=>{
     const tid=s.tenant_id||s.id;
     const hasGh=!!(d.github_owner&&d.github_repo&&d.github_pat);
-    const published=!!s.public_url;
     return `
     <div style="border:1px solid var(--border2);padding:16px 18px;margin-bottom:10px;background:rgba(255,255,255,0.01);">
       <div style="display:flex;align-items:flex-start;justify-content:space-between;gap:12px;flex-wrap:wrap;">
         <div style="flex:1;min-width:0;">
           <div style="display:flex;align-items:center;gap:8px;margin-bottom:6px;flex-wrap:wrap;">
             <span style="font-size:0.85rem;color:var(--cream);letter-spacing:1px;">${s.name}</span>
-            ${published?'<span style="font-size:0.58rem;letter-spacing:2px;color:var(--green);border:1px solid rgba(90,158,106,0.4);padding:2px 7px;">🌐 已發布</span>':(s.downloaded?'<span style="font-size:0.58rem;letter-spacing:2px;color:var(--muted);border:1px solid var(--border2);padding:2px 7px;">已下載（本機）</span>':'<span style="font-size:0.58rem;letter-spacing:2px;color:var(--muted);border:1px solid var(--border2);padding:2px 7px;">未發布</span>')}
+            ${s.downloaded?'<span style="font-size:0.58rem;letter-spacing:2px;color:var(--green);border:1px solid rgba(90,158,106,0.4);padding:2px 7px;">已下載給新人</span>':'<span style="font-size:0.58rem;letter-spacing:2px;color:var(--muted);border:1px solid var(--border2);padding:2px 7px;">未下載</span>'}
             <span style="font-size:0.55rem;color:var(--muted);font-family:'Cormorant Garamond',serif;letter-spacing:1px;">ID: ${tid}</span>
           </div>
           <div style="display:flex;gap:16px;flex-wrap:wrap;">
             <div>
-              <div style="font-size:0.55rem;letter-spacing:3px;color:var(--muted);text-transform:uppercase;margin-bottom:3px;">專屬登入密碼</div>
+              <div style="font-size:0.55rem;letter-spacing:3px;color:var(--muted);text-transform:uppercase;margin-bottom:3px;">新人專屬後台密碼</div>
               <div style="font-family:'Cormorant Garamond',serif;font-size:1rem;color:var(--gold);letter-spacing:3px;">${s.pwd}</div>
             </div>
             <div>
@@ -5312,35 +5357,24 @@ function renderDevDashboard(){
               <div style="font-size:0.75rem;color:var(--muted);">${s.created}</div>
             </div>
           </div>
-          ${published?`
+          ${s.public_url?`
           <div style="margin-top:10px;padding:10px 12px;background:rgba(196,164,74,0.06);border-left:2px solid var(--gold);">
-            <div style="font-size:0.55rem;color:var(--gold);letter-spacing:2px;margin-bottom:4px;">🎉 賓客專屬網址（純淨版）</div>
+            <div style="font-size:0.55rem;color:var(--gold);letter-spacing:2px;margin-bottom:4px;">🎉 賓客版網址（新人發布後生效）</div>
             <a href="${s.public_url}" target="_blank" style="font-size:0.68rem;color:var(--gold);word-break:break-all;text-decoration:none;">${s.public_url}</a>
-            ${s.admin_url?`<div style="font-size:0.55rem;color:var(--cream2);letter-spacing:2px;margin-top:8px;margin-bottom:4px;">🔐 後台網址（管理用，請勿給賓客）</div>
-            <a href="${s.admin_url}" target="_blank" style="font-size:0.62rem;color:var(--muted);word-break:break-all;text-decoration:none;">${s.admin_url}</a>`:''}
           </div>`:''}
-          <!-- 雲端統計（會被 fillSubsiteStats 填入）-->
           <div id="ss-stats-${tid}" style="display:flex;gap:14px;flex-wrap:wrap;margin-top:10px;font-size:0.68rem;color:var(--muted);letter-spacing:1px;">
             ${CFG.SUPABASE_URL?'<span style="color:var(--muted);">☁ 載入雲端統計中…</span>':'<span style="color:var(--muted);">設定 Supabase 後可顯示即時統計</span>'}
           </div>
         </div>
         <div style="display:flex;flex-direction:column;gap:6px;flex-shrink:0;">
-          ${hasGh&&!published?`<button id="pub-btn-${s.id}" onclick="publishSubsite('${s.id}')"
-            style="background:var(--gold);border:none;color:var(--bg);padding:8px 16px;font-size:0.72rem;letter-spacing:2px;cursor:pointer;font-family:'Noto Serif TC',serif;white-space:nowrap;">
-            🚀 發布到網路
-          </button>`:''}
-          ${published?`<button onclick="showShareDialog('${s.id}')"
-            style="background:var(--gold);border:none;color:var(--bg);padding:8px 16px;font-size:0.72rem;letter-spacing:2px;cursor:pointer;font-family:'Noto Serif TC',serif;white-space:nowrap;">
-            📱 分享 / QR
-          </button>
-          <button id="pub-btn-${s.id}" onclick="publishSubsite('${s.id}')"
-            style="background:none;border:1px solid var(--gold);color:var(--gold);padding:6px 16px;font-size:0.68rem;letter-spacing:2px;cursor:pointer;font-family:'Noto Serif TC',serif;">
-            ♻ 重新發布
-          </button>`:''}
           <button id="dl-btn-${s.id}" onclick="downloadSubsite('${s.id}')"
-            style="background:none;border:1px solid var(--border2);color:var(--muted);padding:6px 16px;font-size:0.68rem;letter-spacing:2px;cursor:pointer;font-family:'Noto Serif TC',serif;white-space:nowrap;">
-            📥 下載 HTML
+            style="background:var(--gold);border:none;color:var(--bg);padding:9px 18px;font-size:0.72rem;letter-spacing:2px;cursor:pointer;font-family:'Noto Serif TC',serif;white-space:nowrap;">
+            📥 ${s.downloaded?'重新下載':'下載管理員 HTML'}
           </button>
+          ${s.public_url?`<button onclick="window.open('${s.public_url}','_blank')"
+            style="background:none;border:1px solid var(--gold);color:var(--gold);padding:6px 16px;font-size:0.68rem;letter-spacing:2px;cursor:pointer;font-family:'Noto Serif TC',serif;">
+            🔗 訪問賓客版
+          </button>`:''}
           <button onclick="viewSubsiteData('${tid}','${s.name.replace(/'/g,"\\'")}')"
             style="background:none;border:1px solid var(--gold);color:var(--gold);padding:6px 16px;font-size:0.68rem;letter-spacing:2px;cursor:pointer;font-family:'Noto Serif TC',serif;${CFG.SUPABASE_URL?'':'display:none;'}">
             👁 檢視資料
@@ -5349,7 +5383,7 @@ function renderDevDashboard(){
             style="background:none;border:1px solid var(--border2);color:var(--muted);padding:6px 16px;font-size:0.68rem;letter-spacing:2px;cursor:pointer;font-family:'Noto Serif TC',serif;">
             🔄 重產密碼
           </button>
-          <button onclick="if(confirm('確定刪除此子網站？\\n（含 GitHub 上的檔案）'))deleteSubsite('${s.id}')"
+          <button onclick="if(confirm('確定刪除此子網站？\\n（含 GitHub 上的賓客版）'))deleteSubsite('${s.id}')"
             style="background:none;border:1px solid rgba(158,90,90,0.3);color:rgba(158,90,90,0.6);padding:6px 16px;font-size:0.68rem;letter-spacing:2px;cursor:pointer;font-family:'Noto Serif TC',serif;">
             🗑 刪除
           </button>
